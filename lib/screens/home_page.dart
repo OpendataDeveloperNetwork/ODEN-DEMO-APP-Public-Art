@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../components/app_bar.dart';
 
 // ------------------------ //
 // ----- Landing Page ----- //
@@ -9,6 +10,6 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(appBar: null);
+    return Scaffold(appBar: appBar());
   }
 }

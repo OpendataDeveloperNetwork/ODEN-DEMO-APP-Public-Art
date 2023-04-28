@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import './screens/home_page.dart';
+import './theme/style.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,9 +13,10 @@ class MyApp extends StatelessWidget {
   // For simplicity, for now, just add your class on the home!
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       title: 'ODEN Demo',
-      home: HomePage(),
+      theme: appTheme(),
+      home: const HomePage(),
     );
   }
 }
