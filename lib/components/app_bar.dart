@@ -10,11 +10,11 @@ AppBar appBar() {
         ('assets/images/logo.png'),
       ),
     ),
-    leadingWidth: 110,
+    leadingWidth: 125,
     toolbarHeight: 60,
     actions: [
       Transform.scale(
-        scale: 1.50,
+        scale: 1.75,
         child: profileButton(),
       )
     ],
