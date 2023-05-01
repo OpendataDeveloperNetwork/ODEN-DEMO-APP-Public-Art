@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:oden_app/components/app_bar.dart';
 
 // ------------------------------------- //
 // ----- Maps Page - Main Feature ------ //
@@ -9,6 +10,9 @@ class MapsPage extends StatelessWidget {
   // Leave the appBar null, for now, I will be creating a appBar class for that! - Joushua //
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(appBar: null);
+    return Scaffold(
+      appBar: appBar(context),
+      body: const Text("Maps"),
+    );
   }
 }
