@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../components/app_bar.dart';
 import '../models/category.dart';
 import '../models/location.dart';
+import './map_page.dart';
 
 // ------------------------ //
 // ----- Landing Page ----- //
@@ -12,7 +13,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: appBar(), body: const HomePageBody());
+    return Scaffold(appBar: appBar(context), body: const HomePageBody());
   }
 }
 
@@ -28,6 +29,11 @@ class _HomePageBodyState extends State<HomePageBody> {
   late double height;
   final Category _category = Category("Public Art", "public-art");
   final Location _location = Location("Current Location", 0, 0);
+
+  void retrieveData() {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => const MapsPage()));
+  }
 
   Container _buildButton(value, String title) {
     return Container(
@@ -67,7 +73,7 @@ class _HomePageBodyState extends State<HomePageBody> {
         width: double.infinity,
         height: 65,
         child: ElevatedButton(
-            onPressed: () => {},
+            onPressed: retrieveData,
             style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10)),
