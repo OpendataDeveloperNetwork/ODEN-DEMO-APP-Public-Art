@@ -2,7 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:oden_app/screens/profile_page.dart';
 import '../theme/style.dart';
 
-AppBar appBar(BuildContext context) {
+/// ---------------------------------------------------- ///
+/// --- This stores file contains all app bar Widget --- ///
+/// ---------------------------------------------------- ///
+
+///
+/// A function that creates the app bar widget.
+///
+AppBar appBarWidget(BuildContext context) {
   return AppBar(
     backgroundColor: appBarTheme().backgroundColor,
     leading: Padding(
@@ -22,6 +29,10 @@ AppBar appBar(BuildContext context) {
   );
 }
 
+///
+/// A function that creates the profile button
+/// with an inner function for navigation when clicked.
+///
 IconButton profileButton(BuildContext context) {
   void navigateToProfile() {
     Navigator.push(

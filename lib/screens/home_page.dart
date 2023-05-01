@@ -8,12 +8,15 @@ import './map_page.dart';
 // ----- Landing Page ----- //
 // ------------------------ //
 
+///
+/// A class stateful that is responsible for displaying the home page.
+///
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: appBar(context), body: const HomePageBody());
+    return Scaffold(appBar: appBarWidget(context), body: const HomePageBody());
   }
 }
 
@@ -24,18 +27,26 @@ class HomePageBody extends StatefulWidget {
   State<HomePageBody> createState() => _HomePageBodyState();
 }
 
+///
+/// A private class that is updates and contains the current
+/// location and category chosen by the user.
+///
 class _HomePageBodyState extends State<HomePageBody> {
   late Size size;
   late double height;
   final Category _category = Category("Public Art", "public-art");
   final Location _location = Location("Current Location", 0, 0);
 
+  ///
+  /// A function pushes the map page to the stack, we will pass the
+  /// location and category chosen to the user here!
+  ///
   void retrieveData() {
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => const MapsPage()));
   }
 
-  Container _buildButton(value, String title) {
+  Container _buildButtonWidget(value, String title) {
     return Container(
         padding: const EdgeInsets.fromLTRB(50, 10, 50, 10),
         child: Column(
@@ -99,8 +110,8 @@ class _HomePageBodyState extends State<HomePageBody> {
         flex: 3,
         child: Column(
           children: [
-            _buildButton(_category, "Category"),
-            _buildButton(_location, "Location"),
+            _buildButtonWidget(_category, "Category"),
+            _buildButtonWidget(_location, "Location"),
             SizedBox(height: height * 0.10),
             _buildRetrieveButton()
           ],

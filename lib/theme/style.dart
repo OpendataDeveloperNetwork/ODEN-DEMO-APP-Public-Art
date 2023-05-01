@@ -1,5 +1,9 @@
 import "package:flutter/material.dart";
 
+// ----------------------------------------- //
+// ----- All styles are contained here ----- //
+// ----------------------------------------- //
+
 ThemeData appTheme() {
   return ThemeData(
       primaryColor: Colors.white,

@@ -11,7 +11,7 @@ class MapsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBar(context),
+      appBar: appBarWidget(context),
       body: const Text("Maps"),
     );
   }

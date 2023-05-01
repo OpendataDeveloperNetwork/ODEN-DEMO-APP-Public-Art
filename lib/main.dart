@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import './screens/home_page.dart';
 import './theme/style.dart';
 
+// ---------------------------- //
+// ----- The main driver ------ //
+// ---------------------------- //
+
 void main() {
   runApp(const MyApp());
 }
