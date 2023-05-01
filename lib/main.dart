@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
   // For simplicity, for now, just add your class on the home!
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       title: 'ODEN Demo',
       home: MapsPage(),
     );
