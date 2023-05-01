@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:oden_app/screens/profile_page.dart';
 import '../theme/style.dart';
 
-AppBar appBar() {
+AppBar appBar(BuildContext context) {
   return AppBar(
     backgroundColor: appBarTheme().backgroundColor,
     leading: Padding(
@@ -15,19 +16,24 @@ AppBar appBar() {
     actions: [
       Transform.scale(
         scale: 1.75,
-        child: profileButton(),
+        child: profileButton(context),
       )
     ],
   );
 }
 
-IconButton profileButton() {
+IconButton profileButton(BuildContext context) {
+  void navigateToProfile() {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => const ProfilePage()));
+  }
+
   return IconButton(
     splashColor: appBarTheme().actionsIconTheme?.color,
     icon: Icon(
       Icons.account_circle_rounded,
       color: appBarTheme().iconTheme?.color,
     ),
-    onPressed: () => {},
+    onPressed: navigateToProfile,
   );
 }
