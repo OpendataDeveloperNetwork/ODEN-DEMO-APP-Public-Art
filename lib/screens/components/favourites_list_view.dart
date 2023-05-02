@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 
@@ -15,6 +16,14 @@ class FavouritesListView extends StatefulWidget {
 class _FavouritesListViewState extends State<FavouritesListView> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return ListView.builder(
+        itemCount: 10,
+        itemBuilder: (BuildContext context, int index) {
+          return Card(
+            child: Row(children: const [
+              Expanded(child: ListTile(title: Text("Favourites")))
+            ]),
+          );
+        });
   }
 }

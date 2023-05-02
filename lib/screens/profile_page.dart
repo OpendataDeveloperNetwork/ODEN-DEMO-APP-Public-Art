@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:oden_app/components/back_button_app_bar.dart';
-import './components/public_art_list_view.dart';
+import 'components/favourites_list_view.dart';
 
 // ------------------------ //
 // ----- Profile Page ----- //
@@ -71,6 +71,7 @@ class _ProfileBodyState extends State<ProfileBody> {
               )),
         ),
         Align(alignment: Alignment.center, child: _buildToggleButtons()),
+        const SizedBox(height: 15),
         const Expanded(child: FavouritesListView())
       ],
     );
