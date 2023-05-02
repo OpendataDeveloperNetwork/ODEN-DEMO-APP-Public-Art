@@ -1,20 +1,48 @@
 import 'dart:async';
-import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:firebase_core/firebase_core.dart';
+
 
 // ------------------------------------- //
 // ----- Maps Page - Main Feature ------ //
 // ------------------------------------- //
 
 class Data{
+
   void fetchData(){
 
   }
+}
+
+class Art{ 
+
+  final double _lat;
+  final double _long;
+  final String _name;
+  final String _description;
+  final String _address;
+  
+  Art({
+    required lat,
+    required long,
+    name = "Public Art",
+    description = "This piece of art has no description",
+    address = "This piece of art has no address",
+  }) : _lat = lat,
+       _long = long,
+       _name = name,
+       _description = description,
+       _address = address;
+
+  double get lat => _lat;
+  double get long => _long;
+  String get name => _name;
+  String get description => _description;
+  String get address => _address;
+
 }
 
 class MapsPage extends StatefulWidget {
@@ -25,11 +53,31 @@ class MapsPage extends StatefulWidget {
 }
 
 class _MapsPageState extends State<MapsPage> {
-  Map<String, double> coordinates = {
-    "lat": 49.125049,
-    "long": -122.882897
-  };
 
+  final List<Art> publicArt = [];
+
+  final art1 = Art(
+    lat: 41.906255000000002, 
+    long: -87.699420000000003,
+    name: "Interpreting Nature"
+  );
+
+  final art2 = Art(
+    lat: 51.0486151,
+    long: -114.0748777,
+    name: "SWARM"
+  );
+
+  final art3 = Art(
+    lat: 49.125049, 
+    long: -122.882897
+  );
+
+  _MapsPageState() {
+    publicArt.add(art1);
+    publicArt.add(art2);
+    publicArt.add(art3);
+  }
 
   final Map<String, Marker> _markers = {};
 
@@ -37,18 +85,20 @@ class _MapsPageState extends State<MapsPage> {
   _onMapCreated(GoogleMapController controller) {
     _markers.clear();
     // Could add a for loop here to add multiple markers
-    final marker = Marker(
-      markerId: MarkerId("Public Art"),
-      position: LatLng(coordinates["lat"]!, coordinates["long"]!),
-      infoWindow: InfoWindow(
-        title: "Public Art",
-        snippet: "Mock Address",
-      ),
-  );
+    for (final art in publicArt) {
+      final marker = Marker(
+        markerId: MarkerId(art.name),
+        position: LatLng(art.lat, art.long),
+        infoWindow: InfoWindow(
+          title: art.name,
+          snippet: art.description,
+        ),
+      );
 
-  setState(() {
-  _markers.putIfAbsent("location", () => marker);
-  });
+      setState(() {
+        _markers[art.name] = marker;
+      });
+    }
 
 }
 
