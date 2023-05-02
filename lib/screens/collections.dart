@@ -26,8 +26,8 @@ class FilterPage extends StatefulWidget {
 class _FilterPageState extends State<FilterPage> {
   // Dummy data
   List<String> countries = ['Canada'];
-  List<String> regions = ['British Columbia'];
-  List<String> cities = ['Vancouver', 'New Westminster'];
+  List<String> regions = ['ALL', 'British Columbia'];
+  List<String> cities = ['ALL', 'Vancouver', 'New Westminster'];
 
   String? selectedCountry;
   String? selectedRegion;
@@ -63,13 +63,13 @@ class _FilterPageState extends State<FilterPage> {
   void filterData() {
     setState(() {
       filteredArtPieces = allArtPieces.where((artPiece) {
-        return (selectedCountry == null ||
-            artPiece['country'] == selectedCountry) &&
-            (selectedRegion == null || artPiece['region'] == selectedRegion) &&
-            (selectedCity == null || artPiece['city'] == selectedCity);
+        return (selectedCountry == null || artPiece['country'] == selectedCountry) &&
+            (selectedRegion == null || selectedRegion == 'ALL' || artPiece['region'] == selectedRegion) &&
+            (selectedCity == null || selectedCity == 'ALL' || artPiece['city'] == selectedCity);
       }).toList();
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -90,6 +90,9 @@ class _FilterPageState extends State<FilterPage> {
               buildDropdown('Region', regions, selectedRegion, (value) {
                 setState(() {
                   selectedRegion = value;
+                  if (selectedRegion == 'ALL') {
+                    selectedCity = 'ALL';
+                  }
                   filterData();
                 });
               }),
