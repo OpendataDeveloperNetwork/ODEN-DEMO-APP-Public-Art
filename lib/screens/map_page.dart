@@ -25,6 +25,33 @@ class MapsPage extends StatefulWidget {
 }
 
 class _MapsPageState extends State<MapsPage> {
+  Map<String, double> coordinates = {
+    "lat": 49.125049,
+    "long": -122.882897
+  };
+
+
+  final Map<String, Marker> _markers = {};
+
+  // Creates and adds markers to the _markers object
+  _onMapCreated(GoogleMapController controller) {
+    _markers.clear();
+    // Could add a for loop here to add multiple markers
+    final marker = Marker(
+      markerId: MarkerId("Public Art"),
+      position: LatLng(coordinates["lat"]!, coordinates["long"]!),
+      infoWindow: InfoWindow(
+        title: "Public Art",
+        snippet: "Mock Address",
+      ),
+  );
+
+  setState(() {
+  _markers.putIfAbsent("location", () => marker);
+  });
+
+}
+
   CameraPosition _kGooglePlex = const CameraPosition(target: LatLng(0, 0), zoom: 14.4746);
 
   @override
@@ -89,9 +116,8 @@ class _MapsPageState extends State<MapsPage> {
               child: _kGooglePlex.target.longitude == 0 ? const Center(child: CircularProgressIndicator()) : GoogleMap(
                 mapType: MapType.normal,
                 initialCameraPosition: _kGooglePlex,
-                onMapCreated: (GoogleMapController controller) {
-                  _controller.complete(controller);
-                },
+                onMapCreated: _onMapCreated,
+                markers:_markers.values.toSet(),
               ),
             )
           ],
