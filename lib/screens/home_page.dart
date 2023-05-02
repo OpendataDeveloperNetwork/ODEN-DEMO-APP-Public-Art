@@ -3,6 +3,7 @@ import '../components/app_bar.dart';
 import '../models/category.dart';
 import '../models/location.dart';
 import './map_page.dart';
+import './collections.dart';
 
 // ------------------------ //
 // ----- Landing Page ----- //
@@ -14,9 +15,30 @@ import './map_page.dart';
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
+  ///
+  /// A private function that builds the collection button widget
+  ///
+  FloatingActionButton _buildCollectionFloatingWidget(BuildContext context) {
+    ///
+    /// An inner function that navigates to the collections page.
+    ///
+    void navigateToCollections() {
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => const CollectionsPage()));
+    }
+
+    return FloatingActionButton(
+        onPressed: navigateToCollections,
+        backgroundColor: const Color(0xFF2D3848),
+        child: const Icon(Icons.folder_open));
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: appBarWidget(context), body: const HomePageBody());
+    return Scaffold(
+        appBar: appBarWidget(context),
+        body: const HomePageBody(),
+        floatingActionButton: _buildCollectionFloatingWidget(context));
   }
 }
 
