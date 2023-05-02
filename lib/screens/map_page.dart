@@ -29,8 +29,8 @@ class _MapsPageState extends State<MapsPage> {
     super.initState();
     _setCurrentLocation();
     _fetchMarkers();
-
   }
+
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
 
@@ -104,7 +104,8 @@ class _MapsPageState extends State<MapsPage> {
         //   Navigator.push(context, MaterialPageRoute(builder: (context) => const DetailsPage()))
         // },
         markerId: MarkerId(art["art_id"]),
-        position: LatLng(art["point"]["coordinates"][1], art["point"]["coordinates"][0]),
+        position: LatLng(
+            art["point"]["coordinates"][1], art["point"]["coordinates"][0]),
         infoWindow: InfoWindow(
           onTap: () => {
             Navigator.push(context,
@@ -124,25 +125,32 @@ class _MapsPageState extends State<MapsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        resizeToAvoidBottomInset: true,
-        appBar: null,
-        body: Column(
-          children: [
-            // Expanded(
-            //   child: null
-            // ),
-            Expanded(
-              child: _kGooglePlex.target.longitude == 0
-                  ? const Center(child: CircularProgressIndicator())
-                  : GoogleMap(
-                      mapType: MapType.normal,
-                      initialCameraPosition: _kGooglePlex,
-                      onMapCreated: _onMapCreated,
-                      markers: _markers.values.toSet(),
-                    ),
-            )
-          ],
-        ));
+        body: SafeArea(
+            child: Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: TextField(
+            decoration: InputDecoration(
+              hintText: 'Search',
+              prefixIcon: const Icon(Icons.search),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+            ),
+          ),
+        ),
+        Expanded(
+          child: _kGooglePlex.target.longitude == 0
+              ? const Center(child: CircularProgressIndicator())
+              : GoogleMap(
+                  mapType: MapType.normal,
+                  initialCameraPosition: _kGooglePlex,
+                  onMapCreated: _onMapCreated,
+                  markers: _markers.values.toSet(),
+                ),
+        )
+      ],
+    )));
   }
 }
-
