@@ -123,27 +123,43 @@ class _MapsPageState extends State<MapsPage> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-        resizeToAvoidBottomInset: true,
-        appBar: null,
-        body: Column(
-          children: [
-            // Expanded(
-            //   child: null
-            // ),
-            Expanded(
-              child: _kGooglePlex.target.longitude == 0
-                  ? const Center(child: CircularProgressIndicator())
-                  : GoogleMap(
-                      mapType: MapType.normal,
-                      initialCameraPosition: _kGooglePlex,
-                      onMapCreated: _onMapCreated,
-                      markers: _markers.values.toSet(),
+        body: SafeArea(
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    const BackButton(),
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        child: TextField(
+                          decoration: InputDecoration(
+                            hintText: 'Search',
+                            prefixIcon: const Icon(Icons.search),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-            )
-          ],
-        ));
+                  ],
+                ),
+                Expanded(
+                  child: _kGooglePlex.target.longitude == 0
+                      ? const Center(child: CircularProgressIndicator())
+                      : GoogleMap(
+                    mapType: MapType.normal,
+                    initialCameraPosition: _kGooglePlex,
+                    onMapCreated: _onMapCreated,
+                    markers: _markers.values.toSet(),
+                  ),
+                )
+              ],
+            )));
   }
 }
 
