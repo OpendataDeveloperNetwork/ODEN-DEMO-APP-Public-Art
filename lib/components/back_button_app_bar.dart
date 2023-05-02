@@ -13,20 +13,12 @@ import '../theme/style.dart';
 AppBar backButtonAppBarWidget(BuildContext context) {
   return AppBar(
     backgroundColor: appBarTheme().backgroundColor,
-    leading: Padding(
-      padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-      child: Image.asset(
-        ('assets/images/logo.png'),
-      ),
+    leading: backButton(context),
+    title: Image.asset(
+      ('assets/images/logo.png'),
+      scale: 1.9,
     ),
-    leadingWidth: 125,
-    toolbarHeight: 60,
-    actions: [
-      Transform.scale(
-        scale: 1.75,
-        child: profileButton(context),
-      )
-    ],
+    centerTitle: true,
   );
 }
 
@@ -34,13 +26,17 @@ AppBar backButtonAppBarWidget(BuildContext context) {
 /// A function that creates the profile button
 /// with an inner function for navigation when clicked.
 ///
-IconButton profileButton(BuildContext context) {
+IconButton backButton(BuildContext context) {
+  void navigate() {
+    Navigator.pop(context);
+  }
+
   return IconButton(
     splashColor: appBarTheme().actionsIconTheme?.color,
-    icon: Icon(
-      Icons.account_circle_rounded,
-      color: appBarTheme().iconTheme?.color,
+    icon: const Icon(
+      Icons.keyboard_backspace,
+      color: Color(0xFF666666),
     ),
-    onPressed: () => {},
+    onPressed: navigate,
   );
 }
