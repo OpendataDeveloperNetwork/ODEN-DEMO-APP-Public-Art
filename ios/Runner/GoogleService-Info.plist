@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>218422175053-rks4mk2qobqf68u8d4qaho7p6bn3pfl0.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.218422175053-rks4mk2qobqf68u8d4qaho7p6bn3pfl0</string>
+	<key>API_KEY</key>
+	<string>AIzaSyAtlpH2wwD67CwHuMqs2ni6TohtTOOxSls</string>
+	<key>GCM_SENDER_ID</key>
+	<string>218422175053</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.odenApp</string>
+	<key>PROJECT_ID</key>
+	<string>oden-542d3</string>
+	<key>STORAGE_BUCKET</key>
+	<string>oden-542d3.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:218422175053:ios:b058c60ff8d520d3bfc304</string>
+</dict>
+</plist>
