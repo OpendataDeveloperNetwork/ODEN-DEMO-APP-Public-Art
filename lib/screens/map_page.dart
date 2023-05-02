@@ -10,7 +10,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import './details.dart';
-import 'package:oden_app/components/app_bar.dart';
+import '../components/app_bar.dart';
 
 // ------------------------------------- //
 // ----- Maps Page - Main Feature ------ //
@@ -30,8 +30,8 @@ class _MapsPageState extends State<MapsPage> {
     super.initState();
     _setCurrentLocation();
     _fetchMarkers();
-
   }
+
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
 
@@ -105,7 +105,8 @@ class _MapsPageState extends State<MapsPage> {
         //   Navigator.push(context, MaterialPageRoute(builder: (context) => const DetailsPage()))
         // },
         markerId: MarkerId(art["art_id"]),
-        position: LatLng(art["point"]["coordinates"][1], art["point"]["coordinates"][0]),
+        position: LatLng(
+            art["point"]["coordinates"][1], art["point"]["coordinates"][0]),
         infoWindow: InfoWindow(
           onTap: () => {
             Navigator.push(context,
@@ -129,38 +130,38 @@ class _MapsPageState extends State<MapsPage> {
         appBar: appBarWidget(context),
         body: SafeArea(
             child: Column(
+          children: [
+            Row(
               children: [
-                Row(
-                  children: [
-                    const BackButton(),
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                        child: TextField(
-                          decoration: InputDecoration(
-                            hintText: 'Search',
-                            prefixIcon: const Icon(Icons.search),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                          ),
+                const BackButton(),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 10),
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Search',
+                        prefixIcon: const Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
                         ),
                       ),
                     ),
-                  ],
-                ),
-                Expanded(
-                  child: _kGooglePlex.target.longitude == 0
-                      ? const Center(child: CircularProgressIndicator())
-                      : GoogleMap(
-                    mapType: MapType.normal,
-                    initialCameraPosition: _kGooglePlex,
-                    onMapCreated: _onMapCreated,
-                    markers: _markers.values.toSet(),
                   ),
-                )
+                ),
               ],
-            )));
+            ),
+            Expanded(
+              child: _kGooglePlex.target.longitude == 0
+                  ? const Center(child: CircularProgressIndicator())
+                  : GoogleMap(
+                      mapType: MapType.normal,
+                      initialCameraPosition: _kGooglePlex,
+                      onMapCreated: _onMapCreated,
+                      markers: _markers.values.toSet(),
+                    ),
+            )
+          ],
+        )));
   }
 }
-
