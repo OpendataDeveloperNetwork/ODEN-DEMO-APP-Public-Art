@@ -7,30 +7,13 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import './details.dart';
 
 // ------------------------------------- //
 // ----- Maps Page - Main Feature ------ //
 // ------------------------------------- //
-
-class Data {
-  Data() {
-    fetchData();
-  }
-
-  Future<void> fetchData() async {
-    var fire_base = await Firebase.initializeApp();
-    var db = FirebaseFirestore.instance;
-    db.collection("PublicArts").get().then(
-          (querySnapshot) {
-        print("Successfully completed");
-        for (var docSnapshot in querySnapshot.docs) {
-          print('$docSnapshot');
-        }
-      },
-      onError: (e) => print("Error completing: $e"),
-    );
-  }
-}
 
 class MapsPage extends StatefulWidget {
   const MapsPage({Key? key}) : super(key: key);
@@ -40,57 +23,41 @@ class MapsPage extends StatefulWidget {
 }
 
 class _MapsPageState extends State<MapsPage> {
-  Data data = Data();
-
-  CameraPosition _kGooglePlex = const CameraPosition(
-      target: LatLng(0, 0), zoom: 14.4746);
-  Map<String, double> coordinates = {
-    "lat": 49.125049,
-    "long": -122.882897
-  };
-
-
-  final Map<String, Marker> _markers = {};
-
-  // Creates and adds markers to the _markers object
-  _onMapCreated(GoogleMapController controller) {
-    _markers.clear();
-    // Could add a for loop here to add multiple markers
-    final marker = Marker(
-      markerId: MarkerId("Public Art"),
-      position: LatLng(coordinates["lat"]!, coordinates["long"]!),
-      infoWindow: InfoWindow(
-        title: "Public Art",
-        snippet: "Mock Address",
-      ),
-  );
-
-  setState(() {
-  _markers.putIfAbsent("location", () => marker);
-  });
-
-}
-
-  CameraPosition _kGooglePlex = const CameraPosition(target: LatLng(0, 0), zoom: 14.4746);
-
   @override
   void initState() {
+    // TODO: implement initState
     super.initState();
     _setCurrentLocation();
-  }
+    _fetchMarkers();
 
-  Future<void> _setCurrentLocation() async {
-    try {
-      Position pos = await getCurrentLocation();
-      setState(() {
-        _kGooglePlex = CameraPosition(
-            target: LatLng(pos.latitude, pos.longitude), zoom: 14.4746);
-      });
-    } catch (e) {
-      debugPrint("Error");
+  }
+  final Completer<GoogleMapController> _controller =
+      Completer<GoogleMapController>();
+
+  final Map<String, Marker> _markers = {};
+  var publicArts = [];
+
+  // Creates and adds markers to the _markers object
+  Future<void> _fetchMarkers() async {
+    final snapshot =
+        await FirebaseFirestore.instance.collection('PublicArts').get();
+
+    for (final doc in snapshot.docs) {
+      final data = doc.data();
+      var url = Uri.parse(data['link']);
+      var response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        publicArts.addAll(jsonDecode(response.body));
+      } else {
+        // There was an error, handle it here
+        print("OOps something happened somewhere.");
+      }
     }
   }
 
+  CameraPosition _kGooglePlex =
+      const CameraPosition(target: LatLng(0, 0), zoom: 14.4746);
 
   Future<Position> getCurrentLocation() async {
     bool serviceEnabled;
@@ -116,11 +83,44 @@ class _MapsPageState extends State<MapsPage> {
     return await Geolocator.getCurrentPosition();
   }
 
-  final Completer<GoogleMapController> _controller = Completer<
-      GoogleMapController>();
+  Future<void> _setCurrentLocation() async {
+    try {
+      Position pos = await getCurrentLocation();
+      setState(() {
+        _kGooglePlex = CameraPosition(
+            target: LatLng(pos.latitude, pos.longitude), zoom: 14.4746);
+      });
+    } catch (e) {
+      debugPrint("Error");
+    }
+  }
 
+  // Creates and adds markers to the _markers object
+  _onMapCreated(GoogleMapController controller) {
+    _markers.clear();
+    for (final art in publicArts) {
+      final marker = Marker(
+        // onTap: () => {
+        //   Navigator.push(context, MaterialPageRoute(builder: (context) => const DetailsPage()))
+        // },
+        markerId: MarkerId(art["art_id"]),
+        position: LatLng(art["point"]["coordinates"][1], art["point"]["coordinates"][0]),
+        infoWindow: InfoWindow(
+          onTap: () => {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const DetailsPage()))
+          },
+          title: art["title"],
+          snippet: art["short_desc"],
+        ),
+      );
 
-// Leave the appBar null, for now, I will be creating a appBar class for that! - Joshua //
+      setState(() {
+        _markers[art["art_id"]] = marker;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -132,16 +132,16 @@ class _MapsPageState extends State<MapsPage> {
             //   child: null
             // ),
             Expanded(
-              child: _kGooglePlex.target.longitude == 0 ? const Center(
-                  child: CircularProgressIndicator()) : GoogleMap(
-                mapType: MapType.normal,
-                initialCameraPosition: _kGooglePlex,
-                onMapCreated: _onMapCreated,
-                markers:_markers.values.toSet(),
-              ),
+              child: _kGooglePlex.target.longitude == 0
+                  ? const Center(child: CircularProgressIndicator())
+                  : GoogleMap(
+                      mapType: MapType.normal,
+                      initialCameraPosition: _kGooglePlex,
+                      onMapCreated: _onMapCreated,
+                      markers: _markers.values.toSet(),
+                    ),
             )
           ],
         ));
   }
 }
-
