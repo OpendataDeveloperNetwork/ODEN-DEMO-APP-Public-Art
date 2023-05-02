@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:oden_app/components/back_button_app_bar.dart';
 import 'components/favourites_list_view.dart';
+import 'components/visits_list_view.dart';
 
 // ------------------------ //
 // ----- Profile Page ----- //
@@ -36,7 +37,7 @@ class _ProfileBodyState extends State<ProfileBody> {
           for (int buttonIndex = 0;
               buttonIndex < _selectedCategories.length;
               buttonIndex++)
-            {_selectedCategories[buttonIndex] = buttonIndex == index}
+            {_selectedCategories[buttonIndex] = buttonIndex == index},
         });
   }
 
@@ -72,7 +73,12 @@ class _ProfileBodyState extends State<ProfileBody> {
         ),
         Align(alignment: Alignment.center, child: _buildToggleButtons()),
         const SizedBox(height: 15),
-        const Expanded(child: FavouritesListView())
+        Visibility(
+            visible: _selectedCategories[0],
+            child: const Expanded(child: FavouritesListView())),
+        Visibility(
+            visible: _selectedCategories[1],
+            child: const Expanded(child: VisitsListView()))
       ],
     );
   }
