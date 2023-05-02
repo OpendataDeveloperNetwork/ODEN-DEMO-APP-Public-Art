@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:oden_app/components/app_bar.dart';
+import 'package:oden_app/components/profile_button_app_bar.dart';
 
 // ------------------------------------- //
 // ----- Maps Page - Main Feature ------ //
@@ -11,7 +11,7 @@ class MapsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBarWidget(context),
+      appBar: profileAppBarWidget(context),
       body: const Text("Maps"),
     );
   }
