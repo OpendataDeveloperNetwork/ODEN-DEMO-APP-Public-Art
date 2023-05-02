@@ -46,6 +46,9 @@ class _HomePageBodyState extends State<HomePageBody> {
         context, MaterialPageRoute(builder: (context) => const MapsPage()));
   }
 
+  ///
+  /// A private function that builds the button widgets.
+  ///
   Container _buildButtonWidget(value, String title) {
     return Container(
         padding: const EdgeInsets.fromLTRB(50, 10, 50, 10),
@@ -78,6 +81,9 @@ class _HomePageBodyState extends State<HomePageBody> {
         ));
   }
 
+  ///
+  /// A private function that builds the retrieve button widget.
+  ///
   Container _buildRetrieveButton() {
     return Container(
         padding: const EdgeInsets.fromLTRB(50, 10, 50, 10),
