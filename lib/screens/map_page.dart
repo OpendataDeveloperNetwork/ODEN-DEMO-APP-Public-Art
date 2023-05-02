@@ -3,6 +3,7 @@ import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:oden_app/components/profile_button_app_bar.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -10,7 +11,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import './details.dart';
-import '../components/app_bar.dart';
 
 // ------------------------------------- //
 // ----- Maps Page - Main Feature ------ //
@@ -127,7 +127,7 @@ class _MapsPageState extends State<MapsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: appBarWidget(context),
+        appBar: profileAppBarWidget(context),
         body: SafeArea(
             child: Column(
           children: [

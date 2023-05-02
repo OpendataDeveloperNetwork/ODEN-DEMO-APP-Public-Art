@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
-import '../components/app_bar.dart';
+import '../components/profile_button_app_bar.dart';
 
 ///
 /// This contains the collections page.
@@ -12,7 +12,7 @@ class CollectionsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBarWidget(context),
+      appBar: profileAppBarWidget(context),
       body: const Text("Collections"),
     );
   }
