@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
+//import 'package:flutter/src/widgets/placeholder.dart';
 import '../components/app_bar.dart';
 
 ///
@@ -24,31 +24,82 @@ class FilterPage extends StatefulWidget {
 }
 
 class _FilterPageState extends State<FilterPage> {
-  // Dummy data
-  List<String> countries = ['Canada'];
-  List<String> regions = ['ALL', 'British Columbia'];
-  List<String> cities = ['ALL', 'Vancouver', 'New Westminster'];
-
+  // this is the value of the dropdown menu
   String? selectedCountry;
   String? selectedRegion;
   String? selectedCity;
 
+  // Nested data structure
+  Map<String, Map<String, List<String>>> countryRegionCityData = {
+    'Canada': {
+      'British Columbia': ['Vancouver', 'New Westminster'],
+    },
+    'United States': {
+      'California': ['Los Angeles', 'San Francisco'],
+      'New York': ['New York City', 'Buffalo'],
+    },
+  };
+
+  List<String> countries = [];
+  List<String> regions = [];
+  List<String> cities = [];
+
+  void updateRegions() {
+    if (selectedCountry != null) {
+      regions = countryRegionCityData[selectedCountry]!.keys.toList();
+    } else {
+      regions = [];
+    }
+  }
+
+  void updateCities() {
+    if (selectedRegion != null) {
+      cities = countryRegionCityData[selectedCountry]![selectedRegion]!;
+    } else {
+      cities = [];
+    }
+  }
+
   // Generate dummy art pieces data
+// Generate dummy art pieces data
   List<Map<String, dynamic>> generateDummyData() {
     List<Map<String, dynamic>> data = [];
 
-    for (int i = 0; i < 10; i++) {
+    // Canadian Art Pieces
+    for (int i = 0; i < 5; i++) {
       data.add({
-        'name': 'Art Piece ${i + 1}',
+        'name': 'Canadian Art Piece ${i + 1}',
         'country': 'Canada',
         'region': 'British Columbia',
-        'city': i < 5 ? 'Vancouver' : 'New Westminster',
+        'city': i < 3 ? 'Vancouver' : 'New Westminster',
         'image': null,
       });
     }
 
+    // American Art Pieces
+    for (int i = 0; i < 10; i++) {
+      if (i < 5) {
+        data.add({
+          'name': 'American Art Piece ${i + 1}',
+          'country': 'United States',
+          'region': 'California',
+          'city': i < 3 ? 'Los Angeles' : 'San Francisco',
+          'image': null,
+        });
+      } else {
+        data.add({
+          'name': 'American Art Piece ${i + 1}',
+          'country': 'United States',
+          'region': 'New York',
+          'city': i < 8 ? 'New York City' : 'Buffalo',
+          'image': null,
+        });
+      }
+    }
+
     return data;
   }
+
 
   List<Map<String, dynamic>> allArtPieces = [];
   List<Map<String, dynamic>> filteredArtPieces = [];
@@ -56,6 +107,7 @@ class _FilterPageState extends State<FilterPage> {
   @override
   void initState() {
     super.initState();
+    countries = countryRegionCityData.keys.toList();
     allArtPieces = generateDummyData();
     filterData();
   }
@@ -84,15 +136,18 @@ class _FilterPageState extends State<FilterPage> {
               buildDropdown('Country', countries, selectedCountry, (value) {
                 setState(() {
                   selectedCountry = value;
+                  updateRegions();
+                  selectedRegion = null;
+                  updateCities();
+                  selectedCity = null;
                   filterData();
                 });
               }),
               buildDropdown('Region', regions, selectedRegion, (value) {
                 setState(() {
                   selectedRegion = value;
-                  if (selectedRegion == 'ALL') {
-                    selectedCity = 'ALL';
-                  }
+                  updateCities();
+                  selectedCity = null;
                   filterData();
                 });
               }),
