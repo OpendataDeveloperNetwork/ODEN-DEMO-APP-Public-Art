@@ -10,7 +10,7 @@ import '../theme/style.dart';
 ///
 /// A function that creates the app bar widget.
 ///
-AppBar appBarWidget(BuildContext context) {
+AppBar profileAppBarWidget(BuildContext context) {
   return AppBar(
     backgroundColor: appBarTheme().backgroundColor,
     leading: Padding(
