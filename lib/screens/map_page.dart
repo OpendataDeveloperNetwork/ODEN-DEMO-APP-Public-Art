@@ -15,12 +15,6 @@ import './details.dart';
 // ----- Maps Page - Main Feature ------ //
 // ------------------------------------- //
 
-class Data{
-  void fetchData(){
-
-  }
-}
-
 class MapsPage extends StatefulWidget {
   const MapsPage({Key? key}) : super(key: key);
 
