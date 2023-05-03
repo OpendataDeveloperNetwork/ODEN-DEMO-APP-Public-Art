@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
-import '../components/app_bar.dart';
+import '../components/profile_button_app_bar.dart';
 
 class DetailsPage extends StatelessWidget {
   const DetailsPage({super.key});
@@ -9,7 +9,7 @@ class DetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: appBarWidget(context),
+        appBar: profileAppBarWidget(context),
         body: Align(
           alignment: Alignment.center,
           child: Column(
