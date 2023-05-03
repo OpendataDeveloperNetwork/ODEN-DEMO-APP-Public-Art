@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:oden_app/screens/profile_page.dart';
 import '../theme/style.dart';
 
-/// ---------------------------------------------------- ///
-/// --- This stores file contains all app bar Widget --- ///
-/// ---------------------------------------------------- ///
+///
+/// This file is another app bar. But this contains a profile page
+/// button. Choose this if you want to have a profile button on the app bar.
+///
 
 ///
 /// A function that creates the app bar widget.
 ///
-AppBar appBarWidget(BuildContext context) {
+AppBar profileAppBarWidget(BuildContext context) {
   return AppBar(
     backgroundColor: appBarTheme().backgroundColor,
     leading: Padding(

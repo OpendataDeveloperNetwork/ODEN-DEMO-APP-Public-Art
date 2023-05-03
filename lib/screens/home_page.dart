@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../components/app_bar.dart';
+import '../components/profile_button_app_bar.dart';
 import '../models/category.dart';
 import '../models/location.dart';
 import './map_page.dart';
@@ -37,7 +37,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: appBarWidget(context),
+        appBar: profileAppBarWidget(context),
         body: const HomePageBody(),
         floatingActionButton: _buildCollectionFloatingWidget(context));
   }
@@ -58,7 +58,7 @@ class _HomePageBodyState extends State<HomePageBody> {
   late Size size;
   late double height;
   final Category _category = Category("Public Art", "public-art");
-  final Location _location = Location("Current Location", 0, 0);
+  final Location _location = Location(name: "Current Location", latitude: 0.1, longitude: 0.1);
 
   ///
   /// A function pushes the map page to the stack, we will pass the
