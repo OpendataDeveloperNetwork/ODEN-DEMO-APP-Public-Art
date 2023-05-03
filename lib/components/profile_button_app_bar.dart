@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:oden_app/screens/profile_page.dart';
 import '../theme/style.dart';
+import '../models/auth.dart';
+import '../screens/login.dart';
 
 ///
 /// This file is another app bar. But this contains a profile page
@@ -36,8 +38,12 @@ AppBar profileAppBarWidget(BuildContext context) {
 ///
 IconButton profileButton(BuildContext context) {
   void navigateToProfile() {
+    bool isLoggedIn = Auth().isLoggedIn;
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => const ProfilePage()));
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                isLoggedIn ? const ProfilePage() : const LoginPage()));
   }
 
   return IconButton(
