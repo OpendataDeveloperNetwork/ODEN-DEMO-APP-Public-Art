@@ -93,9 +93,7 @@ class _ProfileBodyState extends State<ProfileBody> {
         ),
         Align(alignment: Alignment.center, child: _buildToggleButtons()),
         const SizedBox(height: 15),
-        /* 
-          Visibility of listviews are dynamic depending on which toggle button is selected 
-        */
+        /* Visibility of listviews are dynamic depending on which toggle button is selected */
         _buildListView(const FavouritesListView(), _selectedCategories[0]),
         _buildListView(const VisitsListView(), _selectedCategories[1])
       ],
