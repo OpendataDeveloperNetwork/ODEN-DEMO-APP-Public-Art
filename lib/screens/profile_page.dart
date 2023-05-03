@@ -30,8 +30,16 @@ class ProfileBody extends StatefulWidget {
 }
 
 class _ProfileBodyState extends State<ProfileBody> {
-  final _selectedCategories = [true, false];
+  final _selectedCategories = [
+    true,
+    false
+  ]; // This can be represented as [isFavouritesSelected, isVisitsSelected]
 
+  ///
+  /// This is the function that listens when user clicked on the toggle buttons.
+  /// And changed the _selectedCategories list values accordingly. No values in
+  /// the list can be true at the same time.
+  ///
   void selectedCategory(int index) {
     setState(() => {
           for (int buttonIndex = 0;
@@ -41,6 +49,9 @@ class _ProfileBodyState extends State<ProfileBody> {
         });
   }
 
+  ///
+  /// This is the function that builds the toggle button.
+  ///
   ToggleButtons _buildToggleButtons() {
     return ToggleButtons(
       onPressed: selectedCategory,
@@ -54,6 +65,15 @@ class _ProfileBodyState extends State<ProfileBody> {
       isSelected: _selectedCategories,
       children: categories,
     );
+  }
+
+  ///
+  /// Builds the list view.
+  ///
+  Visibility _buildListView(Widget listView, bool listensTo) {
+    return Visibility(
+        visible: listensTo, // if true, show FavouritesListView
+        child: Expanded(child: listView));
   }
 
   @override
@@ -73,12 +93,11 @@ class _ProfileBodyState extends State<ProfileBody> {
         ),
         Align(alignment: Alignment.center, child: _buildToggleButtons()),
         const SizedBox(height: 15),
-        Visibility(
-            visible: _selectedCategories[0],
-            child: const Expanded(child: FavouritesListView())),
-        Visibility(
-            visible: _selectedCategories[1],
-            child: const Expanded(child: VisitsListView()))
+        /* 
+          Visibility of listviews are dynamic depending on which toggle button is selected 
+        */
+        _buildListView(const FavouritesListView(), _selectedCategories[0]),
+        _buildListView(const VisitsListView(), _selectedCategories[1])
       ],
     );
   }
