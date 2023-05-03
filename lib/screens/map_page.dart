@@ -57,7 +57,6 @@ class _MapsPageState extends State<MapsPage> {
           PublicArt publicArt = jsonToPublicArt(data, data['link']);
           publicArts.add(publicArt);
         }
-        
       } else {
         // There was an error, handle it here
         print("OOps something happened somewhere.");
@@ -120,7 +119,6 @@ class _MapsPageState extends State<MapsPage> {
     for (final art in publicArts) {
       print("<--------------------------------------->");
       print(art);
-      print("<--------------------------------------->");
       final marker = Marker(
         // onTap: () => {
         //   Navigator.push(context, MaterialPageRoute(builder: (context) => const DetailsPage()))
@@ -134,15 +132,6 @@ class _MapsPageState extends State<MapsPage> {
           },
           title: art.name,
           snippet: art.description,
-        // markerId: MarkerId(art["art_id"]),
-        // position: LatLng(art["point"]["coordinates"][1], art["point"]["coordinates"][0]),
-        // infoWindow: InfoWindow(
-        //   onTap: () => {
-        //     Navigator.push(context,
-        //         MaterialPageRoute(builder: (context) => const DetailsPage()))
-        //   },
-        //   title: art["title"],
-        //   snippet: art["short_desc"],
         ),
       );
 

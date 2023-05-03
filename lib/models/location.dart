@@ -49,7 +49,7 @@ class PublicArt extends Location {
 
   @override
   String toString() {
-    return 'PublicArt{name: $name, latitude: $latitude, longitude: $longitude, description: $_description, link: $_link}';
+    return 'PublicArt{\nname: $name,\n latitude: $latitude,\n longitude: $longitude,\n description: $_description,\n link: $_link\t}';
   }
 
 }
