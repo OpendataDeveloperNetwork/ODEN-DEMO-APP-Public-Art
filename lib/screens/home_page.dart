@@ -4,6 +4,7 @@ import '../models/category.dart';
 import '../models/location.dart';
 import './map_page.dart';
 import './collections.dart';
+import './details.dart';
 
 // ------------------------ //
 // ----- Landing Page ----- //
