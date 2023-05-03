@@ -40,5 +40,5 @@ class Auth {
   /// A getter to check if the user is signed in or not. Returns true if the user
   /// signed in successfully, else false.
   ///
-  bool get isSignedIn => _auth.currentUser != null;
+  bool get isLoggedIn => _auth.currentUser != null;
 }
