@@ -7,8 +7,17 @@ import 'package:flutter/material.dart';
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
+  void goBack(BuildContext context) {
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      body: Center(
+        child: OutlinedButton(
+            onPressed: () => goBack(context), child: const Text("Go back!")),
+      ),
+    );
   }
 }
