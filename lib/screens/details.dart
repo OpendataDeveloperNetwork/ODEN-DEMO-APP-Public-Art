@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import '../components/profile_button_app_bar.dart';
+import 'package:oden_app/models/location.dart';
 
 class DetailsPage extends StatelessWidget {
-  const DetailsPage({super.key});
+  final PublicArt art;
+
+  const DetailsPage(this.art, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,12 +23,7 @@ class DetailsPage extends StatelessWidget {
                     child: Row(
                       children: const [
                         BackButton(),
-                        SizedBox(width: 10),
-                        Text(
-                          "Title of Art",
-                          style: TextStyle(fontSize: 20),
-                        ),
-                        SizedBox(width: 200),
+                        SizedBox(width: 300),
                         IconButton(
                           onPressed: null,
                           icon: Icon(
@@ -48,7 +46,7 @@ class DetailsPage extends StatelessWidget {
                             width: 200,
                           )),
                       const SizedBox(width: 50),
-                      const Text("distance", style : TextStyle(fontSize: 20))
+                       Text("${art.distance} km", style: const TextStyle(fontSize: 20))
                     ],
                   )),
               Expanded(
@@ -60,22 +58,29 @@ class DetailsPage extends StatelessWidget {
                     margin: const EdgeInsets.fromLTRB(10, 5, 10, 0),
                     padding: const EdgeInsets.all(20),
                     width: 500,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text("Description : ",
-                            style:
-                                TextStyle(color: Colors.white70, fontSize: 20)),
-                        SizedBox(height: 25),
-                        Text("Artist : ",
-                            style:
-                                TextStyle(color: Colors.white70, fontSize: 20)),
-                        SizedBox(height: 25),
-                        Text("Address : ",
-                            style:
-                                TextStyle(color: Colors.white70, fontSize: 20))
-                      ],
-                    )),
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("Name : ${art.name}\n",
+                                style: const TextStyle(
+                                    color: Colors.white70, fontSize: 20)),
+                            const SizedBox(height: 25),
+                            Text("Description : ${art.description}\n",
+                                style: const TextStyle(
+                                    color: Colors.white70, fontSize: 20)),
+                            const SizedBox(height: 25),
+                            Text("Artist : ${art.artist}\n",
+                                style: const TextStyle(
+                                    color: Colors.white70, fontSize: 20)),
+                            const SizedBox(height: 25),
+                            Text("Address : ${art.address}",
+                                style: const TextStyle(
+                                    color: Colors.white70, fontSize: 20))
+                          ],
+                        )),
+                    ),
               ),
             ],
           ),

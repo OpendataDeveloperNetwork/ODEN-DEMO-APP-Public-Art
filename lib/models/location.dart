@@ -33,19 +33,31 @@ class Location {
 class PublicArt extends Location {
   final String _description;
   final String _link;
+  final String _address;
+  final String _artist;
+  final double _distance;
 
   PublicArt({
     required super.name, 
     required super.latitude,
     required super.longitude,
     description, 
-    link
+    link,
+    address,
+    artist,
+    distance
   }) : 
     _description = description ?? "No description available",
-    _link = link ?? "No link available";
+    _link = link ?? "No link available",
+    _address = address ?? "No address",
+    _artist = artist ?? "No artist",
+    _distance = distance ?? 0;
 
   String get description => _description;
   String get link => _link;
+  String get address => _address;
+  String get artist => _artist;
+  double get distance => _distance;
 
   @override
   String toString() {

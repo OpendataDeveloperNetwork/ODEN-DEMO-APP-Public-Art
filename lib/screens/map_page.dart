@@ -30,7 +30,6 @@ class _MapsPageState extends State<MapsPage> {
     // TODO: implement initState
     super.initState();
     _setCurrentLocation();
-    _fetchMarkers();
   }
 
   final Completer<GoogleMapController> _controller =
@@ -38,11 +37,12 @@ class _MapsPageState extends State<MapsPage> {
 
   final Map<String, Marker> _markers = {};
 
+  List publicArts = [];
+
   var rawJSON = [];
-  final List<PublicArt> publicArts = [];
 
   // Creates and adds markers to the _markers object
-  Future<void> _fetchMarkers() async {
+  Future<List> _fetchMarkers(List publicArts) async {
     final snapshot =
         await FirebaseFirestore.instance.collection('PublicArts').get();
 
@@ -54,7 +54,7 @@ class _MapsPageState extends State<MapsPage> {
       if (response.statusCode == 200) {
         rawJSON.addAll(jsonDecode(response.body));
         for (final data in rawJSON) {
-          PublicArt publicArt = jsonToPublicArt(data, data['link']);
+          PublicArt publicArt = await jsonToPublicArt(data, data['link']);
           publicArts.add(publicArt);
         }
       } else {
@@ -62,15 +62,30 @@ class _MapsPageState extends State<MapsPage> {
         print("OOps something happened somewhere.");
       }
     }
+
+    return publicArts;
   }
-  
-  PublicArt jsonToPublicArt(publicArtJSON, dataLink) {
+
+  jsonToPublicArt(publicArtJSON, dataLink) async  {
+    double lat = publicArtJSON["point"]["coordinates"][1];
+    double long = publicArtJSON["point"]["coordinates"][0];
+    Position pos = await getCurrentLocation();
+    double distanceBetweenLocations = Geolocator.distanceBetween(
+      pos.latitude,
+      pos.longitude,
+      lat,
+      long
+    );
+
     return PublicArt(
       name: publicArtJSON["title"], 
-      latitude: publicArtJSON["point"]["coordinates"][1], 
-      longitude: publicArtJSON["point"]["coordinates"][0],
+      latitude: lat,
+      longitude: long,
       description: publicArtJSON["short_desc"],
-      link: dataLink
+      link: dataLink,
+      address: publicArtJSON["address"],
+      artist: publicArtJSON["artist"],
+      distance: distanceBetweenLocations.round() / 1000
     );
   }
 
@@ -114,21 +129,18 @@ class _MapsPageState extends State<MapsPage> {
   }
 
   // Creates and adds markers to the _markers object
-  _onMapCreated(GoogleMapController controller) {
+  Future <void> _onMapCreated(GoogleMapController controller) async {
+    publicArts = await _fetchMarkers(publicArts);
+
     _markers.clear();
     for (final art in publicArts) {
-      print("<--------------------------------------->");
-      print(art);
       final marker = Marker(
-        // onTap: () => {
-        //   Navigator.push(context, MaterialPageRoute(builder: (context) => const DetailsPage()))
-        // },
         markerId: MarkerId(art.name),
         position: LatLng(art.latitude, art.longitude),
         infoWindow: InfoWindow(
           onTap: () => {
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const DetailsPage()))
+                MaterialPageRoute(builder: (context) => DetailsPage(art)))
           },
           title: art.name,
           snippet: art.description,
@@ -141,7 +153,7 @@ class _MapsPageState extends State<MapsPage> {
     }
   }
 
-  @override
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -170,7 +182,7 @@ class _MapsPageState extends State<MapsPage> {
               ],
             ),
             Expanded(
-              child: _kGooglePlex.target.longitude == 0
+              child: _kGooglePlex.target.longitude == 0 && publicArts.isEmpty
                   ? const Center(child: CircularProgressIndicator())
                   : GoogleMap(
                       mapType: MapType.normal,
