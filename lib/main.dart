@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import './screens/home_page.dart';
 import './screens/map_page.dart';
@@ -9,6 +11,13 @@ import './theme/style.dart';
 // ---------------------------- //
 
 Future<void> main() async{
+  FlutterError.onError = (details) {
+    FlutterError.dumpErrorToConsole(details);
+    if (kReleaseMode) {
+      exit(1);
+    }
+  };
+
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(const MyApp());
