@@ -9,11 +9,11 @@ import 'components/visits_list_view.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
-  // Leave the appBar null, for now, I will be creating a appBar class for that! - Joushua //
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: backButtonAppBarWidget(context), body: ProfileBody());
+        appBar: backButtonAppBarWidget(context), body: const ProfileBody());
   }
 }
 
