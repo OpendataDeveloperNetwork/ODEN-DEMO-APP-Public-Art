@@ -47,8 +47,7 @@ class _LoginBodyState extends State<LoginBody> {
     }
     if (signInSuccessful && context.mounted) {
       Navigator.pop(context);
-      Navigator.push(context,
-          MaterialPageRoute(builder: (context) => const ProfilePage()));
+      Navigator.pushNamed(context, '/profile');
     }
   }
 
@@ -123,8 +122,8 @@ class _LoginBodyState extends State<LoginBody> {
   }
 
   void toSignUpPage() {
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => SignUpPage()));
+    Navigator.pop(context);
+    Navigator.pushNamed(context, '/signUp');
   }
 
   Row _buildSignUpButton() {
@@ -135,7 +134,7 @@ class _LoginBodyState extends State<LoginBody> {
           "Don't have an account? ",
           style: TextStyle(color: Colors.white),
         ),
-        TextButton(onPressed: () {}, child: const Text("Sign Up"))
+        TextButton(onPressed: toSignUpPage, child: const Text("Sign Up"))
       ],
     );
   }

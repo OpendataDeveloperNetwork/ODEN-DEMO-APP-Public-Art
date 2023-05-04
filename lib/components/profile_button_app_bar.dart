@@ -39,11 +39,7 @@ AppBar profileAppBarWidget(BuildContext context) {
 IconButton profileButton(BuildContext context) {
   void navigateToProfile() {
     bool isLoggedIn = Auth().isLoggedIn;
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) =>
-                isLoggedIn ? const ProfilePage() : const LoginPage()));
+    Navigator.pushNamed(context, isLoggedIn ? '/profile' : '/login');
   }
 
   return IconButton(

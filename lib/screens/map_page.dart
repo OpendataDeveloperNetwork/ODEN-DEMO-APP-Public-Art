@@ -63,15 +63,14 @@ class _MapsPageState extends State<MapsPage> {
       }
     }
   }
-  
+
   PublicArt jsonToPublicArt(publicArtJSON, dataLink) {
     return PublicArt(
-      name: publicArtJSON["title"], 
-      latitude: publicArtJSON["point"]["coordinates"][1], 
-      longitude: publicArtJSON["point"]["coordinates"][0],
-      description: publicArtJSON["short_desc"],
-      link: dataLink
-    );
+        name: publicArtJSON["title"],
+        latitude: publicArtJSON["point"]["coordinates"][1],
+        longitude: publicArtJSON["point"]["coordinates"][0],
+        description: publicArtJSON["short_desc"],
+        link: dataLink);
   }
 
   CameraPosition _kGooglePlex =
@@ -127,8 +126,7 @@ class _MapsPageState extends State<MapsPage> {
         position: LatLng(art.latitude, art.longitude),
         infoWindow: InfoWindow(
           onTap: () => {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const DetailsPage()))
+            Navigator.pushNamed(context, '/details') //arguments: art)
           },
           title: art.name,
           snippet: art.description,
