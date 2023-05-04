@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../components/only_back_button_app_bar.dart';
 import '../models/auth.dart';
@@ -32,6 +33,9 @@ class LoginBody extends StatefulWidget {
 class _LoginBodyState extends State<LoginBody> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  String errorMessage = '';
+  bool isEmailInvalid = false;
+  bool isPasswordInvalid = false;
 
   Future<void> signInWithEmailAndPassword(BuildContext context) async {
     bool signInSuccessful = false;
@@ -39,14 +43,21 @@ class _LoginBodyState extends State<LoginBody> {
       await Auth().signInWithEmailAndPassword(
           _emailController.text, _passwordController.text);
       signInSuccessful = true;
-    } catch (e) {
-      // TODO: Create a feedback when invalid password or something else.
-      print(e);
+    } on FirebaseAuthException catch (e) {
+      showError(e.message!);
     }
     if (signInSuccessful && context.mounted) {
       Navigator.pop(context);
       Navigator.pushNamed(context, '/profile');
     }
+  }
+
+  void showError(String message) {
+    setState(() {
+      errorMessage = message;
+      isEmailInvalid = true;
+      isPasswordInvalid = true;
+    });
   }
 
   Expanded _buildLogo() {
@@ -61,7 +72,7 @@ class _LoginBodyState extends State<LoginBody> {
 
   Expanded _buildLoginContainer() {
     return Expanded(
-      flex: 4,
+      flex: 5,
       child: Container(
           decoration: const BoxDecoration(
               color: Color(0xFF2D3848),
@@ -83,15 +94,21 @@ class _LoginBodyState extends State<LoginBody> {
     );
   }
 
-  TextField _editableTextField(String label, TextEditingController controller) {
+  TextField _editableTextField(
+      String label, TextEditingController controller, bool invalidListener) {
     return TextField(
       controller: controller,
       decoration: InputDecoration(
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+              color: !invalidListener ? Colors.grey : Colors.red, width: 1),
+          borderRadius: BorderRadius.circular(20),
+        ),
         isDense: true,
         filled: true,
         fillColor: Colors.white,
         hintText: label,
-        focusColor: Colors.green,
+        focusColor: invalidListener ? Colors.green : Colors.red,
         labelStyle: const TextStyle(color: Colors.grey),
         border: const OutlineInputBorder(
             borderSide: BorderSide(width: 4),
@@ -137,6 +154,24 @@ class _LoginBodyState extends State<LoginBody> {
     );
   }
 
+  Visibility _buildErrorMessage() {
+    return Visibility(
+      visible: isEmailInvalid && isPasswordInvalid,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+            color: Colors.red[600], borderRadius: BorderRadius.circular(15)),
+        child: Center(
+            child: Text(errorMessage,
+                style: const TextStyle(
+                    fontSize: 15,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500))),
+      ),
+    );
+  }
+
   Column _buildLoginWidgets() {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       const Text(
@@ -150,10 +185,14 @@ class _LoginBodyState extends State<LoginBody> {
         style: TextStyle(
             color: Colors.white, fontSize: 22, fontWeight: FontWeight.w600),
       ),
-      const SizedBox(height: 45),
-      _editableTextField("Enter Email Address", _emailController),
       const SizedBox(height: 30),
-      _editableTextField("Enter Password", _passwordController),
+      _buildErrorMessage(),
+      const SizedBox(height: 30),
+      _editableTextField(
+          "Enter Email Address", _emailController, isEmailInvalid),
+      const SizedBox(height: 30),
+      _editableTextField(
+          "Enter Password", _passwordController, isPasswordInvalid),
       const SizedBox(height: 50),
       _buildLoginButton(),
       const SizedBox(height: 20),
