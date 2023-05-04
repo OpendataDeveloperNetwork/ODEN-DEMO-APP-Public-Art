@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:oden_app/screens/profile_page.dart';
 import '../theme/style.dart';
 import '../models/auth.dart';
-import '../screens/login.dart';
 
 ///
 /// This file is another app bar. But this contains a profile page

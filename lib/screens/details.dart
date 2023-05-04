@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import '../components/profile_button_app_bar.dart';
 
 class DetailsPage extends StatelessWidget {
@@ -48,7 +46,7 @@ class DetailsPage extends StatelessWidget {
                             width: 200,
                           )),
                       const SizedBox(width: 50),
-                      const Text("distance", style : TextStyle(fontSize: 20))
+                      const Text("distance", style: TextStyle(fontSize: 20))
                     ],
                   )),
               Expanded(

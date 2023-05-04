@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import '../components/only_back_button_app_bar.dart';
 import '../models/auth.dart';
-import 'sign_up.dart';
-import 'profile_page.dart';
 
 // ---------------------- //
 // ----- Login Page ----- //
