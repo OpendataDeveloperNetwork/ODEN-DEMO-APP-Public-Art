@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../components/only_back_button_app_bar.dart';
 import '../models/auth.dart';
@@ -23,21 +24,73 @@ class SignUpBody extends StatefulWidget {
 }
 
 class _SignUpBodyState extends State<SignUpBody> {
+  String errorMessage = "";
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
+  bool isEmailInvalid = false;
+  bool isPasswordInvalid = false;
+  bool isNameInvalid = false;
+
+  void showError(String message) {
+    setState(() {
+      errorMessage = message;
+      isEmailInvalid = true;
+      isPasswordInvalid = true;
+    });
+  }
+
+  bool isAnyFieldsEmpty() {
+    bool isAnyEmpty = false;
+    setState(() {
+      if (_emailController.text.isEmpty) {
+        isEmailInvalid = true;
+        isAnyEmpty = true;
+      }
+      if (_passwordController.text.isEmpty) {
+        isPasswordInvalid = true;
+        isAnyEmpty = true;
+      }
+      if (_nameController.text.isEmpty) {
+        isNameInvalid = true;
+        isAnyEmpty = true;
+      }
+    });
+    return isAnyEmpty;
+  }
 
   Future<void> signUpWithEmailAndPassword(BuildContext context) async {
     bool signUpSuccessful = false;
+
+    if (_confirmPasswordController.text != _passwordController.text) {
+      showError("Passwords do not match.");
+      isPasswordInvalid = true;
+      isEmailInvalid = false;
+      isNameInvalid = false;
+      return;
+    }
+    if (isAnyFieldsEmpty()) {
+      showError("Please fill in all fields.");
+      return;
+    }
     try {
       await Auth().createUserWithEmailAndPassword(
           _emailController.text, _passwordController.text);
       signUpSuccessful = true;
-    } catch (e) {
-      // TODO: Create a feedback when invalid password or something else.
-      print(e);
+    } on FirebaseAuthException catch (e) {
+      showError(e.message!);
+      if (e.code == 'weak-password') {
+        isPasswordInvalid = true;
+        isEmailInvalid = false;
+        isNameInvalid = false;
+      } else {
+        isEmailInvalid = true;
+        isPasswordInvalid = false;
+        isNameInvalid = false;
+      }
+      return;
     }
     bool addedName = false;
     if (signUpSuccessful) {
@@ -83,19 +136,43 @@ class _SignUpBodyState extends State<SignUpBody> {
     );
   }
 
-  TextField _editableTextField(String label, TextEditingController controller) {
+  TextField _editableTextField(
+      String label, TextEditingController controller, bool isInvalidListener) {
     return TextField(
       controller: controller,
       decoration: InputDecoration(
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+              color: !isInvalidListener ? Colors.grey : Colors.red, width: 1),
+          borderRadius: BorderRadius.circular(20),
+        ),
         isDense: true,
         filled: true,
         fillColor: Colors.white,
         hintText: label,
-        focusColor: Colors.green,
+        focusColor: isInvalidListener ? Colors.green : Colors.red,
         labelStyle: const TextStyle(color: Colors.grey),
         border: const OutlineInputBorder(
             borderSide: BorderSide(width: 4),
             borderRadius: BorderRadius.all(Radius.circular(20))),
+      ),
+    );
+  }
+
+  Visibility _buildErrorMessage() {
+    return Visibility(
+      visible: isEmailInvalid || isPasswordInvalid || isNameInvalid,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+            color: Colors.red[600], borderRadius: BorderRadius.circular(15)),
+        child: Center(
+            child: Text(errorMessage,
+                style: const TextStyle(
+                    fontSize: 15,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500))),
       ),
     );
   }
@@ -150,14 +227,19 @@ class _SignUpBodyState extends State<SignUpBody> {
         style: TextStyle(
             color: Colors.white, fontSize: 22, fontWeight: FontWeight.w600),
       ),
-      const SizedBox(height: 45),
-      _editableTextField("Enter Email Address", _emailController),
       const SizedBox(height: 30),
-      _editableTextField("Enter Username", _nameController),
+      _buildErrorMessage(),
       const SizedBox(height: 30),
-      _editableTextField("Enter Password", _passwordController),
+      _editableTextField(
+          "Enter Email Address", _emailController, isEmailInvalid),
       const SizedBox(height: 30),
-      _editableTextField("Re-enter Password", _confirmPasswordController),
+      _editableTextField("Enter Username", _nameController, isNameInvalid),
+      const SizedBox(height: 30),
+      _editableTextField(
+          "Enter Password", _passwordController, isPasswordInvalid),
+      const SizedBox(height: 30),
+      _editableTextField(
+          "Re-enter Password", _confirmPasswordController, isPasswordInvalid),
       const SizedBox(height: 50),
       _buildLoginButton(),
       const SizedBox(height: 20),
