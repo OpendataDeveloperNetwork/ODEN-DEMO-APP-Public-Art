@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
 
 ///
 /// This file contains all authentication class and its functions.
@@ -27,6 +26,17 @@ class Auth {
     await _auth.createUserWithEmailAndPassword(
         email: email, password: password);
   }
+
+  Future<bool> updateName(String name) async {
+    try {
+      await _auth.currentUser!.updateDisplayName(name);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  String get name => _auth.currentUser!.displayName!;
 
   ///
   /// Use when users a logging out from firebase. Developer is responsible for
