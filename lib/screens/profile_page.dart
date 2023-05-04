@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:oden_app/components/back_button_app_bar.dart';
 import 'components/favourites_list_view.dart';
 import 'components/visits_list_view.dart';
+import '../models/auth.dart';
 
 // ------------------------ //
 // ----- Profile Page ----- //
@@ -95,7 +96,9 @@ class _ProfileBodyState extends State<ProfileBody> {
         const SizedBox(height: 15),
         /* Visibility of listviews are dynamic depending on which toggle button is selected */
         _buildListView(const FavouritesListView(), _selectedCategories[0]),
-        _buildListView(const VisitsListView(), _selectedCategories[1])
+        _buildListView(const VisitsListView(), _selectedCategories[1]),
+        ElevatedButton(
+            onPressed: () => Auth().signOut(), child: const Text("Log Out"))
       ],
     );
   }
