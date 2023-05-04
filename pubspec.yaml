@@ -43,6 +43,7 @@ dependencies:
   firebase_database: ^10.1.1
   http: ^0.13.6
   json_serializable: ^6.6.1
+  google_maps_cluster_manager: ^3.0.0+1
     
 
 dev_dependencies:

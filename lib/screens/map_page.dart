@@ -1,17 +1,17 @@
 import 'dart:async';
-import 'dart:ffi';
+import 'dart:ui';
+import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
+import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 import 'package:oden_app/components/profile_button_app_bar.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geocoding/geocoding.dart';
+import 'package:oden_app/screens/details.dart';
+import 'package:oden_app/models/location.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import './details.dart';
-import 'package:oden_app/models/location.dart';
 
 // ------------------------------------- //
 // ----- Maps Page - Main Feature ------ //
@@ -25,21 +25,140 @@ class MapsPage extends StatefulWidget {
 }
 
 class _MapsPageState extends State<MapsPage> {
+
+  /// Manages clusters of map markers.
+  late ClusterManager _manager;
+
+  /// Encapsulates GoogleMapController for future use.
+  final Completer<GoogleMapController> _controller = Completer();
+
+  GoogleMapController? controller;
+
+  Set<Marker> _markers = {};
+
+  CameraPosition _kGooglePlex =
+      const CameraPosition(target: LatLng(0, 0), zoom: 14.4746);
+
+  var rawJSON = [];
+
+  final List<PublicArt> publicArts = [];
+
   @override
   void initState() {
     // TODO: implement initState
+    _manager = _initClusterManager();
     super.initState();
     _setCurrentLocation();
     _fetchMarkers();
   }
 
-  final Completer<GoogleMapController> _controller =
-      Completer<GoogleMapController>();
+  ClusterManager<PublicArt> _initClusterManager() {
+    return ClusterManager<PublicArt>(
+      publicArts,
+      _updateMarkers,
+      markerBuilder: _markerBuilder,
+    );
+  }
 
-  final Map<String, Marker> _markers = {};
+  void _updateMarkers(Set<Marker> markers) async {
+    print('Updated ${markers.length} markers');
+    double zoom = await _getZoom();
+    print("<---------- Zoom: $zoom ---------->");
+    setState(() {
+      // if (zoom >= maxClusterZoom) {
+      //   _addMarkers();
+      // } else {
+      //   _markers = markers;
+      // } 
+      _markers = markers;
+    });
+  }
 
-  var rawJSON = [];
-  final List<PublicArt> publicArts = [];
+  Future<Marker> Function(Cluster<PublicArt>) get _markerBuilder => (cluster) async {
+    double cameraZoom = await _getZoom();
+    if (cluster.isMultiple) {
+      return Marker(
+        markerId: MarkerId(cluster.getId()),
+        position: cluster.location,
+        onTap: () {
+          controller!.animateCamera(
+            CameraUpdate.newCameraPosition(
+              CameraPosition(
+                target: cluster.location,
+                zoom: cameraZoom,
+              ),
+            ),
+          );
+        },
+        icon: await _getClusterBitmap(_getClusterSize(cluster.count),
+                text: cluster.count.toString()),
+      );
+    }
+    var art = cluster.items.first;
+    return Marker(
+      markerId: MarkerId(art.name),
+      position: art.location,
+      infoWindow: InfoWindow(
+          onTap: () => {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const DetailsPage()))
+          },
+          title: art.name,
+          snippet: art.description,
+        )
+    );
+  };
+
+  int _getClusterSize(clusterCount) {
+    double baseSize = 100;
+    double scaleFactor = 0.5;
+    final double exponent = 1.1;
+    final size = (baseSize + (pow(clusterCount, exponent) * scaleFactor)).toInt();
+    print("<---------- Cluster Count: $clusterCount ---------->");
+    print("<---------- Size of Cluster: $size ---------->");
+    return size;
+  }
+
+  static Future<BitmapDescriptor> _getClusterBitmap(int size,
+      {String? text}) async {
+    final PictureRecorder pictureRecorder = PictureRecorder();
+    final Canvas canvas = Canvas(pictureRecorder);
+    final Paint paint1 = Paint()..color = Colors.red;
+
+    canvas.drawCircle(Offset(size / 2, size / 2), size / 2.0, paint1);
+
+    if (text != null) {
+      TextPainter painter = TextPainter(textDirection: TextDirection.ltr);
+      painter.text = TextSpan(
+        text: text,
+        style: TextStyle(
+            fontSize: size / 2.5,
+            color: Colors.white,
+            fontWeight: FontWeight.normal),
+      );
+      painter.layout();
+      painter.paint(
+        canvas,
+        Offset(size / 2 - painter.width / 2, size / 2 - painter.height / 2),
+      );
+    } else {
+      return BitmapDescriptor.defaultMarker;
+    }
+
+    final img = await pictureRecorder.endRecording().toImage(size, size);
+    final data = await img.toByteData(format: ImageByteFormat.png) as ByteData;
+
+    return BitmapDescriptor.fromBytes(data.buffer.asUint8List());
+  }
+
+  Future<double> _getZoom() async {
+    final double zoom = await controller!.getZoomLevel();
+    return zoom;
+  }
+
+  void _setController() async {
+    controller = await _controller.future;
+  }
 
   // Creates and adds markers to the _markers object
   Future<void> _fetchMarkers() async {
@@ -63,19 +182,15 @@ class _MapsPageState extends State<MapsPage> {
       }
     }
   }
-  
+
   PublicArt jsonToPublicArt(publicArtJSON, dataLink) {
     return PublicArt(
-      name: publicArtJSON["title"], 
-      latitude: publicArtJSON["point"]["coordinates"][1], 
-      longitude: publicArtJSON["point"]["coordinates"][0],
-      description: publicArtJSON["short_desc"],
-      link: dataLink
-    );
+        name: publicArtJSON["title"],
+        latitude: publicArtJSON["point"]["coordinates"][1],
+        longitude: publicArtJSON["point"]["coordinates"][0],
+        description: publicArtJSON["short_desc"],
+        link: dataLink);
   }
-
-  CameraPosition _kGooglePlex =
-      const CameraPosition(target: LatLng(0, 0), zoom: 14.4746);
 
   Future<Position> getCurrentLocation() async {
     bool serviceEnabled;
@@ -113,16 +228,10 @@ class _MapsPageState extends State<MapsPage> {
     }
   }
 
-  // Creates and adds markers to the _markers object
-  _onMapCreated(GoogleMapController controller) {
+  void _addMarkers() {
     _markers.clear();
     for (final art in publicArts) {
-      print("<--------------------------------------->");
-      print(art);
       final marker = Marker(
-        // onTap: () => {
-        //   Navigator.push(context, MaterialPageRoute(builder: (context) => const DetailsPage()))
-        // },
         markerId: MarkerId(art.name),
         position: LatLng(art.latitude, art.longitude),
         infoWindow: InfoWindow(
@@ -136,50 +245,62 @@ class _MapsPageState extends State<MapsPage> {
       );
 
       setState(() {
-        _markers[art.name] = marker;
+        _markers.add(marker);
       });
     }
   }
 
-  @override
+  // Creates and adds markers to the _markers object
+  void _onMapCreated(GoogleMapController controller) {
+    _controller.complete(controller);
+    _setController();
+    _manager.setMapId(controller.mapId);
+    _addMarkers();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: profileAppBarWidget(context),
         body: SafeArea(
             child: Column(
-          children: [
-            Row(
               children: [
-                const BackButton(),
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 10),
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Search',
-                        prefixIcon: const Icon(Icons.search),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
+                Row(
+                  children: [
+                    const BackButton(),
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 10),
+                        child: TextField(
+                          decoration: InputDecoration(
+                            hintText: 'Search',
+                            prefixIcon: const Icon(Icons.search),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                  ],
+                ),
+                Expanded(
+                  child: _kGooglePlex.target.longitude == 0
+                      ? const Center(child: CircularProgressIndicator())
+                      : GoogleMap(
+                          mapType: MapType.normal,
+                          initialCameraPosition: const CameraPosition(
+                            target: LatLng(51.072052, -114.076904),
+                            zoom: 15,
+                          ),
+                          markers: _markers,
+                          onCameraMove: _manager.onCameraMove,
+                          onCameraIdle: _manager.updateMap,
+                          onMapCreated: _onMapCreated,
+                        ),
                 ),
               ],
-            ),
-            Expanded(
-              child: _kGooglePlex.target.longitude == 0
-                  ? const Center(child: CircularProgressIndicator())
-                  : GoogleMap(
-                      mapType: MapType.normal,
-                      initialCameraPosition: _kGooglePlex,
-                      onMapCreated: _onMapCreated,
-                      markers: _markers.values.toSet(),
-                    ),
-            )
-          ],
         )));
   }
 }
