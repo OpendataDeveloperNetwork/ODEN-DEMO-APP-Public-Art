@@ -84,15 +84,16 @@ class _ProfileBodyState extends State<ProfileBody> {
 
   @override
   Widget build(BuildContext context) {
+    String name = Auth().name;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Padding(
-          padding: EdgeInsets.fromLTRB(20, 20, 0, 15),
-          child: Text("Hey, User!",
-              style: TextStyle(
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 20, 0, 15),
+          child: Text("Hey, ${Auth().name}!",
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               )),
