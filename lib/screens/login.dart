@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../components/only_back_button_app_bar.dart';
 import '../models/auth.dart';
+import 'sign_up.dart';
 
 // ---------------------- //
 // ----- Login Page ----- //
@@ -38,6 +39,7 @@ class _LoginBodyState extends State<LoginBody> {
       await Auth().signInWithEmailAndPassword(
           _emailController.text, _passwordController.text);
     } catch (e) {
+      // TODO: Create a feedback when invalid password or something else.
       print(e);
     }
   }
@@ -110,6 +112,11 @@ class _LoginBodyState extends State<LoginBody> {
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
           ),
         ));
+  }
+
+  void toSignUpPage() {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => SignUpPage()));
   }
 
   Row _buildSignUpButton() {
