@@ -2,18 +2,18 @@
 // ----- Location ------- //
 // ---------------------- //
 
+import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
 ///
 /// Location class contains all value for locations. It must have a name to present
 /// on the button and a longitude and latitude to use for the Googles API origin.
 ///
-class Location {
+class Location with ClusterItem {
   final String _name;
 
   /// The latitude to use in the API call e.g. 51.5074
-  final double _latitude;
-
-  /// The longitude to use in the API call e.g. 0.1278
-  final double _longitude;
+  final LatLng _location;
 
   Location({
     required name, 
@@ -21,12 +21,13 @@ class Location {
     required longitude
   }) : 
     _name = name,
-    _latitude = latitude,
-    _longitude = longitude;
+    _location = LatLng(latitude, longitude);
 
+  @override
+  LatLng get location => _location;
   String get name => _name;
-  double get latitude => _latitude;
-  double get longitude => _longitude;
+  double get latitude => location.latitude;
+  double get longitude => location.longitude;
 
 }
 
@@ -52,4 +53,14 @@ class PublicArt extends Location {
     return 'PublicArt{\nname: $name,\n latitude: $latitude,\n longitude: $longitude,\n description: $_description,\n link: $_link\t}';
   }
 
+}
+
+/// Takes in JSON data and returns a PublicArt object.
+PublicArt jsonToPublicArt(publicArtJSON, dataLink) {
+  return PublicArt(
+      name: publicArtJSON["title"],
+      latitude: publicArtJSON["point"]["coordinates"][1],
+      longitude: publicArtJSON["point"]["coordinates"][0],
+      description: publicArtJSON["short_desc"],
+      link: dataLink);
 }
