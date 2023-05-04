@@ -10,10 +10,11 @@ import '../theme/style.dart';
 ///
 /// A function that creates the app bar widget.
 ///
-AppBar backButtonAppBarWidget(BuildContext context) {
+AppBar onlyBackButtonAppBarWidget(BuildContext context) {
   return AppBar(
     backgroundColor: appBarTheme().backgroundColor,
     leading: backButton(context),
+    elevation: 0,
   );
 }
 
