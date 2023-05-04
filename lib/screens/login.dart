@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../components/only_back_button_app_bar.dart';
 import '../models/auth.dart';
 import 'sign_up.dart';
+import 'profile_page.dart';
 
 // ---------------------- //
 // ----- Login Page ----- //
@@ -34,13 +35,20 @@ class _LoginBodyState extends State<LoginBody> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  Future<void> signInWithEmailAndPassword() async {
+  Future<void> signInWithEmailAndPassword(BuildContext context) async {
+    bool signInSuccessful = false;
     try {
       await Auth().signInWithEmailAndPassword(
           _emailController.text, _passwordController.text);
+      signInSuccessful = true;
     } catch (e) {
       // TODO: Create a feedback when invalid password or something else.
       print(e);
+    }
+    if (signInSuccessful && context.mounted) {
+      Navigator.pop(context);
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => const ProfilePage()));
     }
   }
 
@@ -99,7 +107,7 @@ class _LoginBodyState extends State<LoginBody> {
     return Container(
         width: double.infinity,
         child: ElevatedButton(
-          onPressed: signInWithEmailAndPassword,
+          onPressed: () => signInWithEmailAndPassword(context),
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF77BF4B),
             padding: const EdgeInsets.fromLTRB(0, 12, 0, 12),
