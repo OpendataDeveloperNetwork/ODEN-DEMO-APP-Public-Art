@@ -68,6 +68,11 @@ class _ProfileBodyState extends State<ProfileBody> {
     );
   }
 
+  void onSignOut() {
+    Auth().signOut();
+    Navigator.pop(context);
+  }
+
   ///
   /// Builds the list view.
   ///
@@ -97,8 +102,7 @@ class _ProfileBodyState extends State<ProfileBody> {
         /* Visibility of listviews are dynamic depending on which toggle button is selected */
         _buildListView(const FavouritesListView(), _selectedCategories[0]),
         _buildListView(const VisitsListView(), _selectedCategories[1]),
-        ElevatedButton(
-            onPressed: () => Auth().signOut(), child: const Text("Log Out"))
+        ElevatedButton(onPressed: onSignOut, child: const Text("Log Out"))
       ],
     );
   }
