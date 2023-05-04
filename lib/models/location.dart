@@ -54,3 +54,13 @@ class PublicArt extends Location {
   }
 
 }
+
+/// Takes in JSON data and returns a PublicArt object.
+PublicArt jsonToPublicArt(publicArtJSON, dataLink) {
+  return PublicArt(
+      name: publicArtJSON["title"],
+      latitude: publicArtJSON["point"]["coordinates"][1],
+      longitude: publicArtJSON["point"]["coordinates"][0],
+      description: publicArtJSON["short_desc"],
+      link: dataLink);
+}
