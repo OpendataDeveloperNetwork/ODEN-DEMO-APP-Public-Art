@@ -1,16 +1,21 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:oden_app/screens/profile_page.dart';
 import './screens/home_page.dart';
 import './screens/map_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import './theme/style.dart';
+import 'screens/collections.dart';
+import 'screens/login.dart';
+import 'screens/sign_up.dart';
+import 'screens/details.dart';
 
 // ---------------------------- //
 // ----- The main driver ------ //
 // ---------------------------- //
 
-Future<void> main() async{
+Future<void> main() async {
   FlutterError.onError = (details) {
     FlutterError.dumpErrorToConsole(details);
     if (kReleaseMode) {
@@ -22,6 +27,7 @@ Future<void> main() async{
   await Firebase.initializeApp();
   runApp(const MyApp());
 }
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -30,6 +36,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      routes: {
+        '/login': (context) => const LoginPage(),
+        '/signUp': (context) => const SignUpPage(),
+        '/profile': (context) => const ProfilePage(),
+        '/homepage': (context) => const HomePage(),
+        '/collections': (context) => const CollectionsPage(),
+        '/details': (context) => const DetailsPage(),
+        '/maps': (context) => const MapsPage(),
+      },
       title: 'ODEN Demo',
       theme: appTheme(),
       home: const HomePage(),
