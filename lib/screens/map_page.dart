@@ -1,17 +1,17 @@
 import 'dart:async';
-import 'dart:ffi';
-import 'package:flutter/material.dart';
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:oden_app/components/profile_button_app_bar.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geocoding/geocoding.dart' as location;
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
-import './details.dart';
+import 'package:oden_app/components/profile_button_app_bar.dart';
 import 'package:oden_app/models/location.dart';
+
+import './details.dart';
 
 // ------------------------------------- //
 // ----- Maps Page - Main Feature ------ //
@@ -26,27 +26,32 @@ class MapsPage extends StatefulWidget {
 
 class _MapsPageState extends State<MapsPage> {
   @override
-  void initState() {
-    // TODO: implement initState
+  initState() {
     super.initState();
     _setCurrentLocation();
+    _onMapCreated();
   }
 
-  final Completer<GoogleMapController> _controller =
-      Completer<GoogleMapController>();
+  Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
 
   final Map<String, Marker> _markers = {};
 
   List publicArts = [];
 
-  var rawJSON = [];
+  CameraPosition position = const CameraPosition(
+    target: LatLng(0, 0),
+    zoom: 18.4746,
+  );
+
+  final myController = TextEditingController();
 
   // Creates and adds markers to the _markers object
-  Future<List> _fetchMarkers(List publicArts) async {
+  Future<List> _fetchMarkers() async {
     final snapshot =
         await FirebaseFirestore.instance.collection('PublicArts').get();
 
     for (final doc in snapshot.docs) {
+      var rawJSON = [];
       final data = doc.data();
       var url = Uri.parse(data['link']);
       var response = await http.get(url);
@@ -66,31 +71,23 @@ class _MapsPageState extends State<MapsPage> {
     return publicArts;
   }
 
-  jsonToPublicArt(publicArtJSON, dataLink) async  {
+  jsonToPublicArt(publicArtJSON, dataLink) async {
     double lat = publicArtJSON["point"]["coordinates"][1];
     double long = publicArtJSON["point"]["coordinates"][0];
     Position pos = await getCurrentLocation();
-    double distanceBetweenLocations = Geolocator.distanceBetween(
-      pos.latitude,
-      pos.longitude,
-      lat,
-      long
-    );
+    double distanceBetweenLocations =
+        Geolocator.distanceBetween(pos.latitude, pos.longitude, lat, long);
 
     return PublicArt(
-      name: publicArtJSON["title"], 
-      latitude: lat,
-      longitude: long,
-      description: publicArtJSON["short_desc"],
-      link: dataLink,
-      address: publicArtJSON["address"],
-      artist: publicArtJSON["artist"],
-      distance: distanceBetweenLocations.round() / 1000
-    );
+        name: publicArtJSON["title"],
+        latitude: lat,
+        longitude: long,
+        description: publicArtJSON["short_desc"],
+        link: dataLink,
+        address: publicArtJSON["address"],
+        artist: publicArtJSON["artist"],
+        distance: distanceBetweenLocations.round() / 1000);
   }
-
-  CameraPosition _kGooglePlex =
-      const CameraPosition(target: LatLng(0, 0), zoom: 14.4746);
 
   Future<Position> getCurrentLocation() async {
     bool serviceEnabled;
@@ -120,8 +117,10 @@ class _MapsPageState extends State<MapsPage> {
     try {
       Position pos = await getCurrentLocation();
       setState(() {
-        _kGooglePlex = CameraPosition(
-            target: LatLng(pos.latitude, pos.longitude), zoom: 14.4746);
+        position = CameraPosition(
+          target: LatLng(pos.latitude, pos.longitude),
+          zoom: 18.4746,
+        );
       });
     } catch (e) {
       debugPrint("Error");
@@ -129,9 +128,8 @@ class _MapsPageState extends State<MapsPage> {
   }
 
   // Creates and adds markers to the _markers object
-  Future <void> _onMapCreated(GoogleMapController controller) async {
-    publicArts = await _fetchMarkers(publicArts);
-
+  Future<void> _onMapCreated() async {
+    publicArts = await _fetchMarkers();
     _markers.clear();
     for (final art in publicArts) {
       final marker = Marker(
@@ -153,6 +151,64 @@ class _MapsPageState extends State<MapsPage> {
     }
   }
 
+  void _showDialog(BuildContext context, String message) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Error'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> search() async {
+    var text = myController.text.trim().toLowerCase();
+    bool found = false;
+
+    if (text.isNotEmpty) {
+      for (PublicArt art in publicArts) {
+        if (art.name.toLowerCase() == text) {
+          found = true;
+          position = CameraPosition(
+            target: LatLng(art.latitude, art.longitude),
+            zoom: 18.4746,
+          );
+        }
+      }
+
+      if(!found){
+        try{
+          final List<location.Location> placemarks =
+          await locationFromAddress(text);
+          if (placemarks.isNotEmpty) {
+            found = true;
+            final location.Location placemark = placemarks.first;
+            position = CameraPosition(
+              target: LatLng(placemark.latitude, placemark.longitude),
+              zoom: 10.4746,
+            );
+          }
+        }catch(e){
+          // Invalid name
+          _showDialog(context, "We couldn't find the location. Please try again");
+        }
+      }
+    }
+
+    GoogleMapController gController = await _controller.future;
+    gController.animateCamera(CameraUpdate.newCameraPosition(position));
+    setState(() {});
+
+    myController.clear();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -166,31 +222,49 @@ class _MapsPageState extends State<MapsPage> {
                 const BackButton(),
                 Expanded(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 10),
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Search',
-                        prefixIcon: const Icon(Icons.search),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                    ),
-                  ),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 10),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: myController,
+                              decoration: InputDecoration(
+                                hintText: 'Search',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Container(
+                              margin: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: Colors.green,
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              child: IconButton(
+                                onPressed: () {
+                                  search();
+                                },
+                                color: Colors.white,
+                                icon: const Icon(Icons.search),
+                              ))
+                        ],
+                      )),
                 ),
               ],
             ),
             Expanded(
-              child: _kGooglePlex.target.longitude == 0 && publicArts.isEmpty
-                  ? const Center(child: CircularProgressIndicator())
-                  : GoogleMap(
-                      mapType: MapType.normal,
-                      initialCameraPosition: _kGooglePlex,
-                      onMapCreated: _onMapCreated,
-                      markers: _markers.values.toSet(),
-                    ),
-            )
+                child: _markers.isNotEmpty
+                    ? GoogleMap(
+                        mapType: MapType.normal,
+                        initialCameraPosition: position,
+                        markers: _markers.values.toSet(),
+                        onMapCreated: (GoogleMapController controller) {
+                         _controller.complete(controller);
+                        })
+                    : const Center(child: CircularProgressIndicator()))
           ],
         )));
   }

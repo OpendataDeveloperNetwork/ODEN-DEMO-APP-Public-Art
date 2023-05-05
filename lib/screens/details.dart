@@ -45,8 +45,10 @@ class DetailsPage extends StatelessWidget {
                             "https://assets.simpleviewinc.com/simpleview/image/upload/c_limit,h_1200,q_75,w_1200/v1/clients/vancouverbc/vancouver-public-art-mini-guide_ad75d4cc-dd05-4ab5-8320-cd2df84e83f5.jpg",
                             width: 200,
                           )),
-                      const SizedBox(width: 50),
-                       Text("${art.distance} km", style: const TextStyle(fontSize: 20))
+                      SizedBox(
+                         width: 175,
+                         child: Text("You are ${art.distance} km away", style: const TextStyle(fontSize: 20))
+                       )
                     ],
                   )),
               Expanded(
