@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -8,9 +7,6 @@ Future<void> processPublicArtData() async {
   // Read the dummyData.json file from assets/json folder
   String jsonString = await rootBundle.loadString('assets/json/dummyData.json');
   List<Map<String, dynamic>> elements = List<Map<String, dynamic>>.from(json.decode(jsonString));
-
-  // Initialize Firebase if you haven't done it already
-  // await Firebase.initializeApp();
 
   // Firestore reference
   FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -29,12 +25,12 @@ Future<void> processPublicArtData() async {
         if (response.statusCode == 200) {
           var rawData = json.decode(response.body);
 
-          // Apply the filter and standardize the data
-          var standardizedData = standardizeData(rawData);
+          // Apply the Dart filter function
+          var filteredData = filter(rawData, false);
 
           // Upload the standardized data to Firestore
           await uploadStandardizedDataToFirestore(
-              firestore, countryCode, regionCode, cityCode, standardizedData);
+              firestore, countryCode, regionCode, cityCode, filteredData);
         } else {
           print("Failed to fetch raw data.");
         }
@@ -53,17 +49,7 @@ Future<bool> isNewLocation(FirebaseFirestore firestore, String countryCode, Stri
   return !doc.exists;
 }
 
-List<Map<String, dynamic>> standardizeData(List<dynamic> rawData) {
-  // Apply your data transformation and standardization logic here
-  // This is a dummy example; replace this with your actual logic
-  return rawData.map((item) => {
-    'name': item['name'],
-    'longitude': item['longitude'],
-    'latitude': item['latitude'],
-  }).toList();
-}
-
-Future<void> uploadStandardizedDataToFirestore(FirebaseFirestore firestore, String countryCode, String regionCode, String cityCode, List<Map<String, dynamic>> standardizedData) async {
+Future<void> uploadStandardizedDataToFirestore(FirebaseFirestore firestore, String countryCode, String regionCode, String cityCode, List<dynamic> standardizedData) async {
   // Upload the data to Firestore
   await firestore.collection('Categories')
       .doc('Public_Art')
@@ -72,4 +58,37 @@ Future<void> uploadStandardizedDataToFirestore(FirebaseFirestore firestore, Stri
       .set({'data': standardizedData});
 
   print('Data uploaded to Firestore successfully.');
+}
+
+// Manual way
+
+List<dynamic> filter(dynamic data, bool stringify) {
+  if (data is String) {
+    data = jsonDecode(data);
+  }
+
+  List<dynamic> newData = [];
+
+  for (var d in data) {
+    Map<String, dynamic> item = {};
+    item['name'] = d['title'];
+    if (item['name'] == null) {
+      print('Data name not found for art with url ${d['url']}');
+    }
+    Map<String, dynamic> coordinates = {
+      'longitude': d['point']['coordinates'][0],
+      'latitude': d['point']['coordinates'][1]
+    };
+    if (coordinates['longitude'] == null || coordinates['latitude'] == null) {
+      print('Data coordinates not found for art with url ${d['url']}');
+    }
+    item['coordinates'] = coordinates;
+    newData.add(item);
+  }
+
+/*  if (stringify) {
+    return jsonEncode(newData);
+  }*/
+
+  return newData;
 }
