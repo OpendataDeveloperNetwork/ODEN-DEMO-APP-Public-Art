@@ -26,7 +26,7 @@ Future<void> processPublicArtData() async {
           var rawData = json.decode(response.body);
 
           // Apply the Dart filter function
-          var filteredData = filter(rawData, false);
+          var filteredData = filter(rawData, countryCode, regionCode, cityCode, false);
 
           // Upload the standardized data to Firestore
           await uploadStandardizedDataToFirestore(
@@ -62,7 +62,7 @@ Future<void> uploadStandardizedDataToFirestore(FirebaseFirestore firestore, Stri
 
 // Manual way
 
-List<dynamic> filter(dynamic data, bool stringify) {
+List<dynamic> filter(dynamic data, String countryCode, String regionCode, String cityCode, bool stringify) {
   if (data is String) {
     data = jsonDecode(data);
   }
@@ -71,6 +71,16 @@ List<dynamic> filter(dynamic data, bool stringify) {
 
   for (var d in data) {
     Map<String, dynamic> item = {};
+
+    // add the labels
+    item['labels'] = {
+      'category': 'public-art',
+      'country': countryCode,
+      'region': regionCode,
+      'city': cityCode,
+    };
+
+
     item['name'] = d['title'];
     if (item['name'] == null) {
       print('Data name not found for art with url ${d['url']}');
