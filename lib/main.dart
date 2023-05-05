@@ -24,7 +24,10 @@ Future<void> main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
-  processPublicArtData();
+  // Following function runs the dummy minefest.dart
+  // will upload all entries to the firestore.
+  // commented out not run run everytime.
+  //processPublicArtData();
 
   runApp(const MyApp());
 }
