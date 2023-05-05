@@ -6,6 +6,9 @@ import './screens/map_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import './theme/style.dart';
 
+// import path to dummy_manifest.dart
+import './dummy_manifest.dart';
+
 // ---------------------------- //
 // ----- The main driver ------ //
 // ---------------------------- //
@@ -20,6 +23,9 @@ Future<void> main() async{
 
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+
+  processPublicArtData();
+
   runApp(const MyApp());
 }
 class MyApp extends StatelessWidget {
