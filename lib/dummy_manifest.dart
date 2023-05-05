@@ -18,8 +18,7 @@ Future<void> processPublicArtData() async {
       String regionCode = element['labels']['region'];
       String cityCode = element['labels']['city'];
 
-      // Check if the combination of country, region, and city is unique
-      if (await isNewLocation(firestore, countryCode, regionCode, cityCode)) {
+      // Get the raw data.
         String rawUrl = element['data']['datasets']['json']['url'];
         var response = await http.get(Uri.parse(rawUrl));
         if (response.statusCode == 200) {
@@ -34,19 +33,8 @@ Future<void> processPublicArtData() async {
         } else {
           print("Failed to fetch raw data.");
         }
-      }
     }
   }
-}
-
-Future<bool> isNewLocation(FirebaseFirestore firestore, String countryCode, String regionCode, String cityCode) async {
-  // Check if the document already exists in Firestore
-  DocumentSnapshot doc = await firestore.collection('Categories')
-      .doc('Public_Art')
-      .collection('Items')
-      .doc('${countryCode}_${regionCode}_${cityCode}')
-      .get();
-  return !doc.exists;
 }
 
 Future<void> uploadStandardizedDataToFirestore(FirebaseFirestore firestore, String countryCode, String regionCode, String cityCode, List<dynamic> standardizedData) async {
