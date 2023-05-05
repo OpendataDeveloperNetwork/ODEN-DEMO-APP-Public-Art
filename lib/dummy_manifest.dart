@@ -57,23 +57,39 @@ Future<void> uploadStandardizedDataToFirestore(FirebaseFirestore firestore, Stri
 
   // Upload each element of standardizedData as its own document
   for (var item in standardizedData) {
-    // Create a new document with a unique ID
-    DocumentReference docRef = itemsCollection.doc();
+    // Check for duplicates based on country, region, and city labels
+    QuerySnapshot querySnapshot = await itemsCollection
+        .where('labels.countryCode', isEqualTo: countryCode)
+        .where('labels.regionCode', isEqualTo: regionCode)
+        .where('labels.cityCode', isEqualTo: cityCode)
+        .where('name', isEqualTo: item['name'])
+        .get();
 
-    // Set the data for the new document
-    await docRef.set({
-      'labels': {
-        'countryCode': countryCode,
-        'regionCode': regionCode,
-        'cityCode': cityCode,
-      },
-      'name': item['name'],
-      'coordinates': item['coordinates']
-    });
+    if (querySnapshot.docs.isNotEmpty) {
+      // If a duplicate is found, update the existing document
+      DocumentReference docRef = querySnapshot.docs.first.reference;
+      await docRef.update({
+        'name': item['name'],
+        'coordinates': item['coordinates']
+      });
+    } else {
+      // If no duplicate is found, create a new document
+      DocumentReference docRef = itemsCollection.doc();
+      await docRef.set({
+        'labels': {
+          'countryCode': countryCode,
+          'regionCode': regionCode,
+          'cityCode': cityCode,
+        },
+        'name': item['name'],
+        'coordinates': item['coordinates']
+      });
+    }
   }
 
   print('Data uploaded to Firestore successfully.');
 }
+
 
 
 // Manual way
