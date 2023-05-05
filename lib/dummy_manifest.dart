@@ -37,6 +37,11 @@ Future<void> processPublicArtData() async {
                 rawData, countryCode, regionCode, cityCode, false);
           }
 
+          else if (countryCode == 'Canada' && regionCode == 'British Columbia' && cityCode == 'Prince George') {
+            filteredData = filterPrinceGeorge(
+                rawData, countryCode, regionCode, cityCode, false);
+          }
+
           // controlled list, only seattle is left.
           else {
             filteredData = filterSeattle(
@@ -229,4 +234,42 @@ List<dynamic> filterHamilton(dynamic data, String countryCode, String regionCode
 
   return newData;
 }
+
+List<dynamic> filterPrinceGeorge(dynamic data, String countryCode, String regionCode, String cityCode, bool stringify) {
+  if (data is String) {
+    data = jsonDecode(data);
+  }
+
+  List<dynamic> newData = [];
+
+  for (var d in data['features']) {
+    Map<String, dynamic> item = {};
+
+    // add the labels
+    item['labels'] = {
+      'category': 'public-art',
+      'country': countryCode,
+      'region': regionCode,
+      'city': cityCode,
+    };
+
+    item['name'] = d['properties']['Title'];
+    if (item['name'] == null) {
+      print('Data name not found for art with url ${d['url']}');
+    }
+    Map<String, dynamic> coordinates = {
+      'longitude': d['geometry']['coordinates'][0],
+      'latitude': d['geometry']['coordinates'][1]
+    };
+    if (coordinates['longitude'] == null || coordinates['latitude'] == null) {
+      print('Data coordinates not found for art with url ${d['url']}');
+    }
+    item['coordinates'] = coordinates;
+    newData.add(item);
+  }
+
+
+  return newData;
+}
+
 

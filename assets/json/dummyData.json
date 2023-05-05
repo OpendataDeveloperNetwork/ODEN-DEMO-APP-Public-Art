@@ -61,5 +61,26 @@
       }
     }
 
+  },
+  {
+    "url": "https://data.calgary.ca/d/2kp2-hsy7",
+    "labels": {
+      "category": "public-art",
+      "country": "Canada",
+      "region": "British Columbia",
+      "city": "Prince George"
+    },
+    "data": {
+      "schema": "https://raw.githubusercontent.com/OpendataDeveloperNetwork/ODEN-Transmogrifiers/dev/schemas/public-art.json",
+      "datasets": {
+        "json": {
+          "url": "https://services2.arcgis.com/CnkB6jCzAsyli34z/arcgis/rest/services/OpenData_Parks/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson",
+          "filters": {
+            "json": ""
+          }
+        }
+      }
+    }
+
   }
 ]
