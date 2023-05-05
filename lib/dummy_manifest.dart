@@ -23,9 +23,18 @@ Future<void> processPublicArtData() async {
         var response = await http.get(Uri.parse(rawUrl));
         if (response.statusCode == 200) {
           var rawData = json.decode(response.body);
+          List<dynamic> filteredData;
 
-          // Apply the Dart filter function
-          var filteredData = filter(rawData, countryCode, regionCode, cityCode, false);
+          // Apply the Dart filter function (for different cities
+          if (countryCode == 'Canada' && regionCode == 'Alberta' && cityCode == 'Calgary') {
+            filteredData = filterCalgary(
+                rawData, countryCode, regionCode, cityCode, false);
+          }
+
+          else {
+            filteredData = filterSeattle(
+                rawData, countryCode, regionCode, cityCode, false);
+          }
 
           // Upload the standardized data to Firestore
           await uploadStandardizedDataToFirestore(
@@ -82,7 +91,7 @@ Future<void> uploadStandardizedDataToFirestore(FirebaseFirestore firestore, Stri
 
 // Manual way
 
-List<dynamic> filter(dynamic data, String countryCode, String regionCode, String cityCode, bool stringify) {
+List<dynamic> filterCalgary(dynamic data, String countryCode, String regionCode, String cityCode, bool stringify) {
   if (data is String) {
     data = jsonDecode(data);
   }
@@ -108,6 +117,48 @@ List<dynamic> filter(dynamic data, String countryCode, String regionCode, String
     Map<String, dynamic> coordinates = {
       'longitude': d['point']['coordinates'][0],
       'latitude': d['point']['coordinates'][1]
+    };
+    if (coordinates['longitude'] == null || coordinates['latitude'] == null) {
+      print('Data coordinates not found for art with url ${d['url']}');
+    }
+    item['coordinates'] = coordinates;
+    newData.add(item);
+  }
+
+/*  if (stringify) {
+    return jsonEncode(newData);
+  }*/
+
+  return newData;
+}
+
+// seattle
+List<dynamic> filterSeattle(dynamic data, String countryCode, String regionCode, String cityCode, bool stringify) {
+  if (data is String) {
+    data = jsonDecode(data);
+  }
+
+  List<dynamic> newData = [];
+
+  for (var d in data) {
+    Map<String, dynamic> item = {};
+
+    // add the labels
+    item['labels'] = {
+      'category': 'public-art',
+      'country': countryCode,
+      'region': regionCode,
+      'city': cityCode,
+    };
+
+
+    item['name'] = d['title'];
+    if (item['name'] == null) {
+      print('Data name not found for art with url ${d['url']}');
+    }
+    Map<String, dynamic> coordinates = {
+      'longitude': d['longitude'],
+      'latitude': d['latitude']
     };
     if (coordinates['longitude'] == null || coordinates['latitude'] == null) {
       print('Data coordinates not found for art with url ${d['url']}');
