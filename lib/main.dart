@@ -11,6 +11,9 @@ import 'screens/login.dart';
 import 'screens/sign_up.dart';
 import 'screens/details.dart';
 
+// import path to dummy_manifest.dart
+import './dummy_manifest.dart';
+
 // ---------------------------- //
 // ----- The main driver ------ //
 // ---------------------------- //
@@ -25,6 +28,12 @@ Future<void> main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+
+  // Following function runs the dummy minefest.dart
+  // will upload all entries to the firestore.
+  // commented out not run run everytime.
+  //processPublicArtData();
+
   runApp(const MyApp());
 }
 
