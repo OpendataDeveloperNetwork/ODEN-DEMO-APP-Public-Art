@@ -26,11 +26,18 @@ Future<void> processPublicArtData() async {
           List<dynamic> filteredData;
 
           // Apply the Dart filter function (for different cities
+
           if (countryCode == 'Canada' && regionCode == 'Alberta' && cityCode == 'Calgary') {
             filteredData = filterCalgary(
                 rawData, countryCode, regionCode, cityCode, false);
           }
 
+          else if (countryCode == 'Canada' && regionCode == 'Ontario' && cityCode == 'Hamilton') {
+            filteredData = filterHamilton(
+                rawData, countryCode, regionCode, cityCode, false);
+          }
+
+          // controlled list, only seattle is left.
           else {
             filteredData = filterSeattle(
                 rawData, countryCode, regionCode, cityCode, false);
@@ -48,9 +55,11 @@ Future<void> processPublicArtData() async {
 
 Future<void> uploadStandardizedDataToFirestore(FirebaseFirestore firestore, String countryCode, String regionCode, String cityCode, List<dynamic> standardizedData) async {
   // Get the reference to the 'Items' collection
+  // use 'Items' for in use db and 'Manifest_test' for testing menifest.
   CollectionReference itemsCollection = firestore.collection('Categories')
       .doc('Public_Art')
-      .collection('Items');
+      //.collection('Items');
+      .collection('Manifest_test');
 
   // Upload each element of standardizedData as its own document
   for (var item in standardizedData) {
@@ -173,3 +182,51 @@ List<dynamic> filterSeattle(dynamic data, String countryCode, String regionCode,
 
   return newData;
 }
+
+
+List<dynamic> filterHamilton(dynamic data, String countryCode, String regionCode, String cityCode, bool stringify) {
+  if (data is String) {
+    data = jsonDecode(data);
+  }
+
+  // Extract the features from the input data
+  List<dynamic> features = data['features'];
+
+  List<dynamic> newData = [];
+
+  for (var d in features) {
+    Map<String, dynamic> item = {};
+
+    // Extract the attributes for each feature
+    Map<String, dynamic> attributes = d['attributes'];
+
+    // add the labels
+    item['labels'] = {
+      'category': 'public-art',
+      'country': countryCode,
+      'region': regionCode,
+      'city': cityCode,
+    };
+
+    item['name'] = attributes['ARTWORK_TITLE'];
+    if (item['name'] == null) {
+      print('Data name not found for art with url ${attributes['url']}');
+    }
+    Map<String, dynamic> coordinates = {
+      'longitude': attributes['LONGITUDE'],
+      'latitude': attributes['LATITUDE']
+    };
+    if (coordinates['longitude'] == null || coordinates['latitude'] == null) {
+      print('Data coordinates not found for art with url ${attributes['url']}');
+    }
+    item['coordinates'] = coordinates;
+    newData.add(item);
+  }
+
+/*  if (stringify) {
+    return jsonEncode(newData);
+  }*/
+
+  return newData;
+}
+
