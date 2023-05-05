@@ -50,15 +50,31 @@ Future<bool> isNewLocation(FirebaseFirestore firestore, String countryCode, Stri
 }
 
 Future<void> uploadStandardizedDataToFirestore(FirebaseFirestore firestore, String countryCode, String regionCode, String cityCode, List<dynamic> standardizedData) async {
-  // Upload the data to Firestore
-  await firestore.collection('Categories')
+  // Get the reference to the 'Items' collection
+  CollectionReference itemsCollection = firestore.collection('Categories')
       .doc('Public_Art')
-      .collection('Items')
-      .doc('${countryCode}_${regionCode}_${cityCode}')
-      .set({'data': standardizedData});
+      .collection('Items');
+
+  // Upload each element of standardizedData as its own document
+  for (var item in standardizedData) {
+    // Create a new document with a unique ID
+    DocumentReference docRef = itemsCollection.doc();
+
+    // Set the data for the new document
+    await docRef.set({
+      'labels': {
+        'countryCode': countryCode,
+        'regionCode': regionCode,
+        'cityCode': cityCode,
+      },
+      'name': item['name'],
+      'coordinates': item['coordinates']
+    });
+  }
 
   print('Data uploaded to Firestore successfully.');
 }
+
 
 // Manual way
 
