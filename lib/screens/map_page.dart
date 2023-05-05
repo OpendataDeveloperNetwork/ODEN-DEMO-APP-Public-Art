@@ -32,63 +32,59 @@ class _MapsPageState extends State<MapsPage> {
     _onMapCreated();
   }
 
-  Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
+  // Google maps controller
+  final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
 
   final Map<String, Marker> _markers = {};
 
   List publicArts = [];
 
+  // Position of camera on map
   CameraPosition position = const CameraPosition(
     target: LatLng(0, 0),
     zoom: 18.4746,
   );
 
+  // Search box controller
   final myController = TextEditingController();
 
   // Creates and adds markers to the _markers object
   Future<List> _fetchMarkers() async {
     final snapshot =
-        await FirebaseFirestore.instance.collection('PublicArts').get();
+        await FirebaseFirestore.instance.collection('Categories').get();
 
     for (final doc in snapshot.docs) {
-      var rawJSON = [];
-      final data = doc.data();
-      var url = Uri.parse(data['link']);
-      var response = await http.get(url);
+      var innerCols = doc.reference.collection("Items");
+      QuerySnapshot innerSnapshot = await innerCols.get();
 
-      if (response.statusCode == 200) {
-        rawJSON.addAll(jsonDecode(response.body));
-        for (final data in rawJSON) {
-          PublicArt publicArt = await jsonToPublicArt(data, data['link']);
-          publicArts.add(publicArt);
-        }
-      } else {
-        // There was an error, handle it here
-        print("OOps something happened somewhere.");
+      for (final innerDoc in innerSnapshot.docs){
+        PublicArt publicArt = await jsonToPublicArt(innerDoc);
+        publicArts.add(publicArt);
       }
     }
 
     return publicArts;
   }
 
-  jsonToPublicArt(publicArtJSON, dataLink) async {
-    double lat = publicArtJSON["point"]["coordinates"][1];
-    double long = publicArtJSON["point"]["coordinates"][0];
+  // Creates a public art object
+  jsonToPublicArt(publicArtJSON) async {
+    double lat = double.parse(publicArtJSON["coordinates"]["latitude"].toString());
+    double long = double.parse(publicArtJSON["coordinates"]["longitude"].toString());
     Position pos = await getCurrentLocation();
     double distanceBetweenLocations =
         Geolocator.distanceBetween(pos.latitude, pos.longitude, lat, long);
 
     return PublicArt(
-        name: publicArtJSON["title"],
+        name: publicArtJSON["name"],
         latitude: lat,
         longitude: long,
-        description: publicArtJSON["short_desc"],
-        link: dataLink,
-        address: publicArtJSON["address"],
-        artist: publicArtJSON["artist"],
+        city: publicArtJSON["labels"]["cityCode"],
+        country: publicArtJSON["labels"]["countryCode"],
+        region: publicArtJSON["labels"]["regionCode"],
         distance: distanceBetweenLocations.round() / 1000);
   }
 
+  // Fetches the current location of user
   Future<Position> getCurrentLocation() async {
     bool serviceEnabled;
     LocationPermission permission;
@@ -151,6 +147,7 @@ class _MapsPageState extends State<MapsPage> {
     }
   }
 
+  // Displays a dialogue box
   void _showDialog(BuildContext context, String message) async {
     return showDialog<void>(
       context: context,
@@ -169,30 +166,46 @@ class _MapsPageState extends State<MapsPage> {
     );
   }
 
+  // Handles search
   Future<void> search() async {
     var text = myController.text.trim().toLowerCase();
     bool found = false;
 
     if (text.isNotEmpty) {
-      for (PublicArt art in publicArts) {
-        if (art.name.toLowerCase() == text) {
-          found = true;
-          position = CameraPosition(
-            target: LatLng(art.latitude, art.longitude),
-            zoom: 18.4746,
-          );
+      if(text.contains(",") || text.contains(" ")){
+        var char = text.contains(",") ? "," : " ";
+        List<String> searchField = text.split(char).map((e) => e.trim().toLowerCase()).toList();
+        for (PublicArt art in publicArts) {
+          if (art.name.toLowerCase() == searchField[0] && (art.city.toLowerCase() == searchField[1]
+              || art.country.toLowerCase() == searchField[1]
+              || art.region.toLowerCase() == searchField[1])) {
+            found = true;
+            position = CameraPosition(
+              target: LatLng(art.latitude, art.longitude),
+              zoom: 20.4746,
+            );
+          }
+        }
+      }else{
+        for (PublicArt art in publicArts) {
+          if (art.name.toLowerCase() == text) {
+            found = true;
+            position = CameraPosition(
+              target: LatLng(art.latitude, art.longitude),
+              zoom: 20.4746,
+            );
+          }
         }
       }
 
       if(!found){
         try{
-          final List<location.Location> placemarks =
+          final List<location.Location> locations =
           await locationFromAddress(text);
-          if (placemarks.isNotEmpty) {
-            found = true;
-            final location.Location placemark = placemarks.first;
+          if (locations.isNotEmpty) {
+            final location.Location loc = locations.first;
             position = CameraPosition(
-              target: LatLng(placemark.latitude, placemark.longitude),
+              target: LatLng(loc.latitude, loc.longitude),
               zoom: 10.4746,
             );
           }
@@ -201,11 +214,11 @@ class _MapsPageState extends State<MapsPage> {
           _showDialog(context, "We couldn't find the location. Please try again");
         }
       }
-    }
 
-    GoogleMapController gController = await _controller.future;
-    gController.animateCamera(CameraUpdate.newCameraPosition(position));
-    setState(() {});
+      GoogleMapController gController = await _controller.future;
+      gController.animateCamera(CameraUpdate.newCameraPosition(position));
+      setState(() {});
+    }
 
     myController.clear();
   }
