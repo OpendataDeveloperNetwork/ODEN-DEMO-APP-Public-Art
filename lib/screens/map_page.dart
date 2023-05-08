@@ -31,6 +31,7 @@ class _MapsPageState extends State<MapsPage> {
     _manager = getClusterManager();
     super.initState();
     _displayMarkers();
+    _setCurrentLocation();
   }
 
   // Google maps controller
@@ -151,9 +152,6 @@ class _MapsPageState extends State<MapsPage> {
           zoom: 18.4746,
         );
 
-      getController().animateCamera(CameraUpdate.newCameraPosition(position));
-      setState(() {});
-
     } catch (e) {
       debugPrint("Error, ${e.toString()}");
     }
@@ -168,7 +166,6 @@ class _MapsPageState extends State<MapsPage> {
   Future<void> _OnMapCreated(GoogleMapController controller) async {
   _controller.complete(controller);
   await setController(_controller);
-  _setCurrentLocation();
   _manager.setMapId(getController().mapId);
   }
 
@@ -296,14 +293,16 @@ class _MapsPageState extends State<MapsPage> {
               ],
             ),
             Expanded(
-                child: GoogleMap(
+                child: position.target.longitude != 0 ?
+                GoogleMap(
                         mapType: MapType.normal,
                         initialCameraPosition: position,
                         markers: _markers,
                         onCameraMove: _manager.onCameraMove,
                         onCameraIdle: _manager.updateMap,
                         onMapCreated: (controller) => _OnMapCreated(controller))
-                    )
+                     : const Center(child: CircularProgressIndicator())
+            )
 
           ],
         )));
