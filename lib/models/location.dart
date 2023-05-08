@@ -2,32 +2,36 @@
 // ----- Location ------- //
 // ---------------------- //
 
+import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
 ///
 /// Location class contains all value for locations. It must have a name to present
 /// on the button and a longitude and latitude to use for the Googles API origin.
 ///
-class Location {
+class Location with ClusterItem {
   final String _name;
 
   /// The latitude to use in the API call e.g. 51.5074
-  final double _latitude;
+  final LatLng _location;
 
-  /// The longitude to use in the API call e.g. 0.1278
-  final double _longitude;
+  Location({
+    required name, 
+    required latitude, 
+    required longitude
+  }) : 
+    _name = name ?? "No name",
+    _location = LatLng(latitude, longitude);
 
-  Location({required name, required latitude, required longitude})
-      : _name = name,
-        _latitude = latitude,
-        _longitude = longitude;
-
+  @override
+  LatLng get location => _location;
   String get name => _name;
+  double get latitude => location.latitude;
+  double get longitude => location.longitude;
 
-  double get latitude => _latitude;
-
-  double get longitude => _longitude;
 }
 
-class PublicArt extends Location {
+class PublicArt extends Location{
   final String _description;
   final String _link;
   final String _address;

@@ -1,22 +1,21 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart' as location;
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:http/http.dart' as http;
 import 'package:oden_app/components/profile_button_app_bar.dart';
 import 'package:oden_app/models/location.dart';
-
-import './details.dart';
+import 'package:oden_app/screens/components/markers.dart';
 
 // ------------------------------------- //
 // ----- Maps Page - Main Feature ------ //
 // ------------------------------------- //
 
+/// Represents the MapsPage.
 class MapsPage extends StatefulWidget {
   const MapsPage({Key? key}) : super(key: key);
 
@@ -25,19 +24,27 @@ class MapsPage extends StatefulWidget {
 }
 
 class _MapsPageState extends State<MapsPage> {
+  /// Calls setup methods and sets initial state.
   @override
-  initState() {
+  void initState() {
+    setMaps(this);
+    _manager = getClusterManager();
     super.initState();
-    _setCurrentLocation();
-    _onMapCreated();
+    _displayMarkers();
   }
 
   // Google maps controller
   final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
 
-  final Map<String, Marker> _markers = {};
+  late GoogleMapController gController;
 
-  List publicArts = [];
+  /// Manages clusters of map markers.
+  late ClusterManager _manager;
+
+  Set<Marker> _markers = {};
+
+  /// List of PublicArt objects.
+  List<PublicArt> _publicArts = [];
 
   // Position of camera on map
   CameraPosition position = const CameraPosition(
@@ -48,8 +55,34 @@ class _MapsPageState extends State<MapsPage> {
   // Search box controller
   final myController = TextEditingController();
 
-  // Creates and adds markers to the _markers object
-  Future<List> _fetchMarkers() async {
+  ClusterManager get manager => _manager;
+
+  Set<Marker> get markers => _markers;
+
+  List<PublicArt> get publicArts => _publicArts;
+
+
+  /// Updates the map markers; usually when an action is performed.
+  void updateMarkers(Set<Marker> markers) {
+    setState(() {
+      _markers = markers;
+    });
+  }
+
+  void addMarker(Marker marker) {
+    setState(() {
+      _markers.add(marker);
+    });
+  }
+
+  void removeMarker(Marker marker) {
+    setState(() {
+      _markers.remove(marker);
+    });
+  }
+
+  /// Creates and adds markers to the _markers object
+  Future<List<PublicArt>> _fetchMarkers() async {
     final snapshot =
         await FirebaseFirestore.instance.collection('Categories').get();
 
@@ -57,7 +90,7 @@ class _MapsPageState extends State<MapsPage> {
       var innerCols = doc.reference.collection("Items");
       QuerySnapshot innerSnapshot = await innerCols.get();
 
-      for (final innerDoc in innerSnapshot.docs){
+      for (final innerDoc in innerSnapshot.docs) {
         PublicArt publicArt = await jsonToPublicArt(innerDoc);
         publicArts.add(publicArt);
       }
@@ -109,42 +142,34 @@ class _MapsPageState extends State<MapsPage> {
     return await Geolocator.getCurrentPosition();
   }
 
-  Future<void> _setCurrentLocation() async {
+  /// Sets the camera location to the user's location.
+  void _setCurrentLocation() async {
     try {
       Position pos = await getCurrentLocation();
-      setState(() {
         position = CameraPosition(
           target: LatLng(pos.latitude, pos.longitude),
           zoom: 18.4746,
         );
-      });
+
+      getController().animateCamera(CameraUpdate.newCameraPosition(position));
+      setState(() {});
+
     } catch (e) {
-      debugPrint("Error");
+      debugPrint("Error, ${e.toString()}");
     }
   }
 
   // Creates and adds markers to the _markers object
-  Future<void> _onMapCreated() async {
-    publicArts = await _fetchMarkers();
-    _markers.clear();
-    for (final art in publicArts) {
-      final marker = Marker(
-        markerId: MarkerId(art.name),
-        position: LatLng(art.latitude, art.longitude),
-        infoWindow: InfoWindow(
-          onTap: () => {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => DetailsPage(art)))
-          },
-          title: art.name,
-          snippet: art.description,
-        ),
-      );
+  Future<void> _displayMarkers() async {
+    _publicArts = await _fetchMarkers();
+    await addMarkers();
+  }
 
-      setState(() {
-        _markers[art.name] = marker;
-      });
-    }
+  Future<void> _OnMapCreated(GoogleMapController controller) async {
+  _controller.complete(controller);
+  await setController(_controller);
+  _setCurrentLocation();
+  _manager.setMapId(getController().mapId);
   }
 
   // Displays a dialogue box
@@ -172,13 +197,15 @@ class _MapsPageState extends State<MapsPage> {
     bool found = false;
 
     if (text.isNotEmpty) {
-      if(text.contains(",") || text.contains(" ")){
+      if (text.contains(",") || text.contains(" ")) {
         var char = text.contains(",") ? "," : " ";
-        List<String> searchField = text.split(char).map((e) => e.trim().toLowerCase()).toList();
-        for (PublicArt art in publicArts) {
-          if (art.name.toLowerCase() == searchField[0] && (art.city.toLowerCase() == searchField[1]
-              || art.country.toLowerCase() == searchField[1]
-              || art.region.toLowerCase() == searchField[1])) {
+        List<String> searchField =
+            text.split(char).map((e) => e.trim().toLowerCase()).toList();
+        for (PublicArt art in _publicArts) {
+          if (art.name.toLowerCase() == searchField[0] &&
+              (art.city.toLowerCase() == searchField[1] ||
+                  art.country.toLowerCase() == searchField[1] ||
+                  art.region.toLowerCase() == searchField[1])) {
             found = true;
             position = CameraPosition(
               target: LatLng(art.latitude, art.longitude),
@@ -186,8 +213,8 @@ class _MapsPageState extends State<MapsPage> {
             );
           }
         }
-      }else{
-        for (PublicArt art in publicArts) {
+      } else {
+        for (PublicArt art in _publicArts) {
           if (art.name.toLowerCase() == text) {
             found = true;
             position = CameraPosition(
@@ -198,10 +225,10 @@ class _MapsPageState extends State<MapsPage> {
         }
       }
 
-      if(!found){
-        try{
+      if (!found) {
+        try {
           final List<location.Location> locations =
-          await locationFromAddress(text);
+              await locationFromAddress(text);
           if (locations.isNotEmpty) {
             final location.Location loc = locations.first;
             position = CameraPosition(
@@ -209,14 +236,14 @@ class _MapsPageState extends State<MapsPage> {
               zoom: 10.4746,
             );
           }
-        }catch(e){
+        } catch (e) {
           // Invalid name
-          _showDialog(context, "We couldn't find the location. Please try again");
+          _showDialog(
+              context, "We couldn't find the location. Please try again");
         }
       }
 
-      GoogleMapController gController = await _controller.future;
-      gController.animateCamera(CameraUpdate.newCameraPosition(position));
+      getController().animateCamera(CameraUpdate.newCameraPosition(position));
       setState(() {});
     }
 
@@ -269,15 +296,15 @@ class _MapsPageState extends State<MapsPage> {
               ],
             ),
             Expanded(
-                child: _markers.isNotEmpty
-                    ? GoogleMap(
+                child: GoogleMap(
                         mapType: MapType.normal,
                         initialCameraPosition: position,
-                        markers: _markers.values.toSet(),
-                        onMapCreated: (GoogleMapController controller) {
-                         _controller.complete(controller);
-                        })
-                    : const Center(child: CircularProgressIndicator()))
+                        markers: _markers,
+                        onCameraMove: _manager.onCameraMove,
+                        onCameraIdle: _manager.updateMap,
+                        onMapCreated: (controller) => _OnMapCreated(controller))
+                    )
+
           ],
         )));
   }
