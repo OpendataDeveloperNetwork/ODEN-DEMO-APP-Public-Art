@@ -51,7 +51,6 @@ class MyApp extends StatelessWidget {
         '/profile': (context) => const ProfilePage(),
         '/homepage': (context) => const HomePage(),
         '/collections': (context) => const CollectionsPage(),
-        '/details': (context) => const DetailsPage(),
         '/maps': (context) => const MapsPage(),
       },
       title: 'ODEN Demo',
