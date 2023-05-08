@@ -26,14 +26,7 @@ Future<void> uploadStandardizedDataToFirestore() async {
         .where('name', isEqualTo: item['name'])
         .get();
 
-    if (querySnapshot.docs.isNotEmpty) {
-      // If a duplicate is found, update the existing document
-      DocumentReference docRef = querySnapshot.docs.first.reference;
-      await docRef.update({
-        'name': item['name'],
-        'coordinates': item['coordinates']
-      });
-    } else {
+    if (querySnapshot.docs.isEmpty) {
       // If no duplicate is found, create a new document knowing public art schema from ODEN (simple)
       DocumentReference docRef = itemsCollection.doc();
       await docRef.set({
