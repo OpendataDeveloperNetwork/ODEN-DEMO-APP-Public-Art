@@ -27,7 +27,7 @@ Future<void> main() async{
   // Following function runs the dummy minefest.dart
   // will upload all entries to the firestore.
   // commented out not run run everytime.
-  //processPublicArtData();
+  //uploadStandardizedDataToFirestore();
 
   runApp(const MyApp());
 }
