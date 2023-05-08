@@ -7,7 +7,7 @@ import 'package:firebase_core/firebase_core.dart';
 import './theme/style.dart';
 
 // import path to dummy_manifest.dart
-import './dummy_manifest.dart';
+import './oden_integration.dart';
 
 // ---------------------------- //
 // ----- The main driver ------ //
