@@ -109,8 +109,8 @@ class _MapsPageState extends State<MapsPage> {
     Position pos = await getCurrentLocation();
     double distanceBetweenLocations =
         Geolocator.distanceBetween(pos.latitude, pos.longitude, lat, long);
-
     return PublicArt(
+        id: publicArtJSON.id, // TODO
         name: publicArtJSON["name"],
         latitude: lat,
         longitude: long,
