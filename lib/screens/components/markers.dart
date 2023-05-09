@@ -92,7 +92,7 @@ Future<Marker> Function(Cluster<PublicArt>) get _markerBuilder =>
 /// Navigates to the details page.
 void navigateToDetailsPage(BuildContext context, PublicArt art) {
   Navigator.push(
-      context, MaterialPageRoute(builder: (context) => DetailsPage(art)));
+      context, MaterialPageRoute(builder: (context) => DetailsPage(art: art)));
 }
 
 /// Returns the size of the cluster given the number of markers it contains.
@@ -149,7 +149,7 @@ Future<void> addMarkers() async {
         onTap: () => {
           Navigator.push(
             mapsPage.context,
-            MaterialPageRoute(builder: (context) => DetailsPage(art)),
+            MaterialPageRoute(builder: (context) => DetailsPage(art: art)),
           )
         },
         title: art.name,
