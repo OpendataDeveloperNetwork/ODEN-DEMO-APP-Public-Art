@@ -15,23 +15,18 @@ class Location with ClusterItem {
   /// The latitude to use in the API call e.g. 51.5074
   final LatLng _location;
 
-  Location({
-    required name, 
-    required latitude, 
-    required longitude
-  }) : 
-    _name = name ?? "No name",
-    _location = LatLng(latitude, longitude);
+  Location({required name, required latitude, required longitude})
+      : _name = name ?? "No name",
+        _location = LatLng(latitude, longitude);
 
   @override
   LatLng get location => _location;
   String get name => _name;
   double get latitude => location.latitude;
   double get longitude => location.longitude;
-
 }
 
-class PublicArt extends Location{
+class PublicArt extends Location {
   final String _description;
   final String _link;
   final String _address;
@@ -40,9 +35,11 @@ class PublicArt extends Location{
   final String _city;
   final String _country;
   final String _region;
+  final String _id;
 
   PublicArt(
-      {required super.name,
+      {required id,
+      required super.name,
       required super.latitude,
       required super.longitude,
       description,
@@ -53,7 +50,8 @@ class PublicArt extends Location{
       city,
       country,
       region})
-      : _description = description ?? "No description available",
+      : _id = id ?? "No id",
+        _description = description ?? "No description available",
         _link = link ?? "No link available",
         _address = address ?? "No address",
         _artist = artist ?? "No artist",
@@ -61,6 +59,8 @@ class PublicArt extends Location{
         _city = city ?? "No city",
         _country = country ?? "No country",
         _region = region ?? "No region";
+
+  String get id => _id;
 
   String get description => _description;
 
@@ -80,6 +80,6 @@ class PublicArt extends Location{
 
   @override
   String toString() {
-    return 'PublicArt{\nname: $name,\n latitude: $latitude,\n longitude: $longitude,\n description: $_description,\n link: $_link\t}';
+    return 'PublicArt{\nid: $id\nname: $name,\n latitude: $latitude,\n longitude: $longitude,\n description: $_description,\n link: $_link\t}';
   }
 }
