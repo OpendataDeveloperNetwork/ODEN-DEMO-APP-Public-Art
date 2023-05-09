@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:oden_app/components/back_button_app_bar.dart';
 import 'components/favourites_list_view.dart';
 import 'components/visits_list_view.dart';
+import '../models/auth.dart';
 
 // ------------------------ //
 // ----- Profile Page ----- //
@@ -9,11 +10,11 @@ import 'components/visits_list_view.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
-  // Leave the appBar null, for now, I will be creating a appBar class for that! - Joushua //
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: backButtonAppBarWidget(context), body: ProfileBody());
+        appBar: backButtonAppBarWidget(context), body: const ProfileBody());
   }
 }
 
@@ -67,6 +68,11 @@ class _ProfileBodyState extends State<ProfileBody> {
     );
   }
 
+  void onSignOut() {
+    Auth().signOut();
+    Navigator.pop(context);
+  }
+
   ///
   /// Builds the list view.
   ///
@@ -78,15 +84,16 @@ class _ProfileBodyState extends State<ProfileBody> {
 
   @override
   Widget build(BuildContext context) {
+    String name = Auth().name;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Padding(
-          padding: EdgeInsets.fromLTRB(20, 20, 0, 15),
-          child: Text("Hey, User!",
-              style: TextStyle(
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 20, 0, 15),
+          child: Text("Hey, ${Auth().name}!",
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               )),
@@ -95,7 +102,8 @@ class _ProfileBodyState extends State<ProfileBody> {
         const SizedBox(height: 15),
         /* Visibility of listviews are dynamic depending on which toggle button is selected */
         _buildListView(const FavouritesListView(), _selectedCategories[0]),
-        _buildListView(const VisitsListView(), _selectedCategories[1])
+        _buildListView(const VisitsListView(), _selectedCategories[1]),
+        ElevatedButton(onPressed: onSignOut, child: const Text("Log Out"))
       ],
     );
   }

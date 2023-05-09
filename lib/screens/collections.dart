@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import '../components/profile_button_app_bar.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
+
 
 ///
 /// This contains the collections page.
@@ -29,16 +30,11 @@ class _FilterPageState extends State<FilterPage> {
   String? selectedRegion;
   String? selectedCity;
 
-  // Nested data structure
-  Map<String, Map<String, List<String>>> countryRegionCityData = {
-    'Canada': {
-      'British Columbia': ['Vancouver', 'New Westminster'],
-    },
-    'United States': {
-      'California': ['Los Angeles', 'San Francisco'],
-      'New York': ['New York City', 'Buffalo'],
-    },
-  };
+  // for loading indicator
+  bool isLoading = true;
+
+  // Initialize the nested data structure as an empty map
+  Map<String, Map<String, List<String>>> countryRegionCityData = {};
 
   List<String> countries = [];
   List<String> regions = [];
@@ -60,42 +56,55 @@ class _FilterPageState extends State<FilterPage> {
     }
   }
 
-  // Generate dummy art pieces data
-// Generate dummy art pieces data
-  List<Map<String, dynamic>> generateDummyData() {
+  Future<List<Map<String, dynamic>>> fetchDataFromFirestore() async {
     List<Map<String, dynamic>> data = [];
+    Map<String, Map<String, List<String>>> locationData = {};
 
-    // Canadian Art Pieces
-    for (int i = 0; i < 5; i++) {
-      data.add({
-        'name': 'Canadian Art Piece ${i + 1}',
-        'country': 'Canada',
-        'region': 'British Columbia',
-        'city': i < 3 ? 'Vancouver' : 'New Westminster',
-        'image': null,
-      });
-    }
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    QuerySnapshot querySnapshot = await firestore
+        .collection('Categories')
+        .doc('Public_Art')
+        .collection('Items')
+        .get();
 
-    // American Art Pieces
-    for (int i = 0; i < 10; i++) {
-      if (i < 5) {
-        data.add({
-          'name': 'American Art Piece ${i + 1}',
-          'country': 'United States',
-          'region': 'California',
-          'city': i < 3 ? 'Los Angeles' : 'San Francisco',
-          'image': null,
-        });
-      } else {
-        data.add({
-          'name': 'American Art Piece ${i + 1}',
-          'country': 'United States',
-          'region': 'New York',
-          'city': i < 8 ? 'New York City' : 'Buffalo',
-          'image': null,
-        });
+    for (var doc in querySnapshot.docs) {
+
+      // for debugging purposes
+      print('Document data: ${doc.data()}');
+
+      String country = doc['labels']['countryCode'];
+      String region = doc['labels']['regionCode'];
+      String city = doc['labels']['cityCode'];
+
+      // Update the location data structure
+      if (!locationData.containsKey(country)) {
+        locationData[country] = {};
       }
+      if (!locationData[country]!.containsKey(region)) {
+        locationData[country]![region] = [];
+      }
+      if (!locationData[country]![region]!.contains(city)) {
+        locationData[country]![region]!.add(city);
+      }
+
+      Map<String, dynamic> artPiece = {
+        'name': doc['name'],
+        'country': country,
+        'region': region,
+        'city': city,
+        'image': null,
+      };
+      data.add(artPiece);
     }
+
+    // Update the countryRegionCityData map
+    countryRegionCityData = locationData;
+
+    // Update the countryRegionCityData map and refresh the UI
+    setState(() {
+      countryRegionCityData = locationData;
+      countries = countryRegionCityData.keys.toList();
+    });
 
     return data;
   }
@@ -106,10 +115,17 @@ class _FilterPageState extends State<FilterPage> {
   @override
   void initState() {
     super.initState();
-    countries = countryRegionCityData.keys.toList();
-    allArtPieces = generateDummyData();
-    filterData();
+    fetchDataFromFirestore().then((data) {
+      setState(() {
+        allArtPieces = data;
+        countries = countryRegionCityData.keys.toList();
+        filterData();
+        isLoading = false;
+      });
+    });
+
   }
+
 
   void filterData() {
     setState(() {
@@ -128,6 +144,11 @@ class _FilterPageState extends State<FilterPage> {
 
   @override
   Widget build(BuildContext context) {
+
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     return Scaffold(
       appBar: AppBar(title: Text('Filter Public Art')),
       body: Column(
@@ -162,6 +183,14 @@ class _FilterPageState extends State<FilterPage> {
               }),
             ],
           ),
+          // Add a Padding widget to display the number of filtered results
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              '${filteredArtPieces.length} result(s) found',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ),
           // ListView to display filtered art pieces
           Expanded(
             child: ListView.builder(
@@ -186,6 +215,7 @@ class _FilterPageState extends State<FilterPage> {
       ),
     );
   }
+
 
   DropdownButton<String> buildDropdown(
     String hint,
