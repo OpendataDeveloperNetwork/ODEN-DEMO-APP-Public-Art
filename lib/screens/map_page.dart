@@ -195,10 +195,9 @@ class _MapsPageState extends State<MapsPage> {
     bool found = false;
 
     if (text.isNotEmpty) {
-      if (text.contains(",") || text.contains(" ")) {
-        var char = text.contains(",") ? "," : " ";
+      if (text.contains(",")) {
         List<String> searchField =
-            text.split(char).map((e) => e.trim().toLowerCase()).toList();
+            text.split(",").map((e) => e.trim().toLowerCase()).toList();
         for (PublicArt art in _publicArts) {
           if (art.name.toLowerCase() == searchField[0] &&
               (art.city.toLowerCase() == searchField[1] ||

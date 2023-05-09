@@ -21,7 +21,7 @@ const double outerCircleRadiusDivisor = 2.2;
 const double fontSizeDivisor = 2.5;
 
 /// Max zoom level for clustering.
-const double maxClusterZoom = 16.0;
+const double maxClusterZoom = 9.0;
 
 /// Constant values for zoom
 const zoomFactor = 2.0;
@@ -46,7 +46,8 @@ ClusterManager<PublicArt> getClusterManager() {
 Future<double> getZoom() async => await controller.getZoomLevel();
 
 /// Sets the map controller once it has been retrieved from the completer.
-Future<void> setController(Completer<GoogleMapController> controllerCompleter) async {
+Future<void> setController(
+    Completer<GoogleMapController> controllerCompleter) async {
   controller = await controllerCompleter.future;
 }
 
