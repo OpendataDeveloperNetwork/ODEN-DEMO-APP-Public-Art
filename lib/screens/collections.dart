@@ -30,6 +30,9 @@ class _FilterPageState extends State<FilterPage> {
   String? selectedRegion;
   String? selectedCity;
 
+  // for loading indicator
+  bool isLoading = true;
+
   // Initialize the nested data structure as an empty map
   Map<String, Map<String, List<String>>> countryRegionCityData = {};
 
@@ -113,8 +116,10 @@ class _FilterPageState extends State<FilterPage> {
         allArtPieces = data;
         countries = countryRegionCityData.keys.toList();
         filterData();
+        isLoading = false;
       });
     });
+
   }
 
 
@@ -135,6 +140,11 @@ class _FilterPageState extends State<FilterPage> {
 
   @override
   Widget build(BuildContext context) {
+
+    if (isLoading) {
+      return Center(child: CircularProgressIndicator());
+    }
+
     return Scaffold(
       appBar: AppBar(title: Text('Filter Public Art')),
       body: Column(
