@@ -46,7 +46,8 @@ ClusterManager<PublicArt> getClusterManager() {
 Future<double> getZoom() async => await controller.getZoomLevel();
 
 /// Sets the map controller once it has been retrieved from the completer.
-Future<void> setController(Completer<GoogleMapController> controllerCompleter) async {
+Future<void> setController(
+    Completer<GoogleMapController> controllerCompleter) async {
   controller = await controllerCompleter.future;
 }
 
