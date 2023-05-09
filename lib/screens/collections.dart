@@ -68,6 +68,10 @@ class _FilterPageState extends State<FilterPage> {
         .get();
 
     for (var doc in querySnapshot.docs) {
+
+      // for debugging purposes
+      print('Document data: ${doc.data()}');
+
       String country = doc['labels']['countryCode'];
       String region = doc['labels']['regionCode'];
       String city = doc['labels']['cityCode'];
@@ -142,7 +146,7 @@ class _FilterPageState extends State<FilterPage> {
   Widget build(BuildContext context) {
 
     if (isLoading) {
-      return Center(child: CircularProgressIndicator());
+      return const Center(child: CircularProgressIndicator());
     }
 
     return Scaffold(
