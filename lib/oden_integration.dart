@@ -13,7 +13,6 @@ Future<void> uploadStandardizedDataToFirestore() async {
   // use 'Items' for in use db and 'Manifest_test' for testing menifest.
   CollectionReference itemsCollection = firestore.collection('Categories')
       .doc('Public_Art')
-  //.collection('Items');
       .collection('Manifest_test');
 
   // Upload each element of standardizedData as its own document
