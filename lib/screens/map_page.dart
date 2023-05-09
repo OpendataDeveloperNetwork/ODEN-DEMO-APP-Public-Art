@@ -35,7 +35,8 @@ class _MapsPageState extends State<MapsPage> {
   }
 
   // Google maps controller
-  final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
+  final Completer<GoogleMapController> _controller =
+      Completer<GoogleMapController>();
 
   late GoogleMapController gController;
 
@@ -61,7 +62,6 @@ class _MapsPageState extends State<MapsPage> {
   Set<Marker> get markers => _markers;
 
   List<PublicArt> get publicArts => _publicArts;
-
 
   /// Updates the map markers; usually when an action is performed.
   void updateMarkers(Set<Marker> markers) {
@@ -102,8 +102,10 @@ class _MapsPageState extends State<MapsPage> {
 
   // Creates a public art object
   jsonToPublicArt(publicArtJSON) async {
-    double lat = double.parse(publicArtJSON["coordinates"]["latitude"].toString());
-    double long = double.parse(publicArtJSON["coordinates"]["longitude"].toString());
+    double lat =
+        double.parse(publicArtJSON["coordinates"]["latitude"].toString());
+    double long =
+        double.parse(publicArtJSON["coordinates"]["longitude"].toString());
     Position pos = await getCurrentLocation();
     double distanceBetweenLocations =
         Geolocator.distanceBetween(pos.latitude, pos.longitude, lat, long);
@@ -115,7 +117,7 @@ class _MapsPageState extends State<MapsPage> {
         city: publicArtJSON["labels"]["cityCode"],
         country: publicArtJSON["labels"]["countryCode"],
         region: publicArtJSON["labels"]["regionCode"],
-        distance: distanceBetweenLocations.round() / 1000);
+        distance: distanceBetweenLocations / 1000);
   }
 
   // Fetches the current location of user
@@ -147,11 +149,10 @@ class _MapsPageState extends State<MapsPage> {
   void _setCurrentLocation() async {
     try {
       Position pos = await getCurrentLocation();
-        position = CameraPosition(
-          target: LatLng(pos.latitude, pos.longitude),
-          zoom: 18.4746,
-        );
-
+      position = CameraPosition(
+        target: LatLng(pos.latitude, pos.longitude),
+        zoom: 18.4746,
+      );
     } catch (e) {
       debugPrint("Error, ${e.toString()}");
     }
@@ -164,9 +165,9 @@ class _MapsPageState extends State<MapsPage> {
   }
 
   Future<void> _OnMapCreated(GoogleMapController controller) async {
-  _controller.complete(controller);
-  await setController(_controller);
-  _manager.setMapId(getController().mapId);
+    _controller.complete(controller);
+    await setController(_controller);
+    _manager.setMapId(getController().mapId);
   }
 
   // Displays a dialogue box
@@ -293,17 +294,15 @@ class _MapsPageState extends State<MapsPage> {
               ],
             ),
             Expanded(
-                child: position.target.longitude != 0 ?
-                GoogleMap(
+                child: position.target.longitude != 0
+                    ? GoogleMap(
                         mapType: MapType.normal,
                         initialCameraPosition: position,
                         markers: _markers,
                         onCameraMove: _manager.onCameraMove,
                         onCameraIdle: _manager.updateMap,
                         onMapCreated: (controller) => _OnMapCreated(controller))
-                     : const Center(child: CircularProgressIndicator())
-            )
-
+                    : const Center(child: CircularProgressIndicator()))
           ],
         )));
   }

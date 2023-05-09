@@ -59,7 +59,7 @@ class DetailsPage extends StatelessWidget {
                           )),
                       SizedBox(
                           width: 160,
-                          child: Text("You are ${art.distance} km away",
+                          child: Text("You are ${art.distance.round()} km away",
                               style: const TextStyle(fontSize: 20)))
                     ],
                   )),
