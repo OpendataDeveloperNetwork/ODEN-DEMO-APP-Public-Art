@@ -4,8 +4,14 @@ import 'package:oden_app/models/location.dart';
 
 class DetailsPage extends StatelessWidget {
   final PublicArt art;
+  late Map artDetails;
 
-  const DetailsPage(this.art, {super.key});
+  DetailsPage(this.art, {super.key}) {
+    artDetails = {};
+    artDetails['Description'] = art.description;
+    artDetails['Address'] = art.address;
+    artDetails['Artist'] = art.artist;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +40,14 @@ class DetailsPage extends StatelessWidget {
                     )),
               ),
               Expanded(
+                  child: Center(
+                      child: Container(
+                          width: 400,
+                          margin: const EdgeInsets.fromLTRB(10, 10, 0, 0),
+                          padding: const EdgeInsets.all(5),
+                          child: Text(art.name,
+                              style: const TextStyle(fontSize: 28))))),
+              Expanded(
                   flex: 3,
                   child: Row(
                     children: [
@@ -44,9 +58,9 @@ class DetailsPage extends StatelessWidget {
                             width: 200,
                           )),
                       SizedBox(
-                         width: 160,
-                         child: Text("You are ${art.distance} km away", style: const TextStyle(fontSize: 20))
-                       )
+                          width: 160,
+                          child: Text("You are ${art.distance} km away",
+                              style: const TextStyle(fontSize: 20)))
                     ],
                   )),
               Expanded(
@@ -56,31 +70,18 @@ class DetailsPage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(15),
                         color: Colors.black87),
                     margin: const EdgeInsets.fromLTRB(10, 5, 10, 0),
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.fromLTRB(20, 5, 20, 20),
                     width: 500,
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.vertical,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Name : ${art.name}\n",
-                                style: const TextStyle(
-                                    color: Colors.white70, fontSize: 20)),
-                            const SizedBox(height: 25),
-                            Text("Description : ${art.description}\n",
-                                style: const TextStyle(
-                                    color: Colors.white70, fontSize: 20)),
-                            const SizedBox(height: 25),
-                            Text("Artist : ${art.artist}\n",
-                                style: const TextStyle(
-                                    color: Colors.white70, fontSize: 20)),
-                            const SizedBox(height: 25),
-                            Text("Address : ${art.address}",
-                                style: const TextStyle(
-                                    color: Colors.white70, fontSize: 20))
-                          ],
-                        )),
-                    ),
+                    child: ListView(children: [
+                      ...artDetails.keys.map((key) {
+                        if (!artDetails[key].toString().startsWith("No")) {
+                          return Text(key,
+                              style: const TextStyle(
+                                  fontSize: 40, color: Colors.white38));
+                        }
+                        return const Text("");
+                      }).toList(),
+                    ])),
               ),
             ],
           ),
