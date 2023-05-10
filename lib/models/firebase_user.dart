@@ -10,6 +10,8 @@ import 'package:intl/intl.dart';
 class FirebaseUser {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   late final CollectionReference profiles = firestore.collection("Profiles");
+  late final CollectionReference categories =
+      firestore.collection("Categories");
 
   Future<bool> isPublicArtFavourited(String? uid, String? publicArtId) async {
     if (uid == null) return Future.value(false);
@@ -41,12 +43,12 @@ class FirebaseUser {
   }
 
   Future<void> removePublicArtFromFavourites(
-      String? uid, PublicArt publicArt) async {
+      String? uid, String publicArtId) async {
     final QuerySnapshot data =
         await profiles.doc(uid).collection("Favorites").get();
     if (data.size == 0) return;
     for (var doc in data.docs) {
-      if (doc["id"] == publicArt.id) {
+      if (doc["id"] == publicArtId) {
         await profiles.doc(uid).collection("Favorites").doc(doc.id).delete();
         return;
       }
@@ -56,5 +58,13 @@ class FirebaseUser {
   Future<QuerySnapshot> getFavourites(String uid) async {
     final data = await profiles.doc(uid).collection("Favorites").get();
     return data;
+  }
+
+  Future<DocumentSnapshot> getPublicArt(String uid, String publicArtId) async {
+    return categories
+        .doc("Public_Art")
+        .collection("Items")
+        .doc(publicArtId)
+        .get();
   }
 }
