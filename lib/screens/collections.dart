@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import '../components/profile_button_app_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
+import './details.dart';
+import 'package:oden_app/models/location.dart';
 
 
 ///
@@ -56,8 +57,8 @@ class _FilterPageState extends State<FilterPage> {
     }
   }
 
-  Future<List<Map<String, dynamic>>> fetchDataFromFirestore() async {
-    List<Map<String, dynamic>> data = [];
+  Future<List<PublicArt>>  fetchDataFromFirestore() async {
+    List<PublicArt> data = [];
     Map<String, Map<String, List<String>>> locationData = {};
 
     FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -87,13 +88,23 @@ class _FilterPageState extends State<FilterPage> {
         locationData[country]![region]!.add(city);
       }
 
-      Map<String, dynamic> artPiece = {
-        'name': doc['name'],
-        'country': country,
-        'region': region,
-        'city': city,
-        'image': null,
-      };
+      Map<String, dynamic> coordinates = doc['coordinates'] ?? {};
+      double latitude = double.tryParse(coordinates['latitude']?.toString() ?? '0.0') ?? 0.0;
+      double longitude = double.tryParse(coordinates['longitude']?.toString() ?? '0.0') ?? 0.0;
+
+      PublicArt artPiece = PublicArt(
+        name: doc['name'],
+        latitude: latitude,
+        longitude: longitude,
+        //description: doc['description'],
+        //link: doc['link'],
+        //address: doc['address'],
+        //artist: doc['artist'],
+        //distance: doc['distance'],
+        city: doc['labels']['cityCode'],
+        country: doc['labels']['countryCode'],
+        region: doc['labels']['regionCode'],
+      );
       data.add(artPiece);
     }
 
@@ -109,8 +120,8 @@ class _FilterPageState extends State<FilterPage> {
     return data;
   }
 
-  List<Map<String, dynamic>> allArtPieces = [];
-  List<Map<String, dynamic>> filteredArtPieces = [];
+  List<PublicArt> allArtPieces = [];
+  List<PublicArt> filteredArtPieces = [];
 
   @override
   void initState() {
@@ -131,20 +142,20 @@ class _FilterPageState extends State<FilterPage> {
     setState(() {
       filteredArtPieces = allArtPieces.where((artPiece) {
         return (selectedCountry == null ||
-                artPiece['country'] == selectedCountry) &&
+            artPiece.country == selectedCountry) &&
             (selectedRegion == null ||
                 selectedRegion == 'ALL' ||
-                artPiece['region'] == selectedRegion) &&
+                artPiece.region == selectedRegion) &&
             (selectedCity == null ||
                 selectedCity == 'ALL' ||
-                artPiece['city'] == selectedCity);
+                artPiece.city == selectedCity);
       }).toList();
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
-
     if (isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -198,19 +209,29 @@ class _FilterPageState extends State<FilterPage> {
               itemBuilder: (context, index) {
                 final artPiece = filteredArtPieces[index];
                 return ListTile(
+                  // You can change this part to display the image using an image URL or another property.
                   leading: Image.asset(
-                    artPiece['image'] ?? 'assets/images/logo.png',
+                    'assets/images/logo.png',
                     width: 50,
                     height: 50,
                     fit: BoxFit.cover,
                   ),
-                  title: Text(artPiece['name']),
+                  title: Text(artPiece.name),
                   subtitle: Text(
-                      '${artPiece['city']}, ${artPiece['region']}, ${artPiece['country']}'),
+                      '${artPiece.city}, ${artPiece.region}, ${artPiece.country}'),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DetailsPage(artPiece),
+                      ),
+                    );
+                  },
                 );
               },
             ),
           ),
+
         ],
       ),
     );
