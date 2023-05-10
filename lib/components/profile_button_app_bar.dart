@@ -10,7 +10,7 @@ import '../models/auth.dart';
 ///
 /// A function that creates the app bar widget.
 ///
-AppBar profileAppBarWidget(BuildContext context) {
+AppBar profileAppBarWidget(BuildContext context, bool isCurrentPagePopped) {
   return AppBar(
     backgroundColor: appBarTheme().backgroundColor,
     leading: Padding(
@@ -24,7 +24,7 @@ AppBar profileAppBarWidget(BuildContext context) {
     actions: [
       Transform.scale(
         scale: 1.75,
-        child: profileButton(context),
+        child: profileButton(context, isCurrentPagePopped),
       )
     ],
   );
@@ -34,9 +34,12 @@ AppBar profileAppBarWidget(BuildContext context) {
 /// A function that creates the profile button
 /// with an inner function for navigation when clicked.
 ///
-IconButton profileButton(BuildContext context) {
+IconButton profileButton(BuildContext context, bool isCurrentPagePopped) {
   void navigateToProfile() {
     bool isLoggedIn = Auth().isLoggedIn;
+    if (isCurrentPagePopped && isLoggedIn) {
+      Navigator.pop(context);
+    }
     Navigator.pushNamed(context, isLoggedIn ? '/profile' : '/login');
   }
 

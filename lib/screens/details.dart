@@ -12,7 +12,8 @@ class DetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: profileAppBarWidget(context), body: DetailsPageBody(art: art));
+        appBar: profileAppBarWidget(context, true),
+        body: DetailsPageBody(art: art));
   }
 }
 
@@ -53,7 +54,8 @@ class _DetailsPageBodyState extends State<DetailsPageBody> {
         if (_isFavourite) {
           FirebaseUser().addPublicArtToFavourites(Auth().uid, widget.art);
         } else {
-          FirebaseUser().removePublicArtFromFavourites(Auth().uid, widget.art);
+          FirebaseUser()
+              .removePublicArtFromFavourites(Auth().uid, widget.art.id);
         }
       });
     } else {

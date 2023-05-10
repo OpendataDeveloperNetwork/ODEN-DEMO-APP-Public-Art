@@ -33,7 +33,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: profileAppBarWidget(context),
+        appBar: profileAppBarWidget(context, false),
         body: const HomePageBody(),
         floatingActionButton: _buildCollectionFloatingWidget(context));
   }

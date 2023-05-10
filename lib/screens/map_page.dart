@@ -251,7 +251,7 @@ class _MapsPageState extends State<MapsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: profileAppBarWidget(context),
+        appBar: profileAppBarWidget(context, false),
         body: SafeArea(
             child: Column(
           children: [
