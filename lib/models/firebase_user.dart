@@ -11,32 +11,6 @@ class FirebaseUser {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   late final CollectionReference profiles = firestore.collection("Profiles");
 
-  ///
-  /// A function that adds a favourite to the user's profile database.
-  ///
-  Future<void> addFavourite(String? uid, String? publicId) async {
-    if (uid == null || publicId == null) return;
-    profiles
-        .doc(uid)
-        .collection("Favorites")
-        .add({"id": publicId})
-        .then((_) => print("Added $publicId to $uid"))
-        .catchError((onError) => print("failed to add $publicId"));
-  }
-
-  ///
-  /// A function that adds a visited to the user's profile database.
-  ///
-  Future<void> addVisit(String? uid, String? publicId) async {
-    if (uid == null || publicId == null) return;
-    await profiles
-        .doc(uid)
-        .collection("Visits")
-        .add({"id": publicId})
-        .then((_) => print("Added $publicId to $uid"))
-        .catchError((onError) => print("failed to add $publicId"));
-  }
-
   Future<bool> isPublicArtFavourited(String? uid, String? publicArtId) async {
     if (uid == null) return Future.value(false);
     final data = await profiles.doc(uid).collection("Favorites").get();
@@ -68,7 +42,8 @@ class FirebaseUser {
 
   Future<void> removePublicArtFromFavourites(
       String? uid, PublicArt publicArt) async {
-    final data = await profiles.doc(uid).collection("Favorites").get();
+    final QuerySnapshot data =
+        await profiles.doc(uid).collection("Favorites").get();
     if (data.size == 0) return;
     for (var doc in data.docs) {
       if (doc["id"] == publicArt.id) {
@@ -76,5 +51,10 @@ class FirebaseUser {
         return;
       }
     }
+  }
+
+  Future<QuerySnapshot> getFavourites(String uid) async {
+    final data = await profiles.doc(uid).collection("Favorites").get();
+    return data;
   }
 }
