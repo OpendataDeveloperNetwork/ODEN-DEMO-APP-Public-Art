@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import './details.dart';
 import 'package:oden_app/models/location.dart';
 
-
 ///
 /// This contains the collections page.
 ///
@@ -63,7 +62,7 @@ class _FilterPageState extends State<FilterPage> {
     }
   }
 
-  Future<List<PublicArt>>  fetchDataFromFirestore() async {
+  Future<List<PublicArt>> fetchDataFromFirestore() async {
     List<PublicArt> data = [];
     Map<String, Map<String, List<String>>> locationData = {};
 
@@ -75,7 +74,6 @@ class _FilterPageState extends State<FilterPage> {
         .get();
 
     for (var doc in querySnapshot.docs) {
-
       // for debugging purposes
       print('Document data: ${doc.data()}');
 
@@ -95,10 +93,13 @@ class _FilterPageState extends State<FilterPage> {
       }
 
       Map<String, dynamic> coordinates = doc['coordinates'] ?? {};
-      double latitude = double.tryParse(coordinates['latitude']?.toString() ?? '0.0') ?? 0.0;
-      double longitude = double.tryParse(coordinates['longitude']?.toString() ?? '0.0') ?? 0.0;
+      double latitude =
+          double.tryParse(coordinates['latitude']?.toString() ?? '0.0') ?? 0.0;
+      double longitude =
+          double.tryParse(coordinates['longitude']?.toString() ?? '0.0') ?? 0.0;
 
       PublicArt artPiece = PublicArt(
+        id: doc.id,
         name: doc['name'],
         latitude: latitude,
         longitude: longitude,
@@ -140,25 +141,30 @@ class _FilterPageState extends State<FilterPage> {
         isLoading = false;
       });
     });
-
   }
-
 
   void filterData() {
     setState(() {
       filteredArtPieces = allArtPieces.where((artPiece) {
-        return (selectedCountry == null || artPiece.country == selectedCountry) &&
-            (selectedRegion == null || selectedRegion == 'ALL' || artPiece.region == selectedRegion) &&
-            (selectedCity == null || selectedCity == 'ALL' || artPiece.city == selectedCity);
+        return (selectedCountry == null ||
+                artPiece.country == selectedCountry) &&
+            (selectedRegion == null ||
+                selectedRegion == 'ALL' ||
+                artPiece.region == selectedRegion) &&
+            (selectedCity == null ||
+                selectedCity == 'ALL' ||
+                artPiece.city == selectedCity);
       }).toList();
 
       // Update the country, region, and city counts
-      countryCount = filteredArtPieces.map((artPiece) => artPiece.country).toSet().length;
-      regionCount = filteredArtPieces.map((artPiece) => artPiece.region).toSet().length;
-      cityCount = filteredArtPieces.map((artPiece) => artPiece.city).toSet().length;
+      countryCount =
+          filteredArtPieces.map((artPiece) => artPiece.country).toSet().length;
+      regionCount =
+          filteredArtPieces.map((artPiece) => artPiece.region).toSet().length;
+      cityCount =
+          filteredArtPieces.map((artPiece) => artPiece.city).toSet().length;
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -208,11 +214,18 @@ class _FilterPageState extends State<FilterPage> {
                 children: [
                   TextSpan(
                     text: '${filteredArtPieces.length} result(s) found\n',
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
+                    style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
                   ),
                   TextSpan(
-                    text: 'Countries: $countryCount, Regions: $regionCount, Cities: $cityCount',
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.normal, color: Colors.black),
+                    text:
+                        'Countries: $countryCount, Regions: $regionCount, Cities: $cityCount',
+                    style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.normal,
+                        color: Colors.black),
                   ),
                 ],
               ),
@@ -239,7 +252,7 @@ class _FilterPageState extends State<FilterPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => DetailsPage(artPiece),
+                        builder: (context) => DetailsPage(art: artPiece),
                       ),
                     );
                   },
@@ -247,12 +260,10 @@ class _FilterPageState extends State<FilterPage> {
               },
             ),
           ),
-
         ],
       ),
     );
   }
-
 
   DropdownButton<String> buildDropdown(
     String hint,
