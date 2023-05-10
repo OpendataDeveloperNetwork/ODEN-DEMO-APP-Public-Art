@@ -9,7 +9,7 @@ class Auth {
 
   User? get currentUser => _auth.currentUser;
 
-  String? get uid => _auth.currentUser!.uid;
+  String? get uid => _auth.currentUser?.uid;
 
   ///
   /// Use when users a logging to firebase. Developer is responsible for
