@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../components/profile_button_app_bar.dart';
 import 'package:oden_app/models/location.dart';
+import 'package:oden_app/models/firebase_user.dart';
+import 'package:oden_app/models/auth.dart';
 
 class DetailsPage extends StatelessWidget {
   final PublicArt art;
@@ -31,12 +33,32 @@ class DetailsPageBody extends StatefulWidget {
 }
 
 class _DetailsPageBodyState extends State<DetailsPageBody> {
-  late bool isFavourite;
+  late bool _isFavourite = false;
 
   @override
   void initState() {
+    Future<bool> checkPublicArt =
+        FirebaseUser().isPublicArtFavourited(Auth().uid, widget.art.id);
+    checkPublicArt.then((value) => setState(() {
+          _isFavourite = value;
+        }));
     // TODO: implement initState
     super.initState();
+  }
+
+  void isFavourited() {
+    if (Auth().isLoggedIn) {
+      setState(() {
+        _isFavourite = !_isFavourite;
+        if (_isFavourite) {
+          FirebaseUser().addPublicArtToFavourites(Auth().uid, widget.art);
+        } else {
+          FirebaseUser().removePublicArtFromFavourites(Auth().uid, widget.art);
+        }
+      });
+    } else {
+      Navigator.pushNamed(context, '/login');
+    }
   }
 
   @override
@@ -49,13 +71,13 @@ class _DetailsPageBodyState extends State<DetailsPageBody> {
             child: Container(
                 color: Colors.green,
                 child: Row(
-                  children: const [
-                    BackButton(),
-                    SizedBox(width: 275),
+                  children: [
+                    const BackButton(),
+                    const SizedBox(width: 275),
                     IconButton(
-                      onPressed: null,
+                      onPressed: isFavourited,
                       icon: Icon(
-                        Icons.star,
+                        _isFavourite ? Icons.star : Icons.star_outline,
                         color: Colors.yellow,
                       ),
                       iconSize: 40,
