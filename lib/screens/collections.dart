@@ -37,9 +37,15 @@ class _FilterPageState extends State<FilterPage> {
   // Initialize the nested data structure as an empty map
   Map<String, Map<String, List<String>>> countryRegionCityData = {};
 
+  // Initialize the lists of countries, regions, and cities
   List<String> countries = [];
   List<String> regions = [];
   List<String> cities = [];
+
+  // Initialize the counts of countries, regions, and cities
+  int countryCount = 0;
+  int regionCount = 0;
+  int cityCount = 0;
 
   void updateRegions() {
     if (selectedCountry != null) {
@@ -141,15 +147,15 @@ class _FilterPageState extends State<FilterPage> {
   void filterData() {
     setState(() {
       filteredArtPieces = allArtPieces.where((artPiece) {
-        return (selectedCountry == null ||
-            artPiece.country == selectedCountry) &&
-            (selectedRegion == null ||
-                selectedRegion == 'ALL' ||
-                artPiece.region == selectedRegion) &&
-            (selectedCity == null ||
-                selectedCity == 'ALL' ||
-                artPiece.city == selectedCity);
+        return (selectedCountry == null || artPiece.country == selectedCountry) &&
+            (selectedRegion == null || selectedRegion == 'ALL' || artPiece.region == selectedRegion) &&
+            (selectedCity == null || selectedCity == 'ALL' || artPiece.city == selectedCity);
       }).toList();
+
+      // Update the country, region, and city counts
+      countryCount = filteredArtPieces.map((artPiece) => artPiece.country).toSet().length;
+      regionCount = filteredArtPieces.map((artPiece) => artPiece.region).toSet().length;
+      cityCount = filteredArtPieces.map((artPiece) => artPiece.city).toSet().length;
     });
   }
 
@@ -197,9 +203,19 @@ class _FilterPageState extends State<FilterPage> {
           // Add a Padding widget to display the number of filtered results
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(
-              '${filteredArtPieces.length} result(s) found',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            child: RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: '${filteredArtPieces.length} result(s) found\n',
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
+                  ),
+                  TextSpan(
+                    text: 'Countries: $countryCount, Regions: $regionCount, Cities: $cityCount',
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.normal, color: Colors.black),
+                  ),
+                ],
+              ),
             ),
           ),
           // ListView to display filtered art pieces
