@@ -3,6 +3,8 @@ import 'package:oden_app/components/back_button_app_bar.dart';
 import 'components/favourites_list_view.dart';
 import 'components/visits_list_view.dart';
 import '../models/auth.dart';
+import '../models/profile_public_art.dart';
+import '../models/firebase_user.dart';
 
 // ------------------------ //
 // ----- Profile Page ----- //
@@ -35,6 +37,24 @@ class _ProfileBodyState extends State<ProfileBody> {
     true,
     false
   ]; // This can be represented as [isFavouritesSelected, isVisitsSelected]
+  final List<ProfilePublicArt> _favourites = [];
+
+  void _getFavourites() async {
+    final userFavorites = await FirebaseUser().getFavourites(Auth().uid!);
+    for (var doc in userFavorites.docs) {
+      setState(() {
+        ProfilePublicArt publicArt =
+            ProfilePublicArt(doc["date"], doc["name"], doc["id"]);
+        _favourites.add(publicArt);
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getFavourites();
+  }
 
   ///
   /// This is the function that listens when user clicked on the toggle buttons.
@@ -84,7 +104,6 @@ class _ProfileBodyState extends State<ProfileBody> {
 
   @override
   Widget build(BuildContext context) {
-    String name = Auth().name;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -101,7 +120,7 @@ class _ProfileBodyState extends State<ProfileBody> {
         Align(alignment: Alignment.center, child: _buildToggleButtons()),
         const SizedBox(height: 15),
         /* Visibility of listviews are dynamic depending on which toggle button is selected */
-        _buildListView(const FavouritesListView(), _selectedCategories[0]),
+        _buildListView(FavouritesListView(_favourites), _selectedCategories[0]),
         _buildListView(const VisitsListView(), _selectedCategories[1]),
         ElevatedButton(onPressed: onSignOut, child: const Text("Log Out"))
       ],

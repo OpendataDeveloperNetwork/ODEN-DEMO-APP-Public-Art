@@ -14,7 +14,7 @@ class CollectionsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: profileAppBarWidget(context),
+      appBar: profileAppBarWidget(context, false),
       body: FilterPage(),
     );
   }

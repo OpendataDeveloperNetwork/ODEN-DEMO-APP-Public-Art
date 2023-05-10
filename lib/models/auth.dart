@@ -9,6 +9,8 @@ class Auth {
 
   User? get currentUser => _auth.currentUser;
 
+  String? get uid => _auth.currentUser?.uid;
+
   ///
   /// Use when users a logging to firebase. Developer is responsible for
   /// checking if the user is signed in successfully or not.
