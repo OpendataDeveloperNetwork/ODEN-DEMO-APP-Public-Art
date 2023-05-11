@@ -4,6 +4,7 @@
 
 import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:objectbox/objectbox.dart';
 
 ///
 /// Location class contains all value for locations. It must have a name to present
@@ -26,6 +27,7 @@ class Location with ClusterItem {
   double get longitude => location.longitude;
 }
 
+@Entity()
 class PublicArt extends Location {
   final String _description;
   final String _link;
