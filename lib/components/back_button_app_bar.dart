@@ -15,8 +15,8 @@ AppBar backButtonAppBarWidget(BuildContext context) {
     backgroundColor: appBarTheme().backgroundColor,
     leading: backButton(context),
     title: Image.asset(
-      ('assets/images/logo.png'),
-      scale: 1.9,
+      ('assets/images/logo.jpg'),
+      width: 125,
     ),
     centerTitle: true,
   );

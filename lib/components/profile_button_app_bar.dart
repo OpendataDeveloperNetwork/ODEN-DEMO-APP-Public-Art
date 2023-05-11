@@ -16,7 +16,7 @@ AppBar profileAppBarWidget(BuildContext context, bool isCurrentPagePopped) {
     leading: Padding(
       padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
       child: Image.asset(
-        ('assets/images/logo.png'),
+        ('assets/images/logo.jpg'),
       ),
     ),
     leadingWidth: 125,
