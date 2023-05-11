@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:oden_app/blocprovs/public_arts_provider.dart';
 import 'package:oden_app/screens/profile_page.dart';
 import './screens/home_page.dart';
 import './screens/map_page.dart';
@@ -9,7 +10,9 @@ import './theme/style.dart';
 import 'screens/collections.dart';
 import 'screens/login.dart';
 import 'screens/sign_up.dart';
+import 'package:provider/provider.dart';
 import 'screens/details.dart';
+import 'blocprovs/public_arts_provider.dart';
 
 // import path to dummy_manifest.dart
 import './dummy_manifest.dart';
@@ -34,7 +37,10 @@ Future<void> main() async {
   // commented out not run run everytime.
   //processPublicArtData();
 
-  runApp(const MyApp());
+  runApp(MultiProvider(
+    providers: [ChangeNotifierProvider.value(value: PublicArtsProvider())],
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -49,13 +55,13 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginPage(),
         '/signUp': (context) => const SignUpPage(),
         '/profile': (context) => const ProfilePage(),
-        '/homepage': (context) => const HomePage(),
+        '/homepage': (context) => HomePage(),
         '/collections': (context) => const CollectionsPage(),
         '/maps': (context) => const MapsPage(),
       },
       title: 'ODEN Demo',
       theme: appTheme(),
-      home: const HomePage(),
+      home: HomePage(),
     );
   }
 }
