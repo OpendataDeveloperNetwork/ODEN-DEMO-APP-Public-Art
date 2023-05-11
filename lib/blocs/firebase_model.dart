@@ -7,7 +7,7 @@ import 'package:intl/intl.dart';
 /// or saving data of the user.
 ///
 
-class FirebaseUser {
+class FirebaseModel {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   late final CollectionReference profiles = firestore.collection("Profiles");
   late final CollectionReference categories =
@@ -60,11 +60,15 @@ class FirebaseUser {
     return data;
   }
 
-  Future<DocumentSnapshot> getPublicArt(String uid, String publicArtId) async {
+  Future<DocumentSnapshot> getPublicArt(String publicArtId) async {
     return categories
         .doc("Public_Art")
         .collection("Items")
         .doc(publicArtId)
         .get();
+  }
+
+  Future<QuerySnapshot> getPublicArts() async {
+    return categories.doc("Public_Art").collection("Items").get();
   }
 }
