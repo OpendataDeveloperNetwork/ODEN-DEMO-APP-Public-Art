@@ -7,7 +7,7 @@ import 'package:intl/intl.dart';
 /// or saving data of the user.
 ///
 
-class FirebaseUser {
+class FirebaseModel {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   late final CollectionReference profiles = firestore.collection("Profiles");
   late final CollectionReference categories =

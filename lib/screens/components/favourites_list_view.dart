@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:oden_app/models/location.dart';
 import '../../models/profile_public_art.dart';
-import '../../models/firebase_user.dart';
+import '../../bloc/firebase_model.dart';
 import '../../models/auth.dart';
 import 'package:oden_app/screens/details.dart';
 
@@ -55,13 +55,13 @@ class _FavouritesListViewState extends State<FavouritesListView>
     setState(() {
       widget._favourites.removeWhere((element) => element.id == publicArtId);
     });
-    FirebaseUser().removePublicArtFromFavourites(Auth().uid!, publicArtId);
+    FirebaseModel().removePublicArtFromFavourites(Auth().uid!, publicArtId);
     Navigator.of(context).pop();
   }
 
   void toDetailsPage(String publicId) async {
     DocumentSnapshot data =
-        await FirebaseUser().getPublicArt(Auth().uid!, publicId);
+        await FirebaseModel().getPublicArt(Auth().uid!, publicId);
     PublicArt publicArt = PublicArt(
         id: publicId,
         name: data["name"],
@@ -82,7 +82,7 @@ class _FavouritesListViewState extends State<FavouritesListView>
 
   void reloadListView(PublicArt publicArt) async {
     bool isFavourited =
-        await FirebaseUser().isPublicArtFavourited(Auth().uid, publicArt.id);
+        await FirebaseModel().isPublicArtFavourited(Auth().uid, publicArt.id);
     if (!isFavourited) {
       setState(() {
         widget._favourites.removeWhere((element) => element.id == publicArt.id);

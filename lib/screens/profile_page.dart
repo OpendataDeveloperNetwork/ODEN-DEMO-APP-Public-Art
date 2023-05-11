@@ -4,7 +4,7 @@ import 'components/favourites_list_view.dart';
 import 'components/visits_list_view.dart';
 import '../models/auth.dart';
 import '../models/profile_public_art.dart';
-import '../models/firebase_user.dart';
+import '../bloc/firebase_model.dart';
 
 // ------------------------ //
 // ----- Profile Page ----- //
@@ -40,7 +40,7 @@ class _ProfileBodyState extends State<ProfileBody> {
   final List<ProfilePublicArt> _favourites = [];
 
   void _getFavourites() async {
-    final userFavorites = await FirebaseUser().getFavourites(Auth().uid!);
+    final userFavorites = await FirebaseModel().getFavourites(Auth().uid!);
     for (var doc in userFavorites.docs) {
       setState(() {
         ProfilePublicArt publicArt =

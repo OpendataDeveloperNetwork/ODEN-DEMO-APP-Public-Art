@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../components/profile_button_app_bar.dart';
 import 'package:oden_app/models/location.dart';
-import 'package:oden_app/models/firebase_user.dart';
+import 'package:oden_app/bloc/firebase_model.dart';
 import 'package:oden_app/models/auth.dart';
 
 class DetailsPage extends StatelessWidget {
@@ -39,7 +39,7 @@ class _DetailsPageBodyState extends State<DetailsPageBody> {
   @override
   void initState() {
     Future<bool> checkPublicArt =
-        FirebaseUser().isPublicArtFavourited(Auth().uid, widget.art.id);
+        FirebaseModel().isPublicArtFavourited(Auth().uid, widget.art.id);
     checkPublicArt.then((value) => setState(() {
           _isFavourite = value;
         }));
@@ -52,9 +52,9 @@ class _DetailsPageBodyState extends State<DetailsPageBody> {
       setState(() {
         _isFavourite = !_isFavourite;
         if (_isFavourite) {
-          FirebaseUser().addPublicArtToFavourites(Auth().uid, widget.art);
+          FirebaseModel().addPublicArtToFavourites(Auth().uid, widget.art);
         } else {
-          FirebaseUser()
+          FirebaseModel()
               .removePublicArtFromFavourites(Auth().uid, widget.art.id);
         }
       });
