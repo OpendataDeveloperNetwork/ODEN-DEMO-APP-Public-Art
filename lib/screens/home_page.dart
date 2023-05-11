@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../components/profile_button_app_bar.dart';
 import '../models/category.dart';
-import '../models/location.dart';
+import '../models/public_art.dart';
 
 // ------------------------ //
 // ----- Landing Page ----- //

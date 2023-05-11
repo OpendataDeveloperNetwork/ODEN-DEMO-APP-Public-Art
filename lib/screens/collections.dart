@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../components/profile_button_app_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import './details.dart';
-import 'package:oden_app/models/location.dart';
+import 'package:oden_app/models/public_art.dart';
 
 ///
 /// This contains the collections page.

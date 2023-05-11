@@ -2,7 +2,7 @@ import 'dart:ffi';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:oden_app/models/location.dart';
+import 'package:oden_app/models/public_art.dart';
 import '../../models/profile_public_art.dart';
 import '../../models/firebase_user.dart';
 import '../../models/auth.dart';

@@ -8,7 +8,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:oden_app/components/profile_button_app_bar.dart';
-import 'package:oden_app/models/location.dart';
+import 'package:oden_app/models/public_art.dart';
 import 'package:oden_app/screens/components/markers.dart';
 
 // ------------------------------------- //
