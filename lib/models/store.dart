@@ -1,10 +1,12 @@
 import 'dart:convert';
-import 'package:geolocator/geolocator.dart';
 import 'package:flutter/services.dart';
 import 'package:oden_app/models/public_art.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import '../../objectbox.g.dart'; // created by `flutter pub run build_runner build`
+import './geolocator.dart';
+import 'package:geolocator/geolocator.dart';
+import 'address.dart';
 
 class ObjectBoxDatabase {
   /// The Store of this app.
@@ -13,7 +15,6 @@ class ObjectBoxDatabase {
 
   ObjectBoxDatabase._create(this._store) {
     _publicArts = Box<PublicArt>(_store);
-
     if (_publicArts.isEmpty()) {
       _putDemoData();
     }
@@ -36,38 +37,26 @@ class ObjectBoxDatabase {
         double.parse(publicArtJSON["coordinates"]["latitude"].toString());
     double long =
         double.parse(publicArtJSON["coordinates"]["longitude"].toString());
-    Position pos = await getCurrentLocation();
+    Position pos = await GeolocatorService.getCurrentLocation();
     double distanceBetweenLocations =
         Geolocator.distanceBetween(pos.latitude, pos.longitude, lat, long);
+    Address address = await GeolocatorService.reverseGeocoding(
+        publicArtJSON["coordinates"]["latitude"],
+        publicArtJSON["coordinates"]["longitude"]);
     return PublicArt(
         name: publicArtJSON["name"],
         latitude: lat,
         longitude: long,
+        address: address,
+        dateInstalled: publicArtJSON["dates"]["installed"]["year"],
+        material: publicArtJSON['material'],
+        description: publicArtJSON['description'],
+        artist: publicArtJSON['artist'],
+        owner: publicArtJSON['owner'],
+        type: publicArtJSON['type'],
+        area: publicArtJSON['area'],
+        imageUrl: publicArtJSON['image_url'],
         distance: distanceBetweenLocations / 1000);
-  }
-
-  Future<Position> getCurrentLocation() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return Future.error("Location services are disabled");
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return Future.error("Location permissions are denied");
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      return Future.error("Location permissions are permanently denied");
-    }
-
-    return await Geolocator.getCurrentPosition();
   }
 
   /// Create an instance of ObjectBox to use throughout the app.
