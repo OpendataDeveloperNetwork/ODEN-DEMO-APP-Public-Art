@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:objectbox/objectbox.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart' as location;
@@ -9,7 +9,11 @@ import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:oden_app/components/profile_button_app_bar.dart';
 import 'package:oden_app/models/public_art.dart';
+import 'package:oden_app/objectbox.g.dart';
 import 'package:oden_app/screens/components/markers.dart';
+import 'package:oden_app/models/store.dart';
+
+import '../main.dart';
 
 // ------------------------------------- //
 // ----- Maps Page - Main Feature ------ //
@@ -24,16 +28,6 @@ class MapsPage extends StatefulWidget {
 }
 
 class _MapsPageState extends State<MapsPage> {
-  /// Calls setup methods and sets initial state.
-  @override
-  void initState() {
-    setMaps(this);
-    _manager = getClusterManager();
-    super.initState();
-    _displayMarkers();
-    _setCurrentLocation();
-  }
-
   // Google maps controller
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
@@ -46,7 +40,7 @@ class _MapsPageState extends State<MapsPage> {
   Set<Marker> _markers = {};
 
   /// List of PublicArt objects.
-  List<PublicArt> _publicArts = [];
+  late List<PublicArt> _publicArts;
 
   // Position of camera on map
   CameraPosition position = const CameraPosition(
@@ -62,6 +56,18 @@ class _MapsPageState extends State<MapsPage> {
   Set<Marker> get markers => _markers;
 
   List<PublicArt> get publicArts => _publicArts;
+
+  /// Calls setup methods and sets initial state.
+  @override
+  void initState() {
+    setMaps(this);
+    _publicArts = db.getAllPublicArts();
+    print(_publicArts.length);
+    _manager = getClusterManager();
+    super.initState();
+    _displayMarkers();
+    _setCurrentLocation();
+  }
 
   /// Updates the map markers; usually when an action is performed.
   void updateMarkers(Set<Marker> markers) {
@@ -160,7 +166,6 @@ class _MapsPageState extends State<MapsPage> {
 
   // Creates and adds markers to the _markers object
   Future<void> _displayMarkers() async {
-    _publicArts = await _fetchMarkers();
     await addMarkers();
   }
 
@@ -236,7 +241,7 @@ class _MapsPageState extends State<MapsPage> {
         } catch (e) {
           // Invalid name
           _showDialog(
-              context, "We couldn't find the location. Please try again");
+              this.context, "We couldn't find the location. Please try again");
         }
       }
 
