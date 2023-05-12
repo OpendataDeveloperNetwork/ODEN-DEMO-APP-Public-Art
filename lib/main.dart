@@ -6,6 +6,7 @@ import './screens/home_page.dart';
 import './screens/map_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import './theme/style.dart';
+import 'models/store.dart';
 import 'screens/collections.dart';
 import 'screens/login.dart';
 import 'screens/sign_up.dart';
@@ -17,6 +18,7 @@ import './dummy_manifest.dart';
 // ---------------------------- //
 // ----- The main driver ------ //
 // ---------------------------- //
+late ObjectBoxDatabase db;
 
 Future<void> main() async {
   FlutterError.onError = (details) {
@@ -25,14 +27,9 @@ Future<void> main() async {
       exit(1);
     }
   };
-
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-
-  // Following function runs the dummy minefest.dart
-  // will upload all entries to the firestore.
-  // commented out not run run everytime.
-  //processPublicArtData();
+  db = await ObjectBoxDatabase.create();
 
   runApp(const MyApp());
 }
