@@ -1,0 +1,87 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:3417323906435987347",
+      "lastPropertyId": "12:6015294022217234171",
+      "name": "PublicArt",
+      "properties": [
+        {
+          "id": "1:9140002689213064180",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "2:2734611510974708752",
+          "name": "description",
+          "type": 9
+        },
+        {
+          "id": "3:1945721555820399211",
+          "name": "link",
+          "type": 9
+        },
+        {
+          "id": "4:2637249557382323357",
+          "name": "address",
+          "type": 9
+        },
+        {
+          "id": "5:1570928892950422415",
+          "name": "artist",
+          "type": 9
+        },
+        {
+          "id": "6:856162699992915883",
+          "name": "distance",
+          "type": 8
+        },
+        {
+          "id": "7:4429819600850856239",
+          "name": "city",
+          "type": 9
+        },
+        {
+          "id": "8:6458379223677930808",
+          "name": "country",
+          "type": 9
+        },
+        {
+          "id": "9:5838853619318144122",
+          "name": "region",
+          "type": 9
+        },
+        {
+          "id": "10:1686954186474000670",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "11:4968631663235432612",
+          "name": "latitude",
+          "type": 8
+        },
+        {
+          "id": "12:6015294022217234171",
+          "name": "longitude",
+          "type": 8
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "1:3417323906435987347",
+  "lastIndexId": "0:0",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [],
+  "retiredRelationUids": [],
+  "version": 1
+}
