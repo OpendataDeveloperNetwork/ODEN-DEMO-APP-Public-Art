@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:3417323906435987347",
-      "lastPropertyId": "12:6015294022217234171",
+      "lastPropertyId": "19:434012202449752172",
       "name": "PublicArt",
       "properties": [
         {
@@ -19,16 +19,6 @@
           "type": 9
         },
         {
-          "id": "3:1945721555820399211",
-          "name": "link",
-          "type": 9
-        },
-        {
-          "id": "4:2637249557382323357",
-          "name": "address",
-          "type": 9
-        },
-        {
           "id": "5:1570928892950422415",
           "name": "artist",
           "type": 9
@@ -37,21 +27,6 @@
           "id": "6:856162699992915883",
           "name": "distance",
           "type": 8
-        },
-        {
-          "id": "7:4429819600850856239",
-          "name": "city",
-          "type": 9
-        },
-        {
-          "id": "8:6458379223677930808",
-          "name": "country",
-          "type": 9
-        },
-        {
-          "id": "9:5838853619318144122",
-          "name": "region",
-          "type": 9
         },
         {
           "id": "10:1686954186474000670",
@@ -68,6 +43,41 @@
           "id": "12:6015294022217234171",
           "name": "longitude",
           "type": 8
+        },
+        {
+          "id": "13:2589848364418769135",
+          "name": "dateInstalled",
+          "type": 6
+        },
+        {
+          "id": "14:2938731826494776313",
+          "name": "material",
+          "type": 9
+        },
+        {
+          "id": "15:2945400942448845049",
+          "name": "owner",
+          "type": 9
+        },
+        {
+          "id": "16:3680005722033872847",
+          "name": "type",
+          "type": 9
+        },
+        {
+          "id": "17:6053962221074533227",
+          "name": "area",
+          "type": 9
+        },
+        {
+          "id": "18:1785663436404542980",
+          "name": "imageUrl",
+          "type": 9
+        },
+        {
+          "id": "19:434012202449752172",
+          "name": "link",
+          "type": 9
         }
       ],
       "relations": []
@@ -81,7 +91,13 @@
   "modelVersionParserMinimum": 5,
   "retiredEntityUids": [],
   "retiredIndexUids": [],
-  "retiredPropertyUids": [],
+  "retiredPropertyUids": [
+    2637249557382323357,
+    4429819600850856239,
+    6458379223677930808,
+    5838853619318144122,
+    1945721555820399211
+  ],
   "retiredRelationUids": [],
   "version": 1
 }
