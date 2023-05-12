@@ -21,7 +21,7 @@ class ObjectBoxDatabase {
 
   Future<void> _putDemoData() async {
     final String response =
-        await rootBundle.loadString('assets/json/my-vancouver-data.json');
+        await rootBundle.loadString('assets/json/all-my-data.json');
     final List data = await json.decode(response)['data'];
     for (var i = 0; i < data.length; i++) {
       final publicArt = await jsonToPublicArt(data[i]);
