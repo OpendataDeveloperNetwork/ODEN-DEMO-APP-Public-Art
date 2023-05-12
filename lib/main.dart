@@ -13,28 +13,31 @@ import 'screens/details.dart';
 
 // import path to dummy_manifest.dart
 import './dummy_manifest.dart';
+import './transmogrifier.dart' as transmongrifier;
+
 
 // ---------------------------- //
 // ----- The main driver ------ //
 // ---------------------------- //
 
 Future<void> main() async {
-  FlutterError.onError = (details) {
-    FlutterError.dumpErrorToConsole(details);
-    if (kReleaseMode) {
-      exit(1);
-    }
-  };
+  transmongrifier.main();
+  // FlutterError.onError = (details) {
+  //   FlutterError.dumpErrorToConsole(details);
+  //   if (kReleaseMode) {
+  //     exit(1);
+  //   }
+  // };
 
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  // WidgetsFlutterBinding.ensureInitialized();
+  // await Firebase.initializeApp();
 
   // Following function runs the dummy minefest.dart
   // will upload all entries to the firestore.
   // commented out not run run everytime.
   //processPublicArtData();
 
-  runApp(const MyApp());
+  // runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {

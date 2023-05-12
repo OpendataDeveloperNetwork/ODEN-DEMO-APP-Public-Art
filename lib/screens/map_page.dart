@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:geocoding/geocoding.dart' as location;
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -83,21 +85,25 @@ class _MapsPageState extends State<MapsPage> {
   }
 
   /// Creates and adds markers to the _markers object
-  Future<List<PublicArt>> _fetchMarkers() async {
-    final snapshot =
-        await FirebaseFirestore.instance.collection('Categories').get();
+   _fetchMarkers() async {
+    // final snapshot =
+    //     await FirebaseFirestore.instance.collection('Categories').get();
 
-    for (final doc in snapshot.docs) {
-      var innerCols = doc.reference.collection("Items");
-      QuerySnapshot innerSnapshot = await innerCols.get();
+    // for (final doc in snapshot.docs) {
+    //   var innerCols = doc.reference.collection("Items");
+    //   QuerySnapshot innerSnapshot = await innerCols.get();
 
-      for (final innerDoc in innerSnapshot.docs) {
-        PublicArt publicArt = await jsonToPublicArt(innerDoc);
-        publicArts.add(publicArt);
-      }
-    }
+    //   for (final innerDoc in innerSnapshot.docs) {
+    //     PublicArt publicArt = await jsonToPublicArt(innerDoc);
+    //     publicArts.add(publicArt);
+    //   }
+    // }
 
-    return publicArts;
+    String austinString = await rootBundle.loadString('my-austin-data.json');
+    String vancouverString = await rootBundle.loadString('my-vancouver-data.json');
+
+    print('austinString: $austinString');
+    print('vancouverString: $vancouverString');
   }
 
   // Creates a public art object
