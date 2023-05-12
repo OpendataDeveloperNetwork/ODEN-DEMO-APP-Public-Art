@@ -17,7 +17,7 @@ class Location with ClusterItem {
   final LatLng _location;
 
   Location({required name, required latitude, required longitude})
-      : _name = name ?? "No name",
+      : _name = name,
         _location = LatLng(latitude, longitude);
 
   @override
@@ -28,22 +28,24 @@ class Location with ClusterItem {
 }
 
 @Entity()
-class PublicArt extends Location {
-  final String _description;
-  final String _link;
-  final String _address;
-  final String _artist;
-  final double _distance;
-  final String _city;
-  final String _country;
-  final String _region;
-  final String _id;
+class PublicArt with ClusterItem {
+  final String name;
+  final LatLng _location;
+  final String description;
+  final String link;
+  final String address;
+  final String artist;
+  final double distance;
+  final String city;
+  final String country;
+  final String region;
+  int id;
 
   PublicArt(
-      {required id,
-      required super.name,
-      required super.latitude,
-      required super.longitude,
+      {required name,
+      required latitude,
+      required longitude,
+      id,
       description,
       link,
       address,
@@ -52,36 +54,25 @@ class PublicArt extends Location {
       city,
       country,
       region})
-      : _id = id ?? "No id",
-        _description = description ?? "No description available",
-        _link = link ?? "No link available",
-        _address = address ?? "No address",
-        _artist = artist ?? "No artist",
-        _distance = distance ?? 0,
-        _city = city ?? "No city",
-        _country = country ?? "No country",
-        _region = region ?? "No region";
+      : id = id ?? 0,
+        name = name ?? "No name",
+        _location = LatLng(latitude, longitude),
+        description = description ?? "No description available",
+        link = link ?? "No link available",
+        address = address ?? "No address",
+        artist = artist ?? "No artist",
+        distance = distance ?? 0,
+        city = city ?? "No city",
+        country = country ?? "No country",
+        region = region ?? "No region";
 
-  String get id => _id;
-
-  String get description => _description;
-
-  String get link => _link;
-
-  String get address => _address;
-
-  String get artist => _artist;
-
-  double get distance => _distance;
-
-  String get city => _city;
-
-  String get country => _country;
-
-  String get region => _region;
+  @override
+  LatLng get location => _location;
+  double get latitude => location.latitude;
+  double get longitude => location.longitude;
 
   @override
   String toString() {
-    return 'PublicArt{\nid: $id\nname: $name,\n latitude: $latitude,\n longitude: $longitude,\n description: $_description,\n link: $_link\t}';
+    return 'PublicArt{\nid: $id\nname: $name,\n latitude: $latitude,\n longitude: $longitude,\n description: $description,\n link: $link\t}';
   }
 }
