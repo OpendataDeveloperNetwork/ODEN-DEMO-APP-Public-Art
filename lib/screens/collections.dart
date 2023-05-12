@@ -99,7 +99,7 @@ class _FilterPageState extends State<FilterPage> {
           double.tryParse(coordinates['longitude']?.toString() ?? '0.0') ?? 0.0;
 
       PublicArt artPiece = PublicArt(
-        id: doc.id,
+        // id: doc.id,
         name: doc['name'],
         latitude: latitude,
         longitude: longitude,

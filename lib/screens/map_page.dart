@@ -88,44 +88,6 @@ class _MapsPageState extends State<MapsPage> {
     });
   }
 
-  /// Creates and adds markers to the _markers object
-  Future<List<PublicArt>> _fetchMarkers() async {
-    final snapshot =
-        await FirebaseFirestore.instance.collection('Categories').get();
-
-    for (final doc in snapshot.docs) {
-      var innerCols = doc.reference.collection("Items");
-      QuerySnapshot innerSnapshot = await innerCols.get();
-
-      for (final innerDoc in innerSnapshot.docs) {
-        PublicArt publicArt = await jsonToPublicArt(innerDoc);
-        publicArts.add(publicArt);
-      }
-    }
-
-    return publicArts;
-  }
-
-  // Creates a public art object
-  jsonToPublicArt(publicArtJSON) async {
-    double lat =
-        double.parse(publicArtJSON["coordinates"]["latitude"].toString());
-    double long =
-        double.parse(publicArtJSON["coordinates"]["longitude"].toString());
-    Position pos = await getCurrentLocation();
-    double distanceBetweenLocations =
-        Geolocator.distanceBetween(pos.latitude, pos.longitude, lat, long);
-    return PublicArt(
-        id: publicArtJSON.id, // TODO
-        name: publicArtJSON["name"],
-        latitude: lat,
-        longitude: long,
-        city: publicArtJSON["labels"]["cityCode"],
-        country: publicArtJSON["labels"]["countryCode"],
-        region: publicArtJSON["labels"]["regionCode"],
-        distance: distanceBetweenLocations / 1000);
-  }
-
   // Fetches the current location of user
   Future<Position> getCurrentLocation() async {
     bool serviceEnabled;
