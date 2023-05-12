@@ -24,7 +24,7 @@ class DetailsPageBody extends StatefulWidget {
   DetailsPageBody({super.key, required this.art}) {
     artDetails = {
       'Description': art.description,
-      'Address': art.address,
+      'Address': art.city,
       'Artist': art.artist
     };
   }

@@ -1,7 +1,6 @@
+import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
-
-import 'address.dart';
 
 class GeolocatorService {
   static Future<Position> getCurrentLocation() async {
@@ -28,15 +27,26 @@ class GeolocatorService {
     return await Geolocator.getCurrentPosition();
   }
 
-  static Future<Address> reverseGeocoding(double lat, double long) async {
-    List<Placemark> placemarks = await placemarkFromCoordinates(lat, long);
-    Placemark place = placemarks[0];
-    print(place);
-    return Address(
-        street: place.street.toString(),
-        city: place.locality.toString(),
-        region: place.administrativeArea.toString(),
-        code: place.postalCode.toString(),
-        country: place.country.toString());
+  static Future<Map<String, String>> reverseGeocoding(
+      double lat, double long) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(lat, long);
+      Placemark place = placemarks[0];
+      return {
+        "street": place.street.toString(),
+        "city": place.locality.toString(),
+        "region": place.administrativeArea.toString(),
+        "code": place.postalCode.toString(),
+        "country": place.country.toString()
+      };
+    } on PlatformException catch (err) {
+      return {
+        "street": "Unknown",
+        "city": "Unknown",
+        "region": "Unknown",
+        "code": "Unknown",
+        "country": "Unknown"
+      };
+    }
   }
 }
