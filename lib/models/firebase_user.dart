@@ -13,7 +13,7 @@ class FirebaseUser {
   late final CollectionReference categories =
       firestore.collection("Categories");
 
-  Future<bool> isPublicArtFavourited(String? uid, String? publicArtId) async {
+  Future<bool> isPublicArtFavourited(String? uid, int? publicArtId) async {
     if (uid == null) return Future.value(false);
     final data = await profiles.doc(uid).collection("Favorites").get();
     if (data.size == 0) return Future.value(false);
@@ -43,7 +43,7 @@ class FirebaseUser {
   }
 
   Future<void> removePublicArtFromFavourites(
-      String? uid, String publicArtId) async {
+      String? uid, int publicArtId) async {
     final QuerySnapshot data =
         await profiles.doc(uid).collection("Favorites").get();
     if (data.size == 0) return;
