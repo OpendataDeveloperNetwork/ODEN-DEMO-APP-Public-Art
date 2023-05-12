@@ -14,11 +14,11 @@ ThemeData appTheme() {
 AppBarTheme appBarTheme() {
   return const AppBarTheme(
       iconTheme: IconThemeData(color: Color(0xFF2D3848)),
-      actionsIconTheme: IconThemeData(color: Color(0xFF77BF4B)),
+      actionsIconTheme: IconThemeData(color: Color(0xFF16BCD4)),
       backgroundColor: Colors.white);
 }
 
 
 // Dark Navy Blue: 0xFF2D3848
-// Lime: 0xFF77BF4B
-// 
+// Primary: 0xFF16BCD4
+// #16BCD4

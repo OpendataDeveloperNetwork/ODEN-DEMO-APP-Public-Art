@@ -79,7 +79,7 @@ class _ProfileBodyState extends State<ProfileBody> {
       borderRadius: const BorderRadius.all(Radius.circular(8)),
       selectedColor: Colors.white,
       selectedBorderColor: Colors.green[700],
-      fillColor: const Color(0xFF77BF4B),
+      fillColor: const Color(0xFF16BCD4),
       color: Colors.grey[500],
       constraints: const BoxConstraints(minWidth: 120, minHeight: 35),
       direction: Axis.horizontal,

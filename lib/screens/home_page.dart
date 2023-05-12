@@ -93,7 +93,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(15)),
                           side: const BorderSide(
-                              color: Color(0xFF77BF4B), width: 2)),
+                              color: Color(0xFF16BCD4), width: 2)),
                       child: Text(value.name),
                     )))
           ],
