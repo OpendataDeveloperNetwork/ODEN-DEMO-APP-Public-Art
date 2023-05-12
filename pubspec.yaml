@@ -48,6 +48,7 @@ dependencies:
   intl: ^0.17.0
   objectbox: ^2.0.0
   objectbox_flutter_libs: any
+  path_provider: ^2.0.1
 
 dev_dependencies:
   build_runner: any
@@ -73,7 +74,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/
-    - assets/images/logo.png
+    - assets/images/
     - assets/json/
 
   # To add assets to your application, add an assets section, like this:
