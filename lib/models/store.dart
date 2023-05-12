@@ -6,7 +6,6 @@ import 'package:path_provider/path_provider.dart';
 import '../../objectbox.g.dart'; // created by `flutter pub run build_runner build`
 import './geolocator.dart';
 import 'package:geolocator/geolocator.dart';
-import 'address.dart';
 
 class ObjectBoxDatabase {
   /// The Store of this app.
@@ -15,6 +14,8 @@ class ObjectBoxDatabase {
 
   ObjectBoxDatabase._create(this._store) {
     _publicArts = Box<PublicArt>(_store);
+    // Run this first! Once
+    // _publicArts.removeAll();
     if (_publicArts.isEmpty()) {
       _putDemoData();
     }
@@ -27,6 +28,7 @@ class ObjectBoxDatabase {
     for (var i = 0; i < data.length; i++) {
       final publicArt = await jsonToPublicArt(data[i]);
       addPublicArt(publicArt);
+      print(i);
     }
     print("Finish retrieving data from json file");
   }
@@ -40,21 +42,13 @@ class ObjectBoxDatabase {
     Position pos = await GeolocatorService.getCurrentLocation();
     double distanceBetweenLocations =
         Geolocator.distanceBetween(pos.latitude, pos.longitude, lat, long);
-    Address address = await GeolocatorService.reverseGeocoding(
-        publicArtJSON["coordinates"]["latitude"],
-        publicArtJSON["coordinates"]["longitude"]);
     return PublicArt(
         name: publicArtJSON["name"],
         latitude: lat,
         longitude: long,
-        address: address,
         dateInstalled: publicArtJSON["dates"]["installed"]["year"],
-        material: publicArtJSON['material'],
         description: publicArtJSON['description'],
         artist: publicArtJSON['artist'],
-        owner: publicArtJSON['owner'],
-        type: publicArtJSON['type'],
-        area: publicArtJSON['area'],
         imageUrl: publicArtJSON['image_url'],
         distance: distanceBetweenLocations / 1000);
   }
