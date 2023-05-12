@@ -6,6 +6,8 @@ import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:objectbox/objectbox.dart';
 
+import 'address.dart';
+
 ///
 /// Location class contains all value for locations. It must have a name to present
 /// on the button and a longitude and latitude to use for the Googles API origin.
@@ -33,43 +35,56 @@ class PublicArt with ClusterItem {
   final LatLng _location;
   final String description;
   final String link;
-  final String address;
   final String artist;
   final double distance;
-  final String city;
-  final String country;
-  final String region;
+  final int dateInstalled;
+  final String material;
+  final String owner;
+  final String type;
+  final String area;
+  final String imageUrl;
+  final Address address;
   int id;
 
   PublicArt(
       {required name,
       required latitude,
       required longitude,
-      id,
+      this.id = 0,
+      dateInstalled,
+      material,
       description,
       link,
-      address,
       artist,
       distance,
-      city,
-      country,
-      region})
-      : id = id ?? 0,
-        name = name ?? "No name",
+      owner,
+      type,
+      area,
+      imageUrl,
+      address})
+      : name = name ?? "No name",
         _location = LatLng(latitude, longitude),
         description = description ?? "No description available",
         link = link ?? "No link available",
-        address = address ?? "No address",
         artist = artist ?? "No artist",
+        material = material ?? "No material",
         distance = distance ?? 0,
-        city = city ?? "No city",
-        country = country ?? "No country",
-        region = region ?? "No region";
+        address = address ?? "No address",
+        dateInstalled = dateInstalled ?? 0,
+        owner = owner ?? "No owner",
+        type = type ?? "No type",
+        area = area ?? "No area",
+        imageUrl = imageUrl ?? "No image url";
 
   @override
   LatLng get location => _location;
   double get latitude => location.latitude;
   double get longitude => location.longitude;
+  String get city => address.city;
+  String get country => address.country;
+  String get region => address.region;
+  String get street => address.street;
+  String get postalCode => address.code;
 
   @override
   String toString() {
