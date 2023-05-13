@@ -128,7 +128,10 @@ class _DetailsPageBodyState extends State<DetailsPageBody> {
                           style: const TextStyle(
                               fontSize: 40, color: Colors.white38));
                     }
-                    return const Text("");
+                    return Text(
+                      widget.art.description,
+                      style: const TextStyle(color: Colors.white),
+                    );
                   }).toList(),
                 ])),
           ),
