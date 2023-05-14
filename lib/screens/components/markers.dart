@@ -11,7 +11,7 @@ import 'package:oden_app/screens/details.dart';
 
 /// Constant values for the cluster icon.
 const double baseSize = 100;
-const double scaleFactor = 0.5;
+const double scaleFactor = 0.1;
 const double exponent = 1.1;
 const int alpha1 = 200;
 const int alpha2 = 175;
@@ -105,8 +105,8 @@ int _getClusterSize(clusterCount) {
 Future<BitmapDescriptor> _getClusterBitmap(int size, {String? text}) async {
   final PictureRecorder pictureRecorder = PictureRecorder();
   final Canvas canvas = Canvas(pictureRecorder);
-  final Paint green = Paint()..color = Colors.green.withAlpha(alpha1);
-  final Paint black = Paint()..color = Colors.black.withAlpha(alpha2);
+  final Paint green = Paint()..color = Colors.cyan.withAlpha(alpha1);
+  final Paint black = Paint()..color = Colors.blue.withAlpha(alpha2);
 
   canvas.drawCircle(Offset(size / offsetSizeDivisor, size / offsetSizeDivisor),
       size / innerCircleRadiusDivisor, black);

@@ -117,10 +117,12 @@ class _MapsPageState extends State<MapsPage> {
   void _setCurrentLocation() async {
     try {
       Position pos = await getCurrentLocation();
-      position = CameraPosition(
-        target: LatLng(pos.latitude, pos.longitude),
-        zoom: 18.4746,
-      );
+      setState(() {
+        position = CameraPosition(
+          target: LatLng(pos.latitude, pos.longitude),
+          zoom: 18.4746,
+        );
+      });
     } catch (e) {
       debugPrint("Error, ${e.toString()}");
     }
@@ -203,7 +205,7 @@ class _MapsPageState extends State<MapsPage> {
         } catch (e) {
           // Invalid name
           _showDialog(
-              this.context, "We couldn't find the location. Please try again");
+              context, "We couldn't find the location. Please try again");
         }
       }
 
@@ -214,62 +216,58 @@ class _MapsPageState extends State<MapsPage> {
     myController.clear();
   }
 
+  Container _buildMap() {
+    return Container(
+        height: double.infinity,
+        child: position.target.longitude != 0
+            ? GoogleMap(
+                mapType: MapType.normal,
+                initialCameraPosition: position,
+                markers: _markers,
+                onCameraMove: _manager.onCameraMove,
+                onCameraIdle: _manager.updateMap,
+                onMapCreated: (controller) => _OnMapCreated(controller))
+            : const Center(child: CircularProgressIndicator()));
+  }
+
+  Container _buildSearchBar() {
+    return Container(
+        height: 50,
+        margin: const EdgeInsets.fromLTRB(40, 30, 40, 0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: const Color(0xFF000080)),
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: Row(
+          children: [
+            const BackButton(),
+            Expanded(
+              child: TextField(
+                controller: myController,
+                decoration: const InputDecoration(
+                  hintText: 'Search',
+                  border: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  disabledBorder: InputBorder.none,
+                  errorBorder: InputBorder.none,
+                ),
+              ),
+            ),
+          ],
+        ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: profileAppBarWidget(context, false),
-        body: SafeArea(
-            child: Column(
+        body: Stack(
           children: [
-            Row(
-              children: [
-                const BackButton(),
-                Expanded(
-                  child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 10),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              controller: myController,
-                              decoration: InputDecoration(
-                                hintText: 'Search',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Container(
-                              margin: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: Colors.green,
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                              child: IconButton(
-                                onPressed: () {
-                                  search();
-                                },
-                                color: Colors.white,
-                                icon: const Icon(Icons.search),
-                              ))
-                        ],
-                      )),
-                ),
-              ],
-            ),
-            Expanded(
-                child: position.target.longitude != 0
-                    ? GoogleMap(
-                        mapType: MapType.normal,
-                        initialCameraPosition: position,
-                        markers: _markers,
-                        onCameraMove: _manager.onCameraMove,
-                        onCameraIdle: _manager.updateMap,
-                        onMapCreated: (controller) => _OnMapCreated(controller))
-                    : const Center(child: CircularProgressIndicator()))
+            _buildMap(),
+            _buildSearchBar(),
           ],
-        )));
+        ));
   }
 }

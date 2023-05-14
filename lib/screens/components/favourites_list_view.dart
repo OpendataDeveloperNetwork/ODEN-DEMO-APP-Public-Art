@@ -113,10 +113,12 @@ class _FavouritesListViewState extends State<FavouritesListView>
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-        itemCount: widget._favourites.length,
-        itemBuilder: (BuildContext context, int index) {
-          var favorite = widget._favourites[index];
-          return cardBuilder(favorite);
-        });
+      itemCount: widget._favourites.length,
+      itemBuilder: (BuildContext context, int index) {
+        var favorite = widget._favourites[index];
+        return cardBuilder(favorite);
+      },
+      padding: const EdgeInsets.fromLTRB(10, 15, 10, 0),
+    );
   }
 }
