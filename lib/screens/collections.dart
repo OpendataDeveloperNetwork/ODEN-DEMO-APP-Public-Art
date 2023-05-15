@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../components/profile_button_app_bar.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import './details.dart';
 import 'package:oden_app/models/public_art.dart';
+import 'package:oden_app/main.dart';
 
 ///
 /// This contains the collections page.
@@ -62,24 +62,15 @@ class _FilterPageState extends State<FilterPage> {
     }
   }
 
-  Future<List<PublicArt>> fetchDataFromFirestore() async {
-    List<PublicArt> data = [];
+  Future<List<PublicArt>> fetchDataFromObjectBox() async {
+    List<PublicArt> data = db.getAllPublicArts(); // Get all PublicArt objects using the global 'db' variable
+
     Map<String, Map<String, List<String>>> locationData = {};
 
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-    QuerySnapshot querySnapshot = await firestore
-        .collection('Categories')
-        .doc('Public_Art')
-        .collection('Items')
-        .get();
-
-    for (var doc in querySnapshot.docs) {
-      // for debugging purposes
-      print('Document data: ${doc.data()}');
-
-      String country = doc['labels']['countryCode'];
-      String region = doc['labels']['regionCode'];
-      String city = doc['labels']['cityCode'];
+    for (PublicArt artPiece in data) {
+      String country = artPiece.country;
+      String region = artPiece.region;
+      String city = artPiece.city;
 
       // Update the location data structure
       if (!locationData.containsKey(country)) {
@@ -91,32 +82,7 @@ class _FilterPageState extends State<FilterPage> {
       if (!locationData[country]![region]!.contains(city)) {
         locationData[country]![region]!.add(city);
       }
-
-      Map<String, dynamic> coordinates = doc['coordinates'] ?? {};
-      double latitude =
-          double.tryParse(coordinates['latitude']?.toString() ?? '0.0') ?? 0.0;
-      double longitude =
-          double.tryParse(coordinates['longitude']?.toString() ?? '0.0') ?? 0.0;
-
-      PublicArt artPiece = PublicArt(
-        // id: doc.id,
-        name: doc['name'],
-        latitude: latitude,
-        longitude: longitude,
-        //description: doc['description'],
-        //link: doc['link'],
-        //address: doc['address'],
-        //artist: doc['artist'],
-        //distance: doc['distance'],
-        city: doc['labels']['cityCode'],
-        country: doc['labels']['countryCode'],
-        region: doc['labels']['regionCode'],
-      );
-      data.add(artPiece);
     }
-
-    // Update the countryRegionCityData map
-    countryRegionCityData = locationData;
 
     // Update the countryRegionCityData map and refresh the UI
     setState(() {
@@ -127,13 +93,14 @@ class _FilterPageState extends State<FilterPage> {
     return data;
   }
 
+
   List<PublicArt> allArtPieces = [];
   List<PublicArt> filteredArtPieces = [];
 
   @override
   void initState() {
     super.initState();
-    fetchDataFromFirestore().then((data) {
+    fetchDataFromObjectBox().then((data) {
       setState(() {
         allArtPieces = data;
         countries = countryRegionCityData.keys.toList();
