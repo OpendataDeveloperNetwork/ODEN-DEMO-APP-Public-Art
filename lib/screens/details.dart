@@ -105,7 +105,7 @@ class _DetailsPageBodyState extends State<DetailsPageBody> {
                   SizedBox(
                       width: 160,
                       child: Text(
-                          "You are ${widget.art.distance.round()} km away",
+                          "You are ${widget.art.distance?.round()} km away",
                           style: const TextStyle(fontSize: 20)))
                 ],
               )),
@@ -126,7 +126,7 @@ class _DetailsPageBodyState extends State<DetailsPageBody> {
                               fontSize: 40, color: Colors.white38));
                     }
                     return Text(
-                      widget.art.description,
+                      widget.art.description ?? "No data",
                       style: const TextStyle(color: Colors.white),
                     );
                   }).toList(),

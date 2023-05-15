@@ -31,43 +31,36 @@ class Location with ClusterItem {
 class PublicArt with ClusterItem {
   final String name;
   final LatLng _location;
-  final String description;
-  final String link;
-  final String artist;
-  final double distance;
-  final String dateInstalled;
-  final String imageUrl;
   final String city;
   final String country;
   final String region;
+  final String? description;
+  final String? link;
+  final String? artist;
+  final double? distance;
+  final String? dateInstalled;
+  final List? imageUrls;
+  final String? material;
+  final String? dateCreated;
   int id;
 
-  PublicArt(
-      {required name,
-      required latitude,
-      required longitude,
-      this.id = 0,
-      dateInstalled,
-      material,
-      description,
-      link,
-      distance,
-      artist,
-      region,
-      city,
-      country,
-      imageUrl})
-      : name = name ?? "No name",
-        city = city ?? "No city",
-        country = country ?? "No country",
-        region = region ?? "No region",
-        _location = LatLng(latitude, longitude),
-        description = description ?? "No description available",
-        link = link ?? "No link available",
-        artist = artist ?? "No artist",
-        distance = distance ?? 0,
-        dateInstalled = dateInstalled ?? "Unknown",
-        imageUrl = imageUrl ?? "No image url";
+  PublicArt({
+    required this.name,
+    required latitude,
+    required longitude,
+    required this.region,
+    required this.city,
+    required this.country,
+    this.id = 0,
+    this.dateInstalled,
+    this.material,
+    this.description,
+    this.link,
+    this.distance,
+    this.artist,
+    this.imageUrls,
+    this.dateCreated,
+  }) : _location = LatLng(latitude, longitude);
 
   @override
   LatLng get location => _location;
