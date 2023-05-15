@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:oden_app/models/public_art.dart';
+import '../../main.dart';
 import '../../models/profile_public_art.dart';
 import '../../models/firebase_repo.dart';
 import '../../models/auth.dart';
@@ -41,18 +42,12 @@ class _VisitsListViewState extends State<VisitsListView> {
         });
   }
 
-  // void toDetailsPage(String publicId) async {
-  //   DocumentSnapshot data =
-  //   await FirebaseUser().getPublicArt(Auth().uid!, publicId);
-  //   PublicArt publicArt = PublicArt(
-  //       id: int.parse(publicId),
-  //       name: data["name"],
-  //       latitude: double.parse(data['coordinates']['latitude']),
-  //       longitude: double.parse(data['coordinates']['longitude']));
-  //   if (context.mounted) {
-  //     navigationToDetailsPage(publicArt);
-  //   }
-  // }
+  void toDetailsPage(ProfilePublicArt profilePublicArt) async {
+    PublicArt publicArt = db.getPublicArt(profilePublicArt);
+    if (context.mounted) {
+      navigationToDetailsPage(publicArt);
+    }
+  }
 
   void navigationToDetailsPage(PublicArt publicArt) {
     Navigator.push(context,
@@ -66,11 +61,15 @@ class _VisitsListViewState extends State<VisitsListView> {
     });
   }
 
-  void isConfirmed(publicArtId) {
+  void isConfirmed(ProfilePublicArt publicArt) {
     setState(() {
-      widget._visits.removeWhere((element) => element.id == publicArtId);
+      widget._visits.removeWhere((element) =>
+          element.city == publicArt.city &&
+          element.country == publicArt.country &&
+          element.region == publicArt.region &&
+          element.name == publicArt.name);
     });
-    FirebaseUserRepo().removePublicArtFromVisits(Auth().uid!, publicArtId);
+    FirebaseUserRepo().removePublicArtFromVisits(Auth().uid!, publicArt);
     Navigator.of(context).pop();
   }
 
@@ -81,10 +80,10 @@ class _VisitsListViewState extends State<VisitsListView> {
             child: ListTile(
           title: Text(favorite.name),
           subtitle: Text(favorite.date),
-          // onTap: () => toDetailsPage(favorite.id),
+          onTap: () => toDetailsPage(favorite),
         )),
         IconButton(
-          onPressed: () => unVisit(favorite.toggleFavourite, favorite.id),
+          onPressed: () => unVisit(favorite.toggleFavourite, favorite),
           icon: const Icon(Icons.remove),
           iconSize: 45,
         )
