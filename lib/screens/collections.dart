@@ -240,7 +240,7 @@ class _FilterPageState extends State<FilterPage> {
                 return ListTile(
                   // You can change this part to display the image using an image URL or another property.
                   leading: Image.asset(
-                    'assets/images/logo.png',
+                    'assets/images/icon.png',
                     width: 50,
                     height: 50,
                     fit: BoxFit.cover,
