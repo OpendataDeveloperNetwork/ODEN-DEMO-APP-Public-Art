@@ -64,29 +64,29 @@ class _ProfileBodyState extends State<ProfileBody> {
     final userFavorites = await FirebaseUserRepo().getFavourites(Auth().uid!);
     for (var doc in userFavorites.docs) {
       setState(() {
-        ProfilePublicArt publicArt =
-            ProfilePublicArt(doc["date"], doc["name"], doc["id"]);
+        ProfilePublicArt publicArt = ProfilePublicArt(doc["date"], doc["name"],
+            doc["city"], doc['country'], doc['region']);
         _favourites.add(publicArt);
       });
     }
   }
 
-  void _getVisits() async {
-    final userVists = await FirebaseUserRepo().getVisits(Auth().uid!);
-    for (var doc in userVists.docs) {
-      setState(() {
-        ProfilePublicArt publicArt =
-            ProfilePublicArt(doc["date"], doc["name"], doc["id"]);
-        _visits.add(publicArt);
-      });
-    }
-  }
+  // void _getVisits() async {
+  //   final userVists = await FirebaseUserRepo().getVisits(Auth().uid!);
+  //   for (var doc in userVists.docs) {
+  //     setState(() {
+  //       ProfilePublicArt publicArt =
+  //           ProfilePublicArt(doc["date"], doc["name"], doc["id"]);
+  //       _visits.add(publicArt);
+  //     });
+  //   }
+  // }
 
   @override
   void initState() {
     super.initState();
     _getFavourites();
-    _getVisits();
+    // _getVisits();
   }
 
   ///
