@@ -3,6 +3,7 @@ import 'dart:ffi';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:oden_app/models/public_art.dart';
+import '../../main.dart';
 import '../../models/profile_public_art.dart';
 import '../../models/firebase_repo.dart';
 import '../../models/auth.dart';
@@ -22,7 +23,7 @@ class FavouritesListView extends StatefulWidget {
 
 class _FavouritesListViewState extends State<FavouritesListView>
     with SingleTickerProviderStateMixin {
-  Future unFavourite(callback, publicArtId) {
+  Future unFavourite(callback, ProfilePublicArt publicArt) {
     setState(() {
       callback();
     });
@@ -37,7 +38,7 @@ class _FavouritesListViewState extends State<FavouritesListView>
                   onPressed: () => isCanceled(callback),
                   child: const Text('Cancel')),
               TextButton(
-                  onPressed: () => isConfirmed(publicArtId),
+                  onPressed: () => isConfirmed(publicArt),
                   child: const Text('Confirm'))
             ],
           );
@@ -51,25 +52,24 @@ class _FavouritesListViewState extends State<FavouritesListView>
     });
   }
 
-  void isConfirmed(publicArtId) {
+  void isConfirmed(ProfilePublicArt publicArt) {
     setState(() {
-      widget._favourites.removeWhere((element) => element.id == publicArtId);
+      widget._favourites.removeWhere((element) =>
+          element.city == publicArt.city &&
+          element.country == publicArt.country &&
+          element.region == publicArt.region &&
+          element.name == publicArt.name);
     });
-    FirebaseUserRepo().removePublicArtFromFavourites(Auth().uid!, publicArtId);
+    FirebaseUserRepo().removePublicArtFromFavourites(Auth().uid!, publicArt);
     Navigator.of(context).pop();
   }
 
-  // void toDetailsPage(String publicId) async {
-  //   DocumentSnapshot data =
-  //       await FirebaseUser().getPublicArt(Auth().uid!, publicId);
-  //   PublicArt publicArt = PublicArt(
-  //       name: data["name"],
-  //       latitude: double.parse(data['coordinates']['latitude']),
-  //       longitude: double.parse(data['coordinates']['longitude']));
-  //   if (context.mounted) {
-  //     navigationToDetailsPage(publicArt);
-  //   }
-  // }
+  void toDetailsPage(ProfilePublicArt profilePublicArt) async {
+    PublicArt publicArt = db.getPublicArt(profilePublicArt);
+    if (context.mounted) {
+      navigationToDetailsPage(publicArt);
+    }
+  }
 
   void navigationToDetailsPage(PublicArt publicArt) {
     Navigator.push(
@@ -80,11 +80,15 @@ class _FavouritesListViewState extends State<FavouritesListView>
   }
 
   void reloadListView(PublicArt publicArt) async {
-    bool isFavourited = await FirebaseUserRepo()
-        .isPublicArtFavourited(Auth().uid, publicArt.id);
+    bool isFavourited =
+        await FirebaseUserRepo().isPublicArtFavourited(Auth().uid, publicArt);
     if (!isFavourited) {
       setState(() {
-        widget._favourites.removeWhere((element) => element.id == publicArt.id);
+        widget._favourites.removeWhere((element) =>
+            element.country == publicArt.country &&
+            element.city == publicArt.city &&
+            element.region == publicArt.region &&
+            element.name == publicArt.name);
       });
     }
   }
@@ -96,10 +100,10 @@ class _FavouritesListViewState extends State<FavouritesListView>
             child: ListTile(
           title: Text(favorite.name),
           subtitle: Text(favorite.date),
-          // onTap: () => toDetailsPage(favorite.id),
+          onTap: () => toDetailsPage(favorite),
         )),
         IconButton(
-          onPressed: () => unFavourite(favorite.toggleFavourite, favorite.id),
+          onPressed: () => unFavourite(favorite.toggleFavourite, favorite),
           icon: Icon(
             favorite.isFavourited ? Icons.star : Icons.star_outline,
             color: Colors.yellow,
