@@ -6,12 +6,12 @@
 class ProfilePublicArt {
   final String date;
   final String name;
-  final String _id;
+  final String city;
+  final String country;
+  final String region;
   bool isFavourited = true;
 
-  ProfilePublicArt(this.date, this.name, this._id);
-
-  String get id => _id;
+  ProfilePublicArt(this.date, this.name, this.city, this.country, this.region);
 
   void toggleFavourite() {
     isFavourited = !isFavourited;
@@ -19,6 +19,6 @@ class ProfilePublicArt {
 
   @override
   String toString() {
-    return 'ProfileArts{\nid: $id\nname: $name,\n date: $date \n\t}';
+    return 'ProfileArts{\ncountry: $country\nregion: $region \ncity: $city\nname: $name,\n date: $date \n\t}';
   }
 }
