@@ -47,20 +47,21 @@ class _FilterPageState extends State<FilterPage> {
   int cityCount = 0;
 
   void updateRegions() {
-    if (selectedCountry != null) {
-      regions = countryRegionCityData[selectedCountry]!.keys.toList();
+    if (selectedCountry != null && selectedCountry != 'ALL') {
+      regions = ['ALL'] + countryRegionCityData[selectedCountry]!.keys.toList(); // Add the 'ALL' option for regions
     } else {
       regions = [];
     }
   }
 
   void updateCities() {
-    if (selectedRegion != null) {
-      cities = countryRegionCityData[selectedCountry]![selectedRegion]!;
+    if (selectedRegion != null && selectedRegion != 'ALL') {
+      cities = ['ALL'] + countryRegionCityData[selectedCountry]![selectedRegion]!; // Add the 'ALL' option for cities
     } else {
       cities = [];
     }
   }
+
 
   Future<List<PublicArt>> fetchDataFromObjectBox() async {
     List<PublicArt> data = db.getAllPublicArts(); // Get all PublicArt objects using the global 'db' variable
@@ -87,11 +88,12 @@ class _FilterPageState extends State<FilterPage> {
     // Update the countryRegionCityData map and refresh the UI
     setState(() {
       countryRegionCityData = locationData;
-      countries = countryRegionCityData.keys.toList();
+      countries = ['ALL'] + countryRegionCityData.keys.toList();
     });
 
     return data;
   }
+
 
 
   List<PublicArt> allArtPieces = [];
@@ -103,18 +105,20 @@ class _FilterPageState extends State<FilterPage> {
     fetchDataFromObjectBox().then((data) {
       setState(() {
         allArtPieces = data;
-        countries = countryRegionCityData.keys.toList();
+        countries = ['ALL'] + countryRegionCityData.keys.toList(); // Add the 'ALL' option for countries
         filterData();
         isLoading = false;
       });
     });
   }
 
+
   void filterData() {
     setState(() {
       filteredArtPieces = allArtPieces.where((artPiece) {
         return (selectedCountry == null ||
-                artPiece.country == selectedCountry) &&
+            selectedCountry == 'ALL' ||
+            artPiece.country == selectedCountry) &&
             (selectedRegion == null ||
                 selectedRegion == 'ALL' ||
                 artPiece.region == selectedRegion) &&
