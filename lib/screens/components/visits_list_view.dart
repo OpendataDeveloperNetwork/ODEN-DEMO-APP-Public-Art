@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:oden_app/models/public_art.dart';
 import '../../models/profile_public_art.dart';
-import '../../models/firebase_user.dart';
+import '../../models/firebase_repo.dart';
 import '../../models/auth.dart';
 import 'package:oden_app/screens/details.dart';
 
@@ -70,7 +70,7 @@ class _VisitsListViewState extends State<VisitsListView> {
     setState(() {
       widget._visits.removeWhere((element) => element.id == publicArtId);
     });
-    FirebaseUser().removePublicArtFromVisits(Auth().uid!, publicArtId);
+    FirebaseUserRepo().removePublicArtFromVisits(Auth().uid!, publicArtId);
     Navigator.of(context).pop();
   }
 

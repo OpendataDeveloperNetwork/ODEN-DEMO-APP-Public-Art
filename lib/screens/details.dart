@@ -39,7 +39,7 @@ class _DetailsPageBodyState extends State<DetailsPageBody> {
   @override
   void initState() {
     Future<bool> checkPublicArt =
-        FirebaseUser().isPublicArtFavourited(Auth().uid, widget.art.id);
+        FirebaseUserRepo().isPublicArtFavourited(Auth().uid, widget.art.id);
     checkPublicArt.then((value) => setState(() {
           _isFavourite = value;
         }));
@@ -51,9 +51,9 @@ class _DetailsPageBodyState extends State<DetailsPageBody> {
       setState(() {
         _isFavourite = !_isFavourite;
         if (_isFavourite) {
-          FirebaseUser().addPublicArtToFavourites(Auth().uid, widget.art);
+          FirebaseUserRepo().addPublicArtToFavourites(Auth().uid, widget.art);
         } else {
-          FirebaseUser()
+          FirebaseUserRepo()
               .removePublicArtFromFavourites(Auth().uid, widget.art.id);
         }
       });

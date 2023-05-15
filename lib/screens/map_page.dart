@@ -199,8 +199,8 @@ class _MapsPageState extends State<MapsPage> {
                       onPressed: () => Navigator.of(context).pop(),
                       child: const Text('Cancel')),
                   TextButton(
-                      onPressed: () =>
-                          FirebaseUser().addPublicArtToVisits(Auth().uid, art!),
+                      onPressed: () => FirebaseUserRepo()
+                          .addPublicArtToVisits(Auth().uid, art!),
                       child: const Text('Confirm'))
                 ],
         );
