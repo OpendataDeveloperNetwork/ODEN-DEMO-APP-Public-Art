@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
+import 'package:oden_app/models/profile_public_art.dart';
 import 'package:oden_app/models/public_art.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -97,5 +98,13 @@ class ObjectBoxDatabase {
 
   List<PublicArt> getAllPublicArts() {
     return _publicArts.getAll();
+  }
+
+  PublicArt getPublicArt(ProfilePublicArt publicArt) {
+    final query = _publicArts
+        .query(PublicArt_.name.equals(publicArt.name))
+        .build()
+        .find();
+    return query[0];
   }
 }
