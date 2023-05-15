@@ -41,7 +41,8 @@ class _MapsPageState extends State<MapsPage> {
   }
 
   // Google maps controller
-  final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
+  final Completer<GoogleMapController> _controller =
+      Completer<GoogleMapController>();
 
   late GoogleMapController gController;
 
@@ -265,78 +266,74 @@ class _MapsPageState extends State<MapsPage> {
     myController.clear();
   }
 
-  void _onCameraMove(CameraPosition position){
+  void _onCameraMove(CameraPosition position) {
     changeMarkers(position, markers);
     _manager.onCameraMove(position);
+  }
+
+  Container _buildMap() {
+    return Container(
+        height: double.infinity,
+        child: Stack(
+          children: [
+            GoogleMap(
+                mapType: MapType.normal,
+                initialCameraPosition: position,
+                markers: _markers,
+                onCameraMove: _onCameraMove,
+                onCameraIdle: _manager.updateMap,
+                onMapCreated: (controller) => _OnMapCreated(controller)),
+            Positioned(
+              bottom: 30.0,
+              left: 16.0,
+              child: FloatingActionButton(
+                backgroundColor: Colors.blue,
+                onPressed: _setCurrentLocation,
+                child: const Icon(Icons.my_location_sharp),
+              ),
+            )
+          ],
+        ));
+  }
+
+  Container _buildSearchBar() {
+    return Container(
+        height: 50,
+        margin: const EdgeInsets.fromLTRB(40, 30, 40, 0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: const Color(0xFF000080)),
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: Row(
+          children: [
+            const BackButton(),
+            Expanded(
+              child: TextField(
+                controller: myController,
+                decoration: const InputDecoration(
+                  hintText: 'Search',
+                  border: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  disabledBorder: InputBorder.none,
+                  errorBorder: InputBorder.none,
+                ),
+              ),
+            ),
+          ],
+        ));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: profileAppBarWidget(context, false),
-        body: SafeArea(
-            child: Column(
+        body: Stack(
           children: [
-            Row(
-              children: [
-                const BackButton(),
-                Expanded(
-                  child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 10),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              controller: myController,
-                              decoration: InputDecoration(
-                                hintText: 'Search',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Container(
-                              margin: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: Colors.blue,
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                              child: IconButton(
-                                onPressed: () {
-                                  search();
-                                },
-                                color: Colors.white,
-                                icon: const Icon(Icons.search),
-                              ))
-                        ],
-                      )),
-                ),
-              ],
-            ),
-            Expanded(
-                child: Stack(
-              children: [
-                GoogleMap(
-                    mapType: MapType.normal,
-                    initialCameraPosition: position,
-                    markers: _markers,
-                    onCameraMove: _onCameraMove,
-                    onCameraIdle: _manager.updateMap,
-                    onMapCreated: (controller) => _OnMapCreated(controller)),
-                Positioned(
-                  bottom: 30.0,
-                  left: 16.0,
-                  child: FloatingActionButton(
-                    backgroundColor: Colors.blue,
-                    onPressed: _setCurrentLocation,
-                    child: const Icon(Icons.my_location_sharp),
-                  ),
-                )
-              ],
-            ))
+            _buildMap(),
+            _buildSearchBar(),
           ],
-        )));
+        ));
   }
 }

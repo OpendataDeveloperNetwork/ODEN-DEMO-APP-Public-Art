@@ -13,10 +13,30 @@ import '../models/firebase_user.dart';
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
+  ///
+  /// A private function that builds the collection button widget
+  ///
+  FloatingActionButton _buildCollectionFloatingWidget(BuildContext context) {
+    ///
+    /// An inner function that navigates to the collections page.
+    ///
+    void onSignOut() {
+      Auth().signOut();
+      Navigator.pop(context);
+    }
+
+    return FloatingActionButton(
+        onPressed: onSignOut,
+        backgroundColor: const Color(0xFF16BCD2),
+        child: const Icon(Icons.logout));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: backButtonAppBarWidget(context), body: const ProfileBody());
+        floatingActionButton: _buildCollectionFloatingWidget(context),
+        appBar: backButtonAppBarWidget(context),
+        body: const ProfileBody());
   }
 }
 
@@ -45,7 +65,7 @@ class _ProfileBodyState extends State<ProfileBody> {
     for (var doc in userFavorites.docs) {
       setState(() {
         ProfilePublicArt publicArt =
-        ProfilePublicArt(doc["date"], doc["name"], doc["id"]);
+            ProfilePublicArt(doc["date"], doc["name"], doc["id"]);
         _favourites.add(publicArt);
       });
     }
@@ -56,7 +76,7 @@ class _ProfileBodyState extends State<ProfileBody> {
     for (var doc in userVists.docs) {
       setState(() {
         ProfilePublicArt publicArt =
-        ProfilePublicArt(doc["date"], doc["name"], doc["id"]);
+            ProfilePublicArt(doc["date"], doc["name"], doc["id"]);
         _visits.add(publicArt);
       });
     }
@@ -76,11 +96,11 @@ class _ProfileBodyState extends State<ProfileBody> {
   ///
   void selectedCategory(int index) {
     setState(() => {
-      for (int buttonIndex = 0;
-      buttonIndex < _selectedCategories.length;
-      buttonIndex++)
-        {_selectedCategories[buttonIndex] = buttonIndex == index},
-    });
+          for (int buttonIndex = 0;
+              buttonIndex < _selectedCategories.length;
+              buttonIndex++)
+            {_selectedCategories[buttonIndex] = buttonIndex == index},
+        });
   }
 
   ///
@@ -92,18 +112,13 @@ class _ProfileBodyState extends State<ProfileBody> {
       borderRadius: const BorderRadius.all(Radius.circular(8)),
       selectedColor: Colors.white,
       selectedBorderColor: Colors.green[700],
-      fillColor: const Color(0xFF77BF4B),
+      fillColor: const Color(0xFF000080),
       color: Colors.grey[500],
       constraints: const BoxConstraints(minWidth: 120, minHeight: 35),
       direction: Axis.horizontal,
       isSelected: _selectedCategories,
       children: categories,
     );
-  }
-
-  void onSignOut() {
-    Auth().signOut();
-    Navigator.pop(context);
   }
 
   ///
@@ -134,8 +149,7 @@ class _ProfileBodyState extends State<ProfileBody> {
         const SizedBox(height: 15),
         /* Visibility of listviews are dynamic depending on which toggle button is selected */
         _buildListView(FavouritesListView(_favourites), _selectedCategories[0]),
-        _buildListView(VisitsListView(_visits), _selectedCategories[1]),
-        ElevatedButton(onPressed: onSignOut, child: const Text("Log Out"))
+        // _buildListView(const VisitsListView(), _selectedCategories[1]),
       ],
     );
   }

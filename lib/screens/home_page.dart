@@ -26,7 +26,7 @@ class HomePage extends StatelessWidget {
 
     return FloatingActionButton(
         onPressed: navigateToCollections,
-        backgroundColor: const Color(0xFF2D3848),
+        backgroundColor: const Color(0xFF000080),
         child: const Icon(Icons.folder_open));
   }
 
@@ -93,7 +93,7 @@ class _HomePageBodyState extends State<HomePageBody> {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(15)),
                           side: const BorderSide(
-                              color: Color(0xFF16BCD4), width: 2)),
+                              color: Color(0xFF000080), width: 2)),
                       child: Text(value.name),
                     )))
           ],
@@ -113,7 +113,7 @@ class _HomePageBodyState extends State<HomePageBody> {
             style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10)),
-                backgroundColor: const Color(0xFF2D3848),
+                backgroundColor: const Color(0xFF16BCD2),
                 textStyle:
                     const TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
             child: const Text("Retrieve")));

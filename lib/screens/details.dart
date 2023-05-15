@@ -43,7 +43,6 @@ class _DetailsPageBodyState extends State<DetailsPageBody> {
     checkPublicArt.then((value) => setState(() {
           _isFavourite = value;
         }));
-    // TODO: implement initState
     super.initState();
   }
 
@@ -71,11 +70,17 @@ class _DetailsPageBodyState extends State<DetailsPageBody> {
         children: [
           Flexible(
             child: Container(
-                color: Colors.green,
+                alignment: Alignment.centerLeft,
+                color: const Color(0xFF16BCD2),
                 child: Row(
                   children: [
-                    const BackButton(),
-                    const SizedBox(width: 275),
+                    const BackButton(
+                      color: Colors.white,
+                    ),
+                    Expanded(
+                        child: Text(widget.art.name,
+                            style: const TextStyle(
+                                fontSize: 25, color: Colors.white))),
                     IconButton(
                       onPressed: isFavourited,
                       icon: Icon(
@@ -87,14 +92,6 @@ class _DetailsPageBodyState extends State<DetailsPageBody> {
                   ],
                 )),
           ),
-          Expanded(
-              child: Center(
-                  child: Container(
-                      width: 400,
-                      margin: const EdgeInsets.fromLTRB(10, 10, 0, 0),
-                      padding: const EdgeInsets.all(5),
-                      child: Text(widget.art.name,
-                          style: const TextStyle(fontSize: 28))))),
           Expanded(
               flex: 3,
               child: Row(
@@ -108,7 +105,7 @@ class _DetailsPageBodyState extends State<DetailsPageBody> {
                   SizedBox(
                       width: 160,
                       child: Text(
-                          "You are ${widget.art.distance.round()} km away",
+                          "You are ${widget.art.distance?.round()} km away",
                           style: const TextStyle(fontSize: 20)))
                 ],
               )),
@@ -128,7 +125,10 @@ class _DetailsPageBodyState extends State<DetailsPageBody> {
                           style: const TextStyle(
                               fontSize: 40, color: Colors.white38));
                     }
-                    return const Text("");
+                    return Text(
+                      widget.art.description ?? "No data",
+                      style: const TextStyle(color: Colors.white),
+                    );
                   }).toList(),
                 ])),
           ),

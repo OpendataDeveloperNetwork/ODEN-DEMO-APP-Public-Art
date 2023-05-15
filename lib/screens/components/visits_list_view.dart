@@ -41,18 +41,18 @@ class _VisitsListViewState extends State<VisitsListView> {
         });
   }
 
-  void toDetailsPage(String publicId) async {
-    DocumentSnapshot data =
-    await FirebaseUser().getPublicArt(Auth().uid!, publicId);
-    PublicArt publicArt = PublicArt(
-        id: int.parse(publicId),
-        name: data["name"],
-        latitude: double.parse(data['coordinates']['latitude']),
-        longitude: double.parse(data['coordinates']['longitude']));
-    if (context.mounted) {
-      navigationToDetailsPage(publicArt);
-    }
-  }
+  // void toDetailsPage(String publicId) async {
+  //   DocumentSnapshot data =
+  //   await FirebaseUser().getPublicArt(Auth().uid!, publicId);
+  //   PublicArt publicArt = PublicArt(
+  //       id: int.parse(publicId),
+  //       name: data["name"],
+  //       latitude: double.parse(data['coordinates']['latitude']),
+  //       longitude: double.parse(data['coordinates']['longitude']));
+  //   if (context.mounted) {
+  //     navigationToDetailsPage(publicArt);
+  //   }
+  // }
 
   void navigationToDetailsPage(PublicArt publicArt) {
     Navigator.push(context,
@@ -79,10 +79,10 @@ class _VisitsListViewState extends State<VisitsListView> {
       child: Row(children: [
         Expanded(
             child: ListTile(
-              title: Text(favorite.name),
-              subtitle: Text(favorite.date),
-              onTap: () => toDetailsPage(favorite.id),
-            )),
+          title: Text(favorite.name),
+          subtitle: Text(favorite.date),
+          // onTap: () => toDetailsPage(favorite.id),
+        )),
         IconButton(
           onPressed: () => unVisit(favorite.toggleFavourite, favorite.id),
           icon: const Icon(Icons.remove),

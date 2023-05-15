@@ -108,9 +108,9 @@ class _FilterPageState extends State<FilterPage> {
         //address: doc['address'],
         //artist: doc['artist'],
         //distance: doc['distance'],
-        // city: doc['labels']['cityCode'],
-        // country: doc['labels']['countryCode'],
-        // region: doc['labels']['regionCode'],
+        city: doc['labels']['cityCode'],
+        country: doc['labels']['countryCode'],
+        region: doc['labels']['regionCode'],
       );
       data.add(artPiece);
     }
