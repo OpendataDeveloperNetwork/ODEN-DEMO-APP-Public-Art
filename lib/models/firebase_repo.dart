@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:oden_app/models/PublicArtData.dart';
+import 'package:oden_app/models/profile_public_art.dart';
 import 'package:oden_app/models/public_art.dart';
 import 'package:intl/intl.dart';
 
@@ -13,23 +15,29 @@ class FirebaseUserRepo {
   late final CollectionReference categories =
       firestore.collection("Categories");
 
-  Future<bool> isPublicArtFavourited(String? uid, int? publicArtId) async {
+  Future<bool> isPublicArtFavourited(String? uid, PublicArt publicArt) async {
     if (uid == null) return Future.value(false);
     final data = await profiles.doc(uid).collection("Favorites").get();
     if (data.size == 0) return Future.value(false);
     for (var doc in data.docs) {
-      if (doc["id"] == publicArtId) return Future.value(true);
+      print(doc);
+      if (doc["country"] == publicArt.country &&
+          doc["city"] == publicArt.city &&
+          doc["region"] == publicArt.region &&
+          doc["name"] == publicArt.name) return Future.value(true);
     }
     return Future.value(false);
   }
 
   Future<void> addPublicArtToFavourites(
       String? uid, PublicArt publicArt) async {
-    if (await isPublicArtFavourited(uid, publicArt.id)) return;
+    if (await isPublicArtFavourited(uid, publicArt)) return;
     DateTime now = DateTime.now();
     String date = DateFormat('yyyy-MM-dd hh:mm').format(now);
     Map<String, dynamic> data = {
-      "id": publicArt.id,
+      "country": publicArt.country,
+      "city": publicArt.city,
+      "region": publicArt.region,
       "name": publicArt.name,
       "date": date
     };
@@ -43,12 +51,15 @@ class FirebaseUserRepo {
   }
 
   Future<void> removePublicArtFromFavourites(
-      String? uid, int publicArtId) async {
+      String? uid, dynamic publicArt) async {
     final QuerySnapshot data =
         await profiles.doc(uid).collection("Favorites").get();
     if (data.size == 0) return;
     for (var doc in data.docs) {
-      if (doc["id"] == publicArtId) {
+      if (doc["country"] == publicArt.country &&
+          doc["city"] == publicArt.city &&
+          doc["region"] == publicArt.region &&
+          doc["name"] == publicArt.name) {
         await profiles.doc(uid).collection("Favorites").doc(doc.id).delete();
         return;
       }
@@ -90,13 +101,15 @@ class FirebaseUserRepo {
     return data;
   }
 
-  Future<void> removePublicArtFromVisits(
-      String? uid, String publicArtId) async {
+  Future<void> removePublicArtFromVisits(String? uid, dynamic publicArt) async {
     final QuerySnapshot data =
         await profiles.doc(uid).collection("Visits").get();
     if (data.size == 0) return;
     for (var doc in data.docs) {
-      if (doc["id"] == publicArtId) {
+      if (doc["country"] == publicArt.country &&
+          doc["city"] == publicArt.city &&
+          doc["region"] == publicArt.region &&
+          doc["name"] == publicArt.name) {
         await profiles.doc(uid).collection("Visits").doc(doc.id).delete();
         return;
       }
