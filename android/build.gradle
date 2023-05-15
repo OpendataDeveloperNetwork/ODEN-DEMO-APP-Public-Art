@@ -16,6 +16,11 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        configurations.all{
+            resolutionStrategy{
+                force "com.google.android.gms:play-services-location:21.0.1"
+            }
+        }
     }
 }
 
@@ -27,6 +32,6 @@ subprojects {
     project.evaluationDependsOn(':app')
 }
 
-task clean(type: Delete) {
+tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }

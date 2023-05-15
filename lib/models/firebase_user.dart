@@ -11,7 +11,7 @@ class FirebaseUser {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   late final CollectionReference profiles = firestore.collection("Profiles");
   late final CollectionReference categories =
-      firestore.collection("Categories");
+  firestore.collection("Categories");
 
   Future<bool> isPublicArtFavourited(String? uid, int? publicArtId) async {
     if (uid == null) return Future.value(false);
@@ -45,7 +45,7 @@ class FirebaseUser {
   Future<void> removePublicArtFromFavourites(
       String? uid, int publicArtId) async {
     final QuerySnapshot data =
-        await profiles.doc(uid).collection("Favorites").get();
+    await profiles.doc(uid).collection("Favorites").get();
     if (data.size == 0) return;
     for (var doc in data.docs) {
       if (doc["id"] == publicArtId) {
@@ -66,5 +66,40 @@ class FirebaseUser {
         .collection("Items")
         .doc(publicArtId)
         .get();
+  }
+
+  Future<void> addPublicArtToVisits(String? uid, PublicArt publicArt) async {
+    DateTime now = DateTime.now();
+    String date = DateFormat('yyyy-MM-dd hh:mm').format(now);
+    Map<String, dynamic> data = {
+      "id": publicArt.id,
+      "name": publicArt.name,
+      "date": date
+    };
+    if (uid == null) return;
+    await profiles
+        .doc(uid)
+        .collection("Visits")
+        .add(data)
+        .then((_) => print("Added ${publicArt.id} to $uid"))
+        .catchError((onError) => print("failed to add ${publicArt.id}"));
+  }
+
+  Future<QuerySnapshot> getVisits(String uid) async {
+    final data = await profiles.doc(uid).collection("Visits").get();
+    return data;
+  }
+
+  Future<void> removePublicArtFromVisits(
+      String? uid, String publicArtId) async {
+    final QuerySnapshot data =
+    await profiles.doc(uid).collection("Visits").get();
+    if (data.size == 0) return;
+    for (var doc in data.docs) {
+      if (doc["id"] == publicArtId) {
+        await profiles.doc(uid).collection("Visits").doc(doc.id).delete();
+        return;
+      }
+    }
   }
 }

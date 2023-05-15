@@ -38,14 +38,26 @@ class _ProfileBodyState extends State<ProfileBody> {
     false
   ]; // This can be represented as [isFavouritesSelected, isVisitsSelected]
   final List<ProfilePublicArt> _favourites = [];
+  final List<ProfilePublicArt> _visits = [];
 
   void _getFavourites() async {
     final userFavorites = await FirebaseUser().getFavourites(Auth().uid!);
     for (var doc in userFavorites.docs) {
       setState(() {
         ProfilePublicArt publicArt =
-            ProfilePublicArt(doc["date"], doc["name"], doc["id"]);
+        ProfilePublicArt(doc["date"], doc["name"], doc["id"]);
         _favourites.add(publicArt);
+      });
+    }
+  }
+
+  void _getVisits() async {
+    final userVists = await FirebaseUser().getVisits(Auth().uid!);
+    for (var doc in userVists.docs) {
+      setState(() {
+        ProfilePublicArt publicArt =
+        ProfilePublicArt(doc["date"], doc["name"], doc["id"]);
+        _visits.add(publicArt);
       });
     }
   }
@@ -54,6 +66,7 @@ class _ProfileBodyState extends State<ProfileBody> {
   void initState() {
     super.initState();
     _getFavourites();
+    _getVisits();
   }
 
   ///
@@ -63,11 +76,11 @@ class _ProfileBodyState extends State<ProfileBody> {
   ///
   void selectedCategory(int index) {
     setState(() => {
-          for (int buttonIndex = 0;
-              buttonIndex < _selectedCategories.length;
-              buttonIndex++)
-            {_selectedCategories[buttonIndex] = buttonIndex == index},
-        });
+      for (int buttonIndex = 0;
+      buttonIndex < _selectedCategories.length;
+      buttonIndex++)
+        {_selectedCategories[buttonIndex] = buttonIndex == index},
+    });
   }
 
   ///
@@ -79,7 +92,7 @@ class _ProfileBodyState extends State<ProfileBody> {
       borderRadius: const BorderRadius.all(Radius.circular(8)),
       selectedColor: Colors.white,
       selectedBorderColor: Colors.green[700],
-      fillColor: const Color(0xFF16BCD4),
+      fillColor: const Color(0xFF77BF4B),
       color: Colors.grey[500],
       constraints: const BoxConstraints(minWidth: 120, minHeight: 35),
       direction: Axis.horizontal,
@@ -121,7 +134,7 @@ class _ProfileBodyState extends State<ProfileBody> {
         const SizedBox(height: 15),
         /* Visibility of listviews are dynamic depending on which toggle button is selected */
         _buildListView(FavouritesListView(_favourites), _selectedCategories[0]),
-        _buildListView(const VisitsListView(), _selectedCategories[1]),
+        _buildListView(VisitsListView(_visits), _selectedCategories[1]),
         ElevatedButton(onPressed: onSignOut, child: const Text("Log Out"))
       ],
     );

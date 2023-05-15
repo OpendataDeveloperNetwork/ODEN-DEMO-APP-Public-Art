@@ -1,19 +1,19 @@
 import 'dart:async';
-import 'package:objectbox/objectbox.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart' as location;
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart' as LocationGiver;
 import 'package:oden_app/components/profile_button_app_bar.dart';
+import 'package:oden_app/main.dart';
+import 'package:oden_app/models/firebase_user.dart';
 import 'package:oden_app/models/public_art.dart';
-import 'package:oden_app/objectbox.g.dart';
 import 'package:oden_app/screens/components/markers.dart';
-import 'package:oden_app/models/store.dart';
 
-import '../main.dart';
+import '../models/auth.dart';
 
 // ------------------------------------- //
 // ----- Maps Page - Main Feature ------ //
@@ -28,11 +28,24 @@ class MapsPage extends StatefulWidget {
 }
 
 class _MapsPageState extends State<MapsPage> {
+  /// Calls setup methods and sets initial state.
+  @override
+  void initState() {
+    setMaps(this);
+    _publicArts = db.getAllPublicArts();
+    super.initState();
+    _manager = getClusterManager();
+    _setCurrentLocation();
+    _displayMarkers();
+    _monitorLocation();
+  }
+
   // Google maps controller
-  final Completer<GoogleMapController> _controller =
-      Completer<GoogleMapController>();
+  final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
 
   late GoogleMapController gController;
+
+  LocationGiver.Location locationProvider = LocationGiver.Location();
 
   /// Manages clusters of map markers.
   late ClusterManager _manager;
@@ -40,12 +53,12 @@ class _MapsPageState extends State<MapsPage> {
   Set<Marker> _markers = {};
 
   /// List of PublicArt objects.
-  late List<PublicArt> _publicArts;
+  List<PublicArt> _publicArts = [];
 
   // Position of camera on map
   CameraPosition position = const CameraPosition(
-    target: LatLng(0, 0),
-    zoom: 18.4746,
+    target: LatLng(61.5240, 105.3188),
+    zoom: 11.4746,
   );
 
   // Search box controller
@@ -56,18 +69,6 @@ class _MapsPageState extends State<MapsPage> {
   Set<Marker> get markers => _markers;
 
   List<PublicArt> get publicArts => _publicArts;
-
-  /// Calls setup methods and sets initial state.
-  @override
-  void initState() {
-    setMaps(this);
-    _publicArts = db.getAllPublicArts();
-    print(_publicArts.length);
-    _manager = getClusterManager();
-    super.initState();
-    _displayMarkers();
-    _setCurrentLocation();
-  }
 
   /// Updates the map markers; usually when an action is performed.
   void updateMarkers(Set<Marker> markers) {
@@ -88,46 +89,85 @@ class _MapsPageState extends State<MapsPage> {
     });
   }
 
-  // Fetches the current location of user
-  Future<Position> getCurrentLocation() async {
-    bool serviceEnabled;
-    LocationPermission permission;
+  void _monitorLocation() {
+    locationProvider.onLocationChanged
+        .listen((LocationGiver.LocationData currentLocation) {
+      checkArtworkProximity(currentLocation);
+    });
+  }
 
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return Future.error("Location services are disabled");
+  void checkArtworkProximity(LocationGiver.LocationData currentLocation) {
+    // Loop through each artwork in the list
+    for (PublicArt art in publicArts) {
+      // Calculate the distance between the user's location and the artwork
+
+      double distance = Geolocator.distanceBetween(currentLocation.latitude!,
+          currentLocation.longitude!, art.latitude, art.longitude);
+
+      // If the distance is less than or equal to 100 meters, add the artwork to the database
+      if (distance <= 100) {
+        if (Auth().isLoggedIn) {
+          _showDialog(
+              context,
+              "You are in close proximity to the public art \'${art.name}\'. Do you want to consider it visited ?",
+              "Confirm",
+              art);
+        }
+      }
     }
+  }
 
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return Future.error("Location permissions are denied");
+  // Fetches the current location of user
+  Future<LocationGiver.LocationData> getCurrentLocation() async {
+    bool serviceEnabled;
+    LocationGiver.PermissionStatus permissionGranted;
+
+    serviceEnabled = await locationProvider.serviceEnabled();
+    if (!serviceEnabled) {
+      serviceEnabled = await locationProvider.requestService();
+      if (!serviceEnabled) {
+        return Future.error("Services are not enabled");
       }
     }
 
-    if (permission == LocationPermission.deniedForever) {
-      return Future.error("Location permissions are permanently denied");
+    permissionGranted = await locationProvider.hasPermission();
+    if (permissionGranted == LocationGiver.PermissionStatus.denied) {
+      permissionGranted = await locationProvider.requestPermission();
+      if (permissionGranted != LocationGiver.PermissionStatus.granted) {
+        return Future.error("Permission not granted");
+      }
     }
+    Future<LocationGiver.LocationData> loc =
+        LocationGiver.Location().getLocation();
 
-    return await Geolocator.getCurrentPosition();
+    return await loc;
   }
 
   /// Sets the camera location to the user's location.
-  void _setCurrentLocation() async {
+  Future<void> _setCurrentLocation() async {
     try {
-      Position pos = await getCurrentLocation();
-      position = CameraPosition(
-        target: LatLng(pos.latitude, pos.longitude),
-        zoom: 18.4746,
-      );
+      LocationGiver.LocationData pos = await getCurrentLocation();
+      double? lat = pos.latitude;
+      double? long = pos.longitude;
+
+      if (lat != null && long != null) {
+        position = CameraPosition(
+          target: LatLng(pos.latitude!, pos.longitude!),
+          zoom: 15.4746,
+        );
+        getController().animateCamera(CameraUpdate.newCameraPosition(position));
+        setState(() {});
+      } else {
+        _showDialog(
+            context, "We couldn't fetch your current location", "Error", null);
+      }
     } catch (e) {
       debugPrint("Error, ${e.toString()}");
     }
   }
 
   // Creates and adds markers to the _markers object
-  Future<void> _displayMarkers() async {
+  _displayMarkers() async {
     await addMarkers();
   }
 
@@ -138,19 +178,30 @@ class _MapsPageState extends State<MapsPage> {
   }
 
   // Displays a dialogue box
-  void _showDialog(BuildContext context, String message) async {
+  void _showDialog(BuildContext context, String message, String title,
+      PublicArt? art) async {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Error'),
+          title: Text(title),
           content: Text(message),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('OK'),
-            ),
-          ],
+          actions: !title.startsWith("Error")
+              ? <Widget>[
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('OK'),
+                  ),
+                ]
+              : [
+                  TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text('Cancel')),
+                  TextButton(
+                      onPressed: () =>
+                          FirebaseUser().addPublicArtToVisits(Auth().uid, art!),
+                      child: const Text('Confirm'))
+                ],
         );
       },
     );
@@ -202,8 +253,8 @@ class _MapsPageState extends State<MapsPage> {
           }
         } catch (e) {
           // Invalid name
-          _showDialog(
-              this.context, "We couldn't find the location. Please try again");
+          _showDialog(context,
+              "We couldn't find the location. Please try again", "Error", null);
         }
       }
 
@@ -212,6 +263,11 @@ class _MapsPageState extends State<MapsPage> {
     }
 
     myController.clear();
+  }
+
+  void _onCameraMove(CameraPosition position){
+    changeMarkers(position, markers);
+    _manager.onCameraMove(position);
   }
 
   @override
@@ -244,7 +300,7 @@ class _MapsPageState extends State<MapsPage> {
                           Container(
                               margin: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                color: Colors.green,
+                                color: Colors.blue,
                                 borderRadius: BorderRadius.circular(30),
                               ),
                               child: IconButton(
@@ -260,15 +316,26 @@ class _MapsPageState extends State<MapsPage> {
               ],
             ),
             Expanded(
-                child: position.target.longitude != 0
-                    ? GoogleMap(
-                        mapType: MapType.normal,
-                        initialCameraPosition: position,
-                        markers: _markers,
-                        onCameraMove: _manager.onCameraMove,
-                        onCameraIdle: _manager.updateMap,
-                        onMapCreated: (controller) => _OnMapCreated(controller))
-                    : const Center(child: CircularProgressIndicator()))
+                child: Stack(
+              children: [
+                GoogleMap(
+                    mapType: MapType.normal,
+                    initialCameraPosition: position,
+                    markers: _markers,
+                    onCameraMove: _onCameraMove,
+                    onCameraIdle: _manager.updateMap,
+                    onMapCreated: (controller) => _OnMapCreated(controller)),
+                Positioned(
+                  bottom: 30.0,
+                  left: 16.0,
+                  child: FloatingActionButton(
+                    backgroundColor: Colors.blue,
+                    onPressed: _setCurrentLocation,
+                    child: const Icon(Icons.my_location_sharp),
+                  ),
+                )
+              ],
+            ))
           ],
         )));
   }

@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:oden_app/models/public_art.dart';
@@ -158,5 +159,25 @@ Future<void> addMarkers() async {
     );
 
     mapsPage.addMarker(marker);
+  }
+}
+
+void changeMarkers(CameraPosition position, Set<Marker> markers){
+  if(position.zoom >= maxClusterZoom){
+    markers = markers.map((marker) {
+      double distance = Geolocator.distanceBetween(position.target.latitude,
+        position.target.longitude,
+        marker.position.latitude,
+        marker.position.longitude,);
+
+      // Set visibility to true if the distance is less than or equal to 10 km
+      bool isVisible = distance <= 0.5;
+
+      return marker.copyWith(visibleParam: isVisible);
+    }).toSet();
+  }else{
+    markers = markers.map((marker) {
+      return marker.copyWith(visibleParam: true);
+    }).toSet();
   }
 }
