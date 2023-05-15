@@ -9,7 +9,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart' as LocationGiver;
 import 'package:oden_app/components/profile_button_app_bar.dart';
 import 'package:oden_app/main.dart';
-import 'package:oden_app/models/firebase_user.dart';
+import 'package:oden_app/models/firebase_repo.dart';
 import 'package:oden_app/models/public_art.dart';
 import 'package:oden_app/screens/components/markers.dart';
 

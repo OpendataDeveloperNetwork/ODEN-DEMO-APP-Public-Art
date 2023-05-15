@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../components/profile_button_app_bar.dart';
 import 'package:oden_app/models/public_art.dart';
-import 'package:oden_app/models/firebase_user.dart';
+import 'package:oden_app/models/firebase_repo.dart';
 import 'package:oden_app/models/auth.dart';
 
 class DetailsPage extends StatelessWidget {
