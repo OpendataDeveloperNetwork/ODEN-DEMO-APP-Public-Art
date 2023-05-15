@@ -23,14 +23,17 @@ class ObjectBoxDatabase {
 
   Future<void> _putDemoData() async {
     final String response =
-        await rootBundle.loadString('assets/json/all-my-data.json');
+        await rootBundle.loadString('assets/json/public-art-data.json');
     final List data = await json.decode(response)['data'];
+    DateTime start = DateTime.now();
     for (var i = 0; i < data.length; i++) {
       final publicArt = await jsonToPublicArt(data[i]);
       addPublicArt(publicArt);
       print(i);
     }
-    print("Finish retrieving data from json file");
+    DateTime end = DateTime.now();
+    print(
+        "Time taken to retrieve data from json file: ${end.difference(start).inSeconds.toString()} seconds");
   }
 
   // Creates a public art object
@@ -42,14 +45,31 @@ class ObjectBoxDatabase {
     Position pos = await GeolocatorService.getCurrentLocation();
     double distanceBetweenLocations =
         Geolocator.distanceBetween(pos.latitude, pos.longitude, lat, long);
+    String name = publicArtJSON["name"];
+    String? description = publicArtJSON["description"];
+    String? artist = publicArtJSON["artist"];
+    String? material = publicArtJSON["materials"];
+    String? dateCreated =
+        publicArtJSON['dates']?['created']?['year'].toString();
+    String? dateInstalled =
+        publicArtJSON['dates']?['installed']?['year'].toString();
+    String country = publicArtJSON['labels']['country'];
+    String region = publicArtJSON['labels']['region'];
+    String city = publicArtJSON['labels']['city'];
+    List? imageUrls = publicArtJSON['image_urls'];
     return PublicArt(
-        name: publicArtJSON["name"],
+        name: name,
         latitude: lat,
         longitude: long,
-        dateInstalled: publicArtJSON["dates"]["installed"]["year"],
-        description: publicArtJSON['description'],
-        artist: publicArtJSON['artist'],
-        imageUrl: publicArtJSON['image_url'],
+        dateInstalled: dateInstalled,
+        description: description,
+        artist: artist,
+        imageUrls: imageUrls,
+        country: country,
+        city: city,
+        region: region,
+        material: material,
+        dateCreated: dateCreated,
         distance: distanceBetweenLocations / 1000);
   }
 
@@ -65,8 +85,6 @@ class ObjectBoxDatabase {
   void addPublicArt(PublicArt publicArt) {
     if (!isPublicArtInDatabase(publicArt)) {
       _publicArts.put(publicArt);
-    } else {
-      return;
     }
   }
 
