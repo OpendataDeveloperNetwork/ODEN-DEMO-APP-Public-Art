@@ -25,6 +25,10 @@ class FilterPage extends StatefulWidget {
 }
 
 class _FilterPageState extends State<FilterPage> {
+
+  // filtering data by fields.
+  bool hasDescriptionFilter = false;
+
   // this is the value of the dropdown menu
   String? selectedCountry;
   String? selectedRegion;
@@ -45,6 +49,36 @@ class _FilterPageState extends State<FilterPage> {
   int countryCount = 0;
   int regionCount = 0;
   int cityCount = 0;
+
+  void _showFilterBottomSheet() {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
+            return Container(
+              child: Wrap(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.description),
+                    title: const Text('Description'),
+                    trailing: Switch(
+                      value: hasDescriptionFilter,
+                      onChanged: (bool value) {
+                        setState(() {
+                          hasDescriptionFilter = value;
+                          filterData();
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          });
+        });
+  }
+
+
 
   void updateRegions() {
     if (selectedCountry != null && selectedCountry != 'ALL') {
@@ -124,7 +158,8 @@ class _FilterPageState extends State<FilterPage> {
                 artPiece.region == selectedRegion) &&
             (selectedCity == null ||
                 selectedCity == 'ALL' ||
-                artPiece.city == selectedCity);
+                artPiece.city == selectedCity) &&
+            (!hasDescriptionFilter || (artPiece.description?.isNotEmpty ?? false));
       }).toList();
 
       // Update the country, region, and city counts
@@ -134,8 +169,18 @@ class _FilterPageState extends State<FilterPage> {
           filteredArtPieces.map((artPiece) => artPiece.region).toSet().length;
       cityCount =
           filteredArtPieces.map((artPiece) => artPiece.city).toSet().length;
+
+
+      // debugging
+      print('Length of allArtPieces: ${allArtPieces.length}\n');
+      print('Length of filteredArtPieces: ${filteredArtPieces.length}\n');
+      // print the filtered data
+      /*for (PublicArt artPiece in filteredArtPieces) {
+        print(artPiece);
+      }*/
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -144,7 +189,15 @@ class _FilterPageState extends State<FilterPage> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text('Filter Public Art')),
+      appBar: AppBar(
+        title: Text('Filter Public Art'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.filter_list),
+            onPressed: _showFilterBottomSheet,
+          ),
+        ],
+      ),
       body: Column(
         children: [
           // Dropdown menus for country, region, and city filters
