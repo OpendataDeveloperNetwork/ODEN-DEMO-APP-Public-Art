@@ -107,7 +107,8 @@ class _SignUpBodyState extends State<SignUpBody> {
         child: Container(
       color: Colors.white,
       child: Center(
-        child: Image.asset('assets/images/logo.png'),
+        child: Image.asset('assets/images/logo.jpg',
+            width: 250, height: 250, fit: BoxFit.contain),
       ),
     ));
   }
