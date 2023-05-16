@@ -15,7 +15,7 @@ class ObjectBoxDatabase {
   ObjectBoxDatabase._create(this._store, data) {
     _publicArts = Box<PublicArt>(_store);
     // Run this first! Once
-    // _publicArts.removeAll();
+    _publicArts.removeAll();
     if (_publicArts.isEmpty()) {
       _putDemoData(data);
     }
@@ -24,7 +24,7 @@ class ObjectBoxDatabase {
   Future<void> _putDemoData(data) async {
     DateTime start = DateTime.now();
     for (var i = 0; i < data.length; i++) {
-      final publicArt = await jsonToPublicArt(data[i]);
+      final publicArt = await jsonToPublicArt(data[i], i);
       addPublicArt(publicArt);
       print(i);
     }
@@ -34,7 +34,7 @@ class ObjectBoxDatabase {
   }
 
   // Creates a public art object
-  jsonToPublicArt(publicArtJSON) async {
+  jsonToPublicArt(publicArtJSON, int id) async {
     double lat =
         double.parse(publicArtJSON["coordinates"]["latitude"].toString());
     double long =
@@ -55,6 +55,7 @@ class ObjectBoxDatabase {
     String city = publicArtJSON['labels']['city'];
     List? imageUrls = publicArtJSON['image_urls'];
     return PublicArt(
+        id: id,
         name: name,
         latitude: lat,
         longitude: long,
