@@ -30,7 +30,6 @@ class ObjectBoxDatabase {
     for (var i = 0; i < data.length; i++) {
       final publicArt = await jsonToPublicArt(data[i]);
       addPublicArt(publicArt);
-      print(publicArt.imageUrls);
     }
     DateTime end = DateTime.now();
     print(
