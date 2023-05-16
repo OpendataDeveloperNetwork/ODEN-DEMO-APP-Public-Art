@@ -1,7 +1,10 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:oden_app/screens/profile_page.dart';
+import 'package:oden_app/transmogrifier.dart' as transmogrifier;
 import './screens/home_page.dart';
 import './screens/map_page.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -29,7 +32,12 @@ Future<void> main() async {
   };
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  db = await ObjectBoxDatabase.create();
+  String ODENManifest = await rootBundle.loadString('assets/json/ODEN-manifest.json');
+
+  dynamic data = await transmogrifier.transmogrify(jsonDecode(ODENManifest));
+  dynamic publicArtData = await transmogrifier.transmogrify(data[0]);
+
+  // db = await ObjectBoxDatabase.create(publicArtData);
 
   runApp(const MyApp());
 }
