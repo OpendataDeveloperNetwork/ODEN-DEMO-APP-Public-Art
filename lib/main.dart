@@ -36,8 +36,10 @@ Future<void> main() async {
 
   dynamic data = await transmogrifier.transmogrify(jsonDecode(ODENManifest));
   dynamic publicArtData = await transmogrifier.transmogrify(data[0]);
+  debugPrint("<----- Completed Transmogrification ----->");
 
-  // db = await ObjectBoxDatabase.create(publicArtData);
+  db = await ObjectBoxDatabase.create(publicArtData[0]['data']);
+  debugPrint("<----- Completed ObjectBoxDatabase Creation ----->");
 
   runApp(const MyApp());
 }
