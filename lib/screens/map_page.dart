@@ -321,6 +321,19 @@ class _MapsPageState extends State<MapsPage> {
                 ),
               ),
             ),
+            Container(
+                margin: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                child: IconButton(
+                  onPressed: () {
+                    search();
+                  },
+                  color: Colors.white,
+                  icon: const Icon(Icons.search),
+                )),
           ],
         ));
   }
@@ -330,10 +343,7 @@ class _MapsPageState extends State<MapsPage> {
     return Scaffold(
         appBar: profileAppBarWidget(context, false),
         body: Stack(
-          children: [
-            _buildMap(),
-            _buildSearchBar(),
-          ],
+          children: [_buildMap(), _buildSearchBar()],
         ));
   }
 }
