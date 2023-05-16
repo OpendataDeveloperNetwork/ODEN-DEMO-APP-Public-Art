@@ -184,7 +184,7 @@ class _SignUpBodyState extends State<SignUpBody> {
         child: ElevatedButton(
           onPressed: () => signUpWithEmailAndPassword(context),
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF77BF4B),
+            backgroundColor: const Color(0xFF16BCD2),
             padding: const EdgeInsets.fromLTRB(0, 12, 0, 12),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),

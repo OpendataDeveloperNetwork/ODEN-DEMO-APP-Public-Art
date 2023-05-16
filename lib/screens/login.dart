@@ -124,7 +124,7 @@ class _LoginBodyState extends State<LoginBody> {
         child: ElevatedButton(
           onPressed: () => signInWithEmailAndPassword(context),
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF77BF4B),
+            backgroundColor: const Color(0xFF16BCD2),
             padding: const EdgeInsets.fromLTRB(0, 12, 0, 12),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
