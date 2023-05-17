@@ -16,8 +16,15 @@ import 'package:oden_app/transmogrifier.dart' as transmogrifier;
 ///
 /// A class stateful that is responsible for displaying the home page.
 ///
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  bool isLoading = false;
 
   ///
   /// A private function that builds the collection button widget
@@ -31,6 +38,9 @@ class HomePage extends StatelessWidget {
     }
 
     void populateData() async {
+      setState(() {
+        isLoading = true;
+      });
       debugPrint("<----- Start Transmogrification ----->");
       String ODENManifest =
           await rootBundle.loadString('assets/json/ODEN-manifest.json');
@@ -38,7 +48,10 @@ class HomePage extends StatelessWidget {
       dynamic data =
           await transmogrifier.transmogrify(jsonDecode(ODENManifest));
       dynamic publicArtData = await transmogrifier.transmogrify(data[0]);
-      db.populateData(publicArtData[0]['data']);
+      await db.populateData(publicArtData[0]['data']);
+      setState(() {
+        isLoading = false;
+      });
       debugPrint("<----- Completed Transmogrification ----->");
     }
 
@@ -73,18 +86,24 @@ class HomePage extends StatelessWidget {
             labelBackgroundColor: const Color(0xFF000080))
       ],
     );
-
-    FloatingActionButton(
-        onPressed: navigateToCollections,
-        backgroundColor: const Color(0xFF000080),
-        child: const Icon(Icons.folder_open));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: profileAppBarWidget(context, false),
-        body: const HomePageBody(),
+        body: isLoading
+            ? Center(
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: const [
+                      Text("Retrieving Data", style: TextStyle(fontSize: 20)),
+                      SizedBox(height: 20),
+                      CircularProgressIndicator()
+                    ]),
+              )
+            : const HomePageBody(),
         floatingActionButton: _buildCollectionFloatingWidget(context));
   }
 }
