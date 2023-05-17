@@ -56,6 +56,8 @@ class _MapsPageState extends State<MapsPage> {
   /// List of PublicArt objects.
   List<PublicArt> _publicArts = [];
 
+  List<PublicArt> searchList = [];
+
   // Position of camera on map
   CameraPosition position = const CameraPosition(
     target: LatLng(61.5240, 105.3188),
@@ -92,6 +94,7 @@ class _MapsPageState extends State<MapsPage> {
 
   void _monitorLocation() {
     locationProvider.onLocationChanged
+        .take(1)
         .listen((LocationGiver.LocationData currentLocation) {
       checkArtworkProximity(currentLocation);
     });
@@ -187,7 +190,7 @@ class _MapsPageState extends State<MapsPage> {
         return AlertDialog(
           title: Text(title),
           content: Text(message),
-          actions: !title.startsWith("Error")
+          actions: title.startsWith("Error")
               ? <Widget>[
                   TextButton(
                     onPressed: () => Navigator.pop(context),
@@ -211,7 +214,9 @@ class _MapsPageState extends State<MapsPage> {
   // Handles search
   Future<void> search() async {
     var text = myController.text.trim().toLowerCase();
-    bool found = false;
+    setState(() {
+      searchList.clear();
+    });
 
     if (text.isNotEmpty) {
       if (text.contains(",")) {
@@ -222,26 +227,22 @@ class _MapsPageState extends State<MapsPage> {
               (art.city.toLowerCase() == searchField[1] ||
                   art.country.toLowerCase() == searchField[1] ||
                   art.region.toLowerCase() == searchField[1])) {
-            found = true;
-            position = CameraPosition(
-              target: LatLng(art.latitude, art.longitude),
-              zoom: 20.4746,
-            );
+            setState(() {
+              searchList.add(art);
+            });
           }
         }
       } else {
         for (PublicArt art in _publicArts) {
           if (art.name.toLowerCase() == text) {
-            found = true;
-            position = CameraPosition(
-              target: LatLng(art.latitude, art.longitude),
-              zoom: 20.4746,
-            );
+            setState(() {
+              searchList.add(art);
+            });
           }
         }
       }
 
-      if (!found) {
+      if (searchList.isEmpty) {
         try {
           final List<location.Location> locations =
               await locationFromAddress(text);
@@ -251,6 +252,9 @@ class _MapsPageState extends State<MapsPage> {
               target: LatLng(loc.latitude, loc.longitude),
               zoom: 10.4746,
             );
+            getController()
+                .animateCamera(CameraUpdate.newCameraPosition(position));
+            setState(() {});
           }
         } catch (e) {
           // Invalid name
@@ -258,9 +262,6 @@ class _MapsPageState extends State<MapsPage> {
               "We couldn't find the location. Please try again", "Error", null);
         }
       }
-
-      getController().animateCamera(CameraUpdate.newCameraPosition(position));
-      setState(() {});
     }
 
     myController.clear();
@@ -280,6 +281,9 @@ class _MapsPageState extends State<MapsPage> {
                 mapType: MapType.normal,
                 initialCameraPosition: position,
                 markers: _markers,
+                onTap: (LatLng) => setState(() {
+                  searchList.clear();
+                }),
                 onCameraMove: _onCameraMove,
                 onCameraIdle: _manager.updateMap,
                 onMapCreated: (controller) => _OnMapCreated(controller)),
@@ -338,12 +342,56 @@ class _MapsPageState extends State<MapsPage> {
         ));
   }
 
+  Container _buildSearchList() {
+    return searchList.isNotEmpty ? Container(
+      padding: const EdgeInsets.all(5),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(30.0),
+            bottomRight: Radius.circular(30.0),
+          ),
+      ),
+      height: 270,
+      width: 330,
+      child: ListView.builder(
+        itemCount: searchList.length,
+        itemBuilder: (context, index) {
+          final artPiece = searchList[index];
+          return ListTile(
+            // You can change this part to display the image using an image URL or another property.
+            leading: Image.asset(
+              'assets/images/icon.png',
+              width: 50,
+              height: 50,
+              fit: BoxFit.cover,
+            ),
+            title: Text(artPiece.name),
+            subtitle: Text(
+                '${artPiece.city}, ${artPiece.region}, ${artPiece.country}'),
+            onTap: () {
+              position = CameraPosition(
+                target: LatLng(artPiece.latitude, artPiece.longitude),
+                zoom: 15.4746,
+              );
+              getController()
+                  .animateCamera(CameraUpdate.newCameraPosition(position));
+              setState(() {
+                searchList.clear();
+              });
+            },
+          );
+        },
+      ),
+    ) : Container();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: profileAppBarWidget(context, false),
         body: Stack(
-          children: [_buildMap(), _buildSearchBar()],
+          children: [_buildMap(), _buildSearchBar(), Positioned(left: 40, top: 80,child: _buildSearchList(),)],
         ));
   }
 }
