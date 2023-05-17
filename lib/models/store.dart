@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:oden_app/models/profile_public_art.dart';
 import 'package:oden_app/models/public_art.dart';
@@ -15,20 +16,13 @@ class ObjectBoxDatabase {
 
   ObjectBoxDatabase._create(this._store) {
     _publicArts = Box<PublicArt>(_store);
-    // Run this first! Once
-    _publicArts.removeAll();
-    if (_publicArts.isEmpty()) {
-      _putDemoData();
-    }
   }
 
-  Future<void> _putDemoData() async {
-    final String response =
-        await rootBundle.loadString('assets/json/public-art-data.json');
-    final List data = await json.decode(response)['data'];
+  Future<void> populateData(data) async {
     DateTime start = DateTime.now();
+
     for (var i = 0; i < data.length; i++) {
-      final publicArt = await jsonToPublicArt(data[i]);
+      final publicArt = await jsonToPublicArt(data[i], i);
       addPublicArt(publicArt);
     }
     DateTime end = DateTime.now();
@@ -37,7 +31,7 @@ class ObjectBoxDatabase {
   }
 
   // Creates a public art object
-  jsonToPublicArt(publicArtJSON) async {
+  jsonToPublicArt(publicArtJSON, int id) async {
     double lat =
         double.parse(publicArtJSON["coordinates"]["latitude"].toString());
     double long =
@@ -58,6 +52,7 @@ class ObjectBoxDatabase {
     String city = publicArtJSON['labels']['city'];
     dynamic imageUrls = publicArtJSON['image_urls']?[0];
     return PublicArt(
+        id: id,
         name: name,
         latitude: lat,
         longitude: long,
@@ -74,6 +69,7 @@ class ObjectBoxDatabase {
   }
 
   /// Create an instance of ObjectBox to use throughout the app.
+  /// Pass in a list of data and a version
   static Future<ObjectBoxDatabase> create() async {
     final docsDir = await getApplicationDocumentsDirectory();
     // Future<Store> openStore() {...} is defined in the generated objectbox.g.dart

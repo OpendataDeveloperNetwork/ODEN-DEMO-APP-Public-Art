@@ -1,0 +1,23 @@
+[
+    {
+        "schema": "https://raw.githubusercontent.com/transmogrifier-io/transmogrifier/dev/schemas/manifest-schema.json",
+        "entries": [
+            {
+                "source": {
+                    "func": "url_read",
+                    "params": {
+                        "path": "https://raw.githubusercontent.com/OpendataDeveloperNetwork/ODEN-Client/main/data.json"
+                    }
+                },
+                "filters": [
+                    {
+                        "func": "https://raw.githubusercontent.com/OpendataDeveloperNetwork/ODEN-Transmogrifiers/dev/filters/oden-to-transmog.js",
+                        "params": {
+                            "category": "public-art"
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+]

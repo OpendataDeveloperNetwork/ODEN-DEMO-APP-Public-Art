@@ -1,0 +1,41 @@
+[
+  {
+    "schema": "https://raw.githubusercontent.com/OpendataDeveloperNetwork/ODEN-Transmogrifiers/dev/schemas/public-art.json",
+    "entries": [
+      {
+        "source": {
+          "func": "url_read",
+          "params": {
+            "path": "https://opendata.vancouver.ca/api/explore/v2.1/catalog/datasets/public-art/exports/json?lang=en&timezone=America%2FLos_Angeles"
+          }
+        },
+        "filters": [
+          {
+            "func": "https://raw.githubusercontent.com/OpendataDeveloperNetwork/ODEN-Transmogrifiers/dev/filters/canada/british-columbia/vancouver/public-art-json-to-json.js",
+            "params": {
+              "library": "https://raw.githubusercontent.com/OpendataDeveloperNetwork/ODEN-Transmogrifiers/dev/libraries/standard.js"
+            }
+          },
+          {
+            "func": "https://raw.githubusercontent.com/OpendataDeveloperNetwork/ODEN-Transmogrifiers/dev/filters/validate.js",
+            "params": {
+              "validator": "json"
+            }
+          },
+          {
+            "func": "https://raw.githubusercontent.com/OpendataDeveloperNetwork/ODEN-Transmogrifiers/dev/filters/stringify.js",
+            "params": {
+              "indent": true
+            }
+          }
+        ],
+        "sink": {
+          "func": "file_write",
+          "params": {
+            "path": "./my-vancouver-data.json"
+          }
+        }
+      }
+    ]
+  }
+]
