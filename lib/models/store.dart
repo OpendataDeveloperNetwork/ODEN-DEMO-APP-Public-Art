@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:oden_app/models/public_art.dart';
 import 'package:path/path.dart' as p;
@@ -23,10 +24,10 @@ class ObjectBoxDatabase {
 
   Future<void> _putDemoData(data) async {
     DateTime start = DateTime.now();
+
     for (var i = 0; i < data.length; i++) {
       final publicArt = await jsonToPublicArt(data[i], i);
       addPublicArt(publicArt);
-      print(i);
     }
     DateTime end = DateTime.now();
     print(
