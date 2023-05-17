@@ -1,7 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:oden_app/main.dart';
 import '../components/profile_button_app_bar.dart';
 import '../models/category.dart';
 import '../models/public_art.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:oden_app/transmogrifier.dart' as transmogrifier;
 
 // ------------------------ //
 // ----- Landing Page ----- //
@@ -16,7 +22,7 @@ class HomePage extends StatelessWidget {
   ///
   /// A private function that builds the collection button widget
   ///
-  FloatingActionButton _buildCollectionFloatingWidget(BuildContext context) {
+  SpeedDial _buildCollectionFloatingWidget(BuildContext context) {
     ///
     /// An inner function that navigates to the collections page.
     ///
@@ -24,7 +30,51 @@ class HomePage extends StatelessWidget {
       Navigator.pushNamed(context, '/collections');
     }
 
-    return FloatingActionButton(
+    void populateData() async {
+      debugPrint("<----- Start Transmogrification ----->");
+      String ODENManifest =
+          await rootBundle.loadString('assets/json/ODEN-manifest.json');
+
+      dynamic data =
+          await transmogrifier.transmogrify(jsonDecode(ODENManifest));
+      dynamic publicArtData = await transmogrifier.transmogrify(data[0]);
+      db.populateData(publicArtData[0]['data']);
+      debugPrint("<----- Completed Transmogrification ----->");
+    }
+
+    return SpeedDial(
+      animatedIcon: AnimatedIcons.menu_close,
+      animatedIconTheme: const IconThemeData(size: 22),
+      backgroundColor: const Color(0xFF000080),
+      visible: true,
+      curve: Curves.bounceIn,
+      children: [
+        // FAB 1
+        SpeedDialChild(
+            child: const Icon(Icons.folder_open, color: Colors.white),
+            backgroundColor: const Color(0xFF000080),
+            onTap: navigateToCollections,
+            label: 'Collections',
+            labelStyle: const TextStyle(
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+                fontSize: 16.0),
+            labelBackgroundColor: const Color(0xFF000080)),
+        // FAB 2
+        SpeedDialChild(
+            child: const Icon(Icons.update, color: Colors.white),
+            backgroundColor: const Color(0xFF000080),
+            onTap: populateData,
+            label: 'Update',
+            labelStyle: const TextStyle(
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+                fontSize: 16.0),
+            labelBackgroundColor: const Color(0xFF000080))
+      ],
+    );
+
+    FloatingActionButton(
         onPressed: navigateToCollections,
         backgroundColor: const Color(0xFF000080),
         child: const Icon(Icons.folder_open));

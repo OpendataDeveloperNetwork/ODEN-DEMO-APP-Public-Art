@@ -13,16 +13,11 @@ class ObjectBoxDatabase {
   final Store _store;
   late final Box<PublicArt> _publicArts;
 
-  ObjectBoxDatabase._create(this._store, data) {
+  ObjectBoxDatabase._create(this._store) {
     _publicArts = Box<PublicArt>(_store);
-    // Run this first! Once
-    _publicArts.removeAll();
-    if (_publicArts.isEmpty()) {
-      _putDemoData(data);
-    }
   }
 
-  Future<void> _putDemoData(data) async {
+  Future<void> populateData(data) async {
     DateTime start = DateTime.now();
 
     for (var i = 0; i < data.length; i++) {
@@ -74,12 +69,12 @@ class ObjectBoxDatabase {
 
   /// Create an instance of ObjectBox to use throughout the app.
   /// Pass in a list of data and a version
-  static Future<ObjectBoxDatabase> create(data) async {
+  static Future<ObjectBoxDatabase> create() async {
     final docsDir = await getApplicationDocumentsDirectory();
     // Future<Store> openStore() {...} is defined in the generated objectbox.g.dart
     final store =
         await openStore(directory: p.join(docsDir.path, "objectbox-testing"));
-    return ObjectBoxDatabase._create(store, data);
+    return ObjectBoxDatabase._create(store);
   }
 
   void addPublicArt(PublicArt publicArt) {

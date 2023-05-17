@@ -32,15 +32,7 @@ Future<void> main() async {
   };
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  String ODENManifest = await rootBundle.loadString('assets/json/ODEN-manifest.json');
-
-  dynamic data = await transmogrifier.transmogrify(jsonDecode(ODENManifest));
-  dynamic publicArtData = await transmogrifier.transmogrify(data[0]);
-  debugPrint("<----- Completed Transmogrification ----->");
-
-  db = await ObjectBoxDatabase.create(publicArtData[0]['data']);
-  debugPrint("<----- Completed ObjectBoxDatabase Creation ----->");
-
+  db = await ObjectBoxDatabase.create();
   runApp(const MyApp());
 }
 
