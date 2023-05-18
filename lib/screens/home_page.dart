@@ -93,11 +93,11 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
         appBar: profileAppBarWidget(context, false),
         body: isLoading
-            ? Center(
+            ? const Center(
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
-                    children: const [
+                    children: [
                       Text("Retrieving Data", style: TextStyle(fontSize: 20)),
                       SizedBox(height: 20),
                       CircularProgressIndicator()

@@ -29,6 +29,20 @@ class FirebaseUserRepo {
     return Future.value(false);
   }
 
+  Future<bool> isPublicArtVisited(String? uid, PublicArt publicArt) async {
+    if (uid == null) return Future.value(false);
+    final data = await profiles.doc(uid).collection("Visits").get();
+    if (data.size == 0) return Future.value(false);
+    for (var doc in data.docs) {
+      print(doc);
+      if (doc["country"] == publicArt.country &&
+          doc["city"] == publicArt.city &&
+          doc["region"] == publicArt.region &&
+          doc["name"] == publicArt.name) return Future.value(true);
+    }
+    return Future.value(false);
+  }
+
   Future<void> addPublicArtToFavourites(
       String? uid, PublicArt publicArt) async {
     if (await isPublicArtFavourited(uid, publicArt)) return;

@@ -78,8 +78,6 @@ class _DetailsPageBodyState extends State<DetailsPageBody> {
   }
 
   Future<void> validateImage(List? imageUrls) async {
-    print("hello sir");
-    print(imageUrls);
     http.Response res;
 
     if (imageUrls != null) {
@@ -183,20 +181,17 @@ class _DetailsPageBodyState extends State<DetailsPageBody> {
                     child: image.isNotEmpty
                         ? Image.network(
                             image,
-                            width: 200,
+                            width: 180,
                           )
-                        : Image.network(
-                            "https://assets.simpleviewinc.com/simpleview/image/upload/c_limit,h_1200,q_75,w_1200/v1/clients/vancouverbc/vancouver-public-art-mini-guide_ad75d4cc-dd05-4ab5-8320-cd2df84e83f5.jpg",
-                            width: 200,
-                          )),
+                        : Image.asset("assets/images/icon.png", width: 180,)),
                 Column(
                       children: [
-                        Container(width : 150, margin: const EdgeInsets.fromLTRB(0, 50, 0, 0),
+                        Container(width : 125, margin: const EdgeInsets.fromLTRB(0, 50, 0, 0),
                           child: Text("You are ${(distance / 1000).round()} km away",
                             style: const TextStyle(fontSize: 20)),),
 
                         Container(
-                            margin: const EdgeInsets.fromLTRB(0, 30, 120, 5),
+                            margin: const EdgeInsets.fromLTRB(0, 25, 110, 5),
                             decoration: BoxDecoration(
                               color: Colors.blue,
                               borderRadius: BorderRadius.circular(30),
