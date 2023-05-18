@@ -30,6 +30,8 @@ class DetailsPageBody extends StatefulWidget {
 
   DetailsPageBody({super.key, required this.art}) {
     artDetails = {};
+    if (art.dateCreated != null) artDetails['Date Created'] = art.dateCreated;
+    if (art.dateInstalled != null) artDetails['Date Installed'] = art.dateInstalled;
     if (art.description != null) artDetails['Description'] = art.description;
     if (art.artist != null) artDetails['Artist'] = art.artist;
     if (art.material != null) artDetails['Material'] = art.material;
@@ -100,7 +102,8 @@ class _DetailsPageBodyState extends State<DetailsPageBody> {
   }
 
   bool checkIfImage(String param) {
-    if (param == 'image/jpeg' || param == 'image/png' || param == 'image/gif') {
+    if (param == 'image/jpeg' || param == 'image/png' || param == 'image/gif' || param == 'image/JPEG'
+    || param == 'image/PNG') {
       return true;
     }
     return false;

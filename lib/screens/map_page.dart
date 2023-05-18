@@ -234,7 +234,10 @@ class _MapsPageState extends State<MapsPage> {
         }
       } else {
         for (PublicArt art in _publicArts) {
-          if (art.name.toLowerCase() == text) {
+          if (art.name.toLowerCase() == text || art.name.toLowerCase().contains(text) ||
+              art.city.toLowerCase() == text ||
+              art.country.toLowerCase() == text ||
+              art.region.toLowerCase() == text) {
             setState(() {
               searchList.add(art);
             });
