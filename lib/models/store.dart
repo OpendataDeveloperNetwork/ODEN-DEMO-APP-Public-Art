@@ -22,7 +22,7 @@ class ObjectBoxDatabase {
     DateTime start = DateTime.now();
 
     for (var i = 0; i < data.length; i++) {
-      final publicArt = await jsonToPublicArt(data[i], i);
+      final publicArt = await jsonToPublicArt(data[i]);
       addPublicArt(publicArt);
     }
     DateTime end = DateTime.now();
@@ -31,7 +31,7 @@ class ObjectBoxDatabase {
   }
 
   // Creates a public art object
-  jsonToPublicArt(publicArtJSON, int id) async {
+  jsonToPublicArt(publicArtJSON) async {
     double lat =
         double.parse(publicArtJSON["coordinates"]["latitude"].toString());
     double long =
@@ -52,7 +52,6 @@ class ObjectBoxDatabase {
     String city = publicArtJSON['labels']['city'];
     dynamic imageUrls = publicArtJSON['image_urls']?[0];
     return PublicArt(
-        id: id,
         name: name,
         latitude: lat,
         longitude: long,

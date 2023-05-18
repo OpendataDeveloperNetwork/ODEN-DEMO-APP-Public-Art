@@ -41,17 +41,16 @@ class PublicArt with ClusterItem {
   final dynamic imageUrls;
   final String? material;
   final String? dateCreated;
-  @Id(assignable: true)
-  final int id;
+  int id;
 
   PublicArt({
+    this.id = 0,
     required this.name,
     required latitude,
     required longitude,
     required this.region,
     required this.city,
     required this.country,
-    id,
     this.dateInstalled,
     this.material,
     this.description,
@@ -59,8 +58,7 @@ class PublicArt with ClusterItem {
     this.artist,
     this.imageUrls,
     this.dateCreated,
-  })  : _location = LatLng(latitude, longitude),
-        id = id ?? 0;
+  }) : _location = LatLng(latitude, longitude);
 
   @override
   LatLng get location => _location;
