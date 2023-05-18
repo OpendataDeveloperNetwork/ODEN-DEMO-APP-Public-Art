@@ -202,8 +202,11 @@ class _MapsPageState extends State<MapsPage> {
                       onPressed: () => Navigator.of(context).pop(),
                       child: const Text('Cancel')),
                   TextButton(
-                      onPressed: () => FirebaseUserRepo()
-                          .addPublicArtToVisits(Auth().uid, art!),
+                      onPressed: () => {
+                            FirebaseUserRepo()
+                                .addPublicArtToVisits(Auth().uid, art!),
+                            Navigator.of(context).pop()
+                          },
                       child: const Text('Confirm'))
                 ],
         );
@@ -285,8 +288,8 @@ class _MapsPageState extends State<MapsPage> {
                 initialCameraPosition: position,
                 markers: _markers,
                 onTap: (LatLng) => setState(() {
-                  searchList.clear();
-                }),
+                      searchList.clear();
+                    }),
                 onCameraMove: _onCameraMove,
                 onCameraIdle: _manager.updateMap,
                 onMapCreated: (controller) => _OnMapCreated(controller)),
@@ -346,47 +349,49 @@ class _MapsPageState extends State<MapsPage> {
   }
 
   Container _buildSearchList() {
-    return searchList.isNotEmpty ? Container(
-      padding: const EdgeInsets.all(5),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(30.0),
-            bottomRight: Radius.circular(30.0),
-          ),
-      ),
-      height: 270,
-      width: 330,
-      child: ListView.builder(
-        itemCount: searchList.length,
-        itemBuilder: (context, index) {
-          final artPiece = searchList[index];
-          return ListTile(
-            // You can change this part to display the image using an image URL or another property.
-            leading: Image.asset(
-              'assets/images/icon.png',
-              width: 50,
-              height: 50,
-              fit: BoxFit.cover,
+    return searchList.isNotEmpty
+        ? Container(
+            padding: const EdgeInsets.all(5),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(30.0),
+                bottomRight: Radius.circular(30.0),
+              ),
             ),
-            title: Text(artPiece.name),
-            subtitle: Text(
-                '${artPiece.city}, ${artPiece.region}, ${artPiece.country}'),
-            onTap: () {
-              position = CameraPosition(
-                target: LatLng(artPiece.latitude, artPiece.longitude),
-                zoom: 15.4746,
-              );
-              getController()
-                  .animateCamera(CameraUpdate.newCameraPosition(position));
-              setState(() {
-                searchList.clear();
-              });
-            },
-          );
-        },
-      ),
-    ) : Container();
+            height: 270,
+            width: 330,
+            child: ListView.builder(
+              itemCount: searchList.length,
+              itemBuilder: (context, index) {
+                final artPiece = searchList[index];
+                return ListTile(
+                  // You can change this part to display the image using an image URL or another property.
+                  leading: Image.asset(
+                    'assets/images/icon.png',
+                    width: 50,
+                    height: 50,
+                    fit: BoxFit.cover,
+                  ),
+                  title: Text(artPiece.name),
+                  subtitle: Text(
+                      '${artPiece.city}, ${artPiece.region}, ${artPiece.country}'),
+                  onTap: () {
+                    position = CameraPosition(
+                      target: LatLng(artPiece.latitude, artPiece.longitude),
+                      zoom: 15.4746,
+                    );
+                    getController().animateCamera(
+                        CameraUpdate.newCameraPosition(position));
+                    setState(() {
+                      searchList.clear();
+                    });
+                  },
+                );
+              },
+            ),
+          )
+        : Container();
   }
 
   @override
@@ -394,7 +399,15 @@ class _MapsPageState extends State<MapsPage> {
     return Scaffold(
         appBar: profileAppBarWidget(context, false),
         body: Stack(
-          children: [_buildMap(), _buildSearchBar(), Positioned(left: 40, top: 80,child: _buildSearchList(),)],
+          children: [
+            _buildMap(),
+            _buildSearchBar(),
+            Positioned(
+              left: 40,
+              top: 80,
+              child: _buildSearchList(),
+            )
+          ],
         ));
   }
 }
