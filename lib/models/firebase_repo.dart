@@ -83,7 +83,9 @@ class FirebaseUserRepo {
     DateTime now = DateTime.now();
     String date = DateFormat('yyyy-MM-dd hh:mm').format(now);
     Map<String, dynamic> data = {
-      "id": publicArt.id,
+      "country": publicArt.country,
+      "city": publicArt.city,
+      "region": publicArt.region,
       "name": publicArt.name,
       "date": date
     };

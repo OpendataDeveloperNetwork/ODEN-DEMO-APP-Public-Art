@@ -73,17 +73,17 @@ class _VisitsListViewState extends State<VisitsListView> {
     Navigator.of(context).pop();
   }
 
-  Card cardBuilder(ProfilePublicArt favorite) {
+  Card cardBuilder(ProfilePublicArt visit) {
     return Card(
       child: Row(children: [
         Expanded(
             child: ListTile(
-          title: Text(favorite.name),
-          subtitle: Text(favorite.date),
-          onTap: () => toDetailsPage(favorite),
+          title: Text(visit.name),
+          subtitle: Text(visit.date),
+          onTap: () => toDetailsPage(visit),
         )),
         IconButton(
-          onPressed: () => unVisit(favorite.toggleFavourite, favorite),
+          onPressed: () => unVisit(visit.toggleFavourite, visit),
           icon: const Icon(Icons.remove),
           iconSize: 45,
         )
@@ -96,8 +96,8 @@ class _VisitsListViewState extends State<VisitsListView> {
     return ListView.builder(
         itemCount: widget._visits.length,
         itemBuilder: (BuildContext context, int index) {
-          var favorite = widget._visits[index];
-          return cardBuilder(favorite);
+          var visit = widget._visits[index];
+          return cardBuilder(visit);
         });
   }
 }
