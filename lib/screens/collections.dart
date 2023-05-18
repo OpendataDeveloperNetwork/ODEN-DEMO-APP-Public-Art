@@ -30,6 +30,8 @@ class _FilterPageState extends State<FilterPage> {
   bool hasDescriptionFilter = false;
   bool hasArtistFilter = false;
   bool hasMaterialFilter = false;
+  bool dateCreatedFilter = false;
+  bool dateInstalledFilter = false;
 
   // this is the value of the dropdown menu
   String? selectedCountry;
@@ -94,6 +96,32 @@ class _FilterPageState extends State<FilterPage> {
                       onChanged: (bool value) {
                         setState(() {
                           hasMaterialFilter = value;
+                          filterData();
+                        });
+                      },
+                    ),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.calendar_today),
+                    title: const Text('Date Created'),
+                    trailing: Switch(
+                      value: dateCreatedFilter,
+                      onChanged: (bool value) {
+                        setState(() {
+                          dateCreatedFilter = value;
+                          filterData();
+                        });
+                      },
+                    ),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.calendar_today),
+                    title: const Text('Date Installed'),
+                    trailing: Switch(
+                      value: dateInstalledFilter,
+                      onChanged: (bool value) {
+                        setState(() {
+                          dateInstalledFilter = value;
                           filterData();
                         });
                       },
@@ -189,7 +217,9 @@ class _FilterPageState extends State<FilterPage> {
                 artPiece.city == selectedCity) &&
             (!hasDescriptionFilter || (artPiece.description?.isNotEmpty ?? false)) &&
             (!hasArtistFilter || (artPiece.artist?.isNotEmpty ?? false)) &&
-            (!hasMaterialFilter || (artPiece.material?.isNotEmpty ?? false));
+            (!hasMaterialFilter || (artPiece.material?.isNotEmpty ?? false)) &&
+            (!dateCreatedFilter || (artPiece.dateCreated?.isNotEmpty ?? false)) &&
+            (!dateInstalledFilter || (artPiece.dateInstalled?.isNotEmpty ?? false));
       }).toList();
 
       // Update the country, region, and city counts
