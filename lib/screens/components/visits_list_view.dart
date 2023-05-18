@@ -84,8 +84,8 @@ class _VisitsListViewState extends State<VisitsListView> {
         )),
         IconButton(
           onPressed: () => unVisit(visit.toggleFavourite, visit),
-          icon: const Icon(Icons.remove),
-          iconSize: 45,
+          icon: const Icon(Icons.delete, color: Colors.red),
+          iconSize: 30,
         )
       ]),
     );
