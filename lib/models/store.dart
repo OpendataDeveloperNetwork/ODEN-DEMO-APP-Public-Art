@@ -42,7 +42,7 @@ class ObjectBoxDatabase {
     String name = publicArtJSON["name"];
     String? description = publicArtJSON["description"];
     String? artist = publicArtJSON["artist"];
-    String? material = publicArtJSON["materials"];
+    String? material = publicArtJSON["material"];
     String? dateCreated =
         publicArtJSON['dates']?['created']?['year'].toString();
     String? dateInstalled =
