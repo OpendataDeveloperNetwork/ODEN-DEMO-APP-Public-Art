@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -11,6 +12,7 @@ import 'package:geolocator/geolocator.dart';
 
 class ObjectBoxDatabase {
   /// The Store of this app.
+  final StreamController _retrievingData = StreamController.broadcast();
   final Store _store;
   late final Box<PublicArt> _publicArts;
 
@@ -22,12 +24,17 @@ class ObjectBoxDatabase {
     DateTime start = DateTime.now();
 
     for (var i = 0; i < data.length; i++) {
+      _retrievingData.add(i);
       final publicArt = await jsonToPublicArt(data[i]);
       addPublicArt(publicArt);
     }
     DateTime end = DateTime.now();
     print(
         "Time taken to retrieve data from json file: ${end.difference(start).inSeconds.toString()} seconds");
+  }
+
+  bool isPublicArtEmpty() {
+    return _publicArts.isEmpty();
   }
 
   // Creates a public art object
@@ -101,4 +108,6 @@ class ObjectBoxDatabase {
         .find();
     return query[0];
   }
+
+  get retrievingData => _retrievingData.stream;
 }

@@ -1,8 +1,11 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lottie/lottie.dart';
 import 'package:oden_app/main.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
 import '../components/profile_button_app_bar.dart';
 import '../models/category.dart';
 import '../models/public_art.dart';
@@ -25,6 +28,11 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   bool isLoading = false;
+  bool isTransmogrifying = false;
+  int totalData = 0;
+  int currentData = 0;
+  double percent = 0;
+  String dbStatus = "";
 
   ///
   /// A private function that builds the collection button widget
@@ -39,18 +47,31 @@ class _HomePageState extends State<HomePage> {
 
     void populateData() async {
       setState(() {
-        isLoading = true;
+        isTransmogrifying = true;
       });
-      debugPrint("<----- Start Transmogrification ----->");
       String ODENManifest =
           await rootBundle.loadString('assets/json/ODEN-manifest.json');
 
       dynamic data =
           await transmogrifier.transmogrify(jsonDecode(ODENManifest));
       dynamic publicArtData = await transmogrifier.transmogrify(data[0]);
+      setState(() {
+        isLoading = true;
+        db.retrievingData.listen((data) {
+          setState(() {
+            debugPrint(data.toString());
+            currentData = data;
+            percent = currentData / totalData;
+          });
+        });
+        dbStatus = db.isPublicArtEmpty() ? "Downloading Data" : "Updating Data";
+      });
+      List jsonData = publicArtData[0]['data'];
+      totalData = jsonData.length;
       await db.populateData(publicArtData[0]['data']);
       setState(() {
         isLoading = false;
+        isTransmogrifying = false;
       });
       debugPrint("<----- Completed Transmogrification ----->");
     }
@@ -88,20 +109,45 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  List<Widget> showLoading() {
+    if (isLoading) {
+      return [
+        Text(dbStatus, style: const TextStyle(fontSize: 20)),
+        const SizedBox(height: 20),
+        CircularPercentIndicator(
+          progressColor: Colors.blue[900],
+          backgroundColor: Colors.deepPurple.shade100,
+          circularStrokeCap: CircularStrokeCap.round,
+          center: Text(
+            "${(percent * 100).toStringAsFixed(0)}%",
+            style: const TextStyle(fontSize: 25),
+          ),
+          radius: 200,
+          lineWidth: 20,
+          percent: percent,
+        )
+      ];
+    } else {
+      return [
+        Lottie.network(
+            "https://assets2.lottiefiles.com/packages/lf20_2KHZQg.json"),
+        const SizedBox(height: 20),
+        const Text("Transmogrifying Open Data",
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+      ];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: profileAppBarWidget(context, false),
-        body: isLoading
+        body: isTransmogrifying
             ? Center(
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
-                    children: const [
-                      Text("Retrieving Data", style: TextStyle(fontSize: 20)),
-                      SizedBox(height: 20),
-                      CircularProgressIndicator()
-                    ]),
+                    children: showLoading()),
               )
             : const HomePageBody(),
         floatingActionButton: _buildCollectionFloatingWidget(context));
