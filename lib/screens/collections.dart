@@ -28,6 +28,10 @@ class _FilterPageState extends State<FilterPage> {
 
   // filtering data by fields.
   bool hasDescriptionFilter = false;
+  bool hasArtistFilter = false;
+  bool hasMaterialFilter = false;
+  bool dateCreatedFilter = false;
+  bool dateInstalledFilter = false;
 
   // this is the value of the dropdown menu
   String? selectedCountry;
@@ -66,6 +70,58 @@ class _FilterPageState extends State<FilterPage> {
                       onChanged: (bool value) {
                         setState(() {
                           hasDescriptionFilter = value;
+                          filterData();
+                        });
+                      },
+                    ),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.person),
+                    title: const Text('Artist'),
+                    trailing: Switch(
+                      value: hasArtistFilter,
+                      onChanged: (bool value) {
+                        setState(() {
+                          hasArtistFilter = value;
+                          filterData();
+                        });
+                      },
+                    ),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.build),
+                    title: const Text('Material'),
+                    trailing: Switch(
+                      value: hasMaterialFilter,
+                      onChanged: (bool value) {
+                        setState(() {
+                          hasMaterialFilter = value;
+                          filterData();
+                        });
+                      },
+                    ),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.calendar_today),
+                    title: const Text('Date Created'),
+                    trailing: Switch(
+                      value: dateCreatedFilter,
+                      onChanged: (bool value) {
+                        setState(() {
+                          dateCreatedFilter = value;
+                          filterData();
+                        });
+                      },
+                    ),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.calendar_today),
+                    title: const Text('Date Installed'),
+                    trailing: Switch(
+                      value: dateInstalledFilter,
+                      onChanged: (bool value) {
+                        setState(() {
+                          dateInstalledFilter = value;
                           filterData();
                         });
                       },
@@ -159,7 +215,11 @@ class _FilterPageState extends State<FilterPage> {
             (selectedCity == null ||
                 selectedCity == 'ALL' ||
                 artPiece.city == selectedCity) &&
-            (!hasDescriptionFilter || (artPiece.description?.isNotEmpty ?? false));
+            (!hasDescriptionFilter || (artPiece.description?.isNotEmpty ?? false)) &&
+            (!hasArtistFilter || (artPiece.artist?.isNotEmpty ?? false)) &&
+            (!hasMaterialFilter || (artPiece.material?.isNotEmpty ?? false)) &&
+            (!dateCreatedFilter || (artPiece.dateCreated?.isNotEmpty ?? false)) &&
+            (!dateInstalledFilter || (artPiece.dateInstalled?.isNotEmpty ?? false));
       }).toList();
 
       // Update the country, region, and city counts

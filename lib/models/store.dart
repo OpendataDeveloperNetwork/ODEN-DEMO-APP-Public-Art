@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -11,6 +12,7 @@ import 'package:geolocator/geolocator.dart';
 
 class ObjectBoxDatabase {
   /// The Store of this app.
+  final StreamController _retrievingData = StreamController.broadcast();
   final Store _store;
   late final Box<PublicArt> _publicArts;
 
@@ -22,7 +24,8 @@ class ObjectBoxDatabase {
     DateTime start = DateTime.now();
 
     for (var i = 0; i < data.length; i++) {
-      final publicArt = await jsonToPublicArt(data[i], i);
+      _retrievingData.add(i);
+      final publicArt = await jsonToPublicArt(data[i]);
       addPublicArt(publicArt);
     }
     DateTime end = DateTime.now();
@@ -30,8 +33,12 @@ class ObjectBoxDatabase {
         "Time taken to retrieve data from json file: ${end.difference(start).inSeconds.toString()} seconds");
   }
 
+  bool isPublicArtEmpty() {
+    return _publicArts.isEmpty();
+  }
+
   // Creates a public art object
-  jsonToPublicArt(publicArtJSON, int id) async {
+  jsonToPublicArt(publicArtJSON) async {
     double lat =
         double.parse(publicArtJSON["coordinates"]["latitude"].toString());
     double long =
@@ -42,17 +49,16 @@ class ObjectBoxDatabase {
     String name = publicArtJSON["name"];
     String? description = publicArtJSON["description"];
     String? artist = publicArtJSON["artist"];
-    String? material = publicArtJSON["materials"];
+    String? material = publicArtJSON["material"];
     String? dateCreated =
         publicArtJSON['dates']?['created']?['year'].toString();
     String? dateInstalled =
         publicArtJSON['dates']?['installed']?['year'].toString();
-    String country = publicArtJSON['labels']['country'];
-    String region = publicArtJSON['labels']['region'];
-    String city = publicArtJSON['labels']['city'];
+    String country = 'Canada';
+    String region = 'British Columbia';
+    String city = 'Vancouver';
     dynamic imageUrls = publicArtJSON['image_urls']?[0];
     return PublicArt(
-        id: id,
         name: name,
         latitude: lat,
         longitude: long,
@@ -74,7 +80,7 @@ class ObjectBoxDatabase {
     final docsDir = await getApplicationDocumentsDirectory();
     // Future<Store> openStore() {...} is defined in the generated objectbox.g.dart
     final store =
-        await openStore(directory: p.join(docsDir.path, "objectbox-testing"));
+        await openStore(directory: p.join(docsDir.path, "objectbox-demo"));
     return ObjectBoxDatabase._create(store);
   }
 
@@ -102,4 +108,6 @@ class ObjectBoxDatabase {
         .find();
     return query[0];
   }
+
+  get retrievingData => _retrievingData.stream;
 }
