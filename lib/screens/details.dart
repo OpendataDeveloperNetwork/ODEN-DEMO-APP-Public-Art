@@ -31,7 +31,8 @@ class DetailsPageBody extends StatefulWidget {
   DetailsPageBody({super.key, required this.art}) {
     artDetails = {};
     if (art.dateCreated != null) artDetails['Date Created'] = art.dateCreated;
-    if (art.dateInstalled != null) artDetails['Date Installed'] = art.dateInstalled;
+    if (art.dateInstalled != null)
+      artDetails['Date Installed'] = art.dateInstalled;
     if (art.description != null) artDetails['Description'] = art.description;
     if (art.artist != null) artDetails['Artist'] = art.artist;
     if (art.material != null) artDetails['Material'] = art.material;
@@ -100,8 +101,11 @@ class _DetailsPageBodyState extends State<DetailsPageBody> {
   }
 
   bool checkIfImage(String param) {
-    if (param == 'image/jpeg' || param == 'image/png' || param == 'image/gif' || param == 'image/JPEG'
-    || param == 'image/PNG') {
+    if (param == 'image/jpeg' ||
+        param == 'image/png' ||
+        param == 'image/gif' ||
+        param == 'image/JPEG' ||
+        param == 'image/PNG') {
       return true;
     }
     return false;
@@ -117,27 +121,28 @@ class _DetailsPageBodyState extends State<DetailsPageBody> {
   }
 
   Future<void> launchMapUrl() async {
-    String address = '${current_pos.latitude},${current_pos
-        .longitude}/${widget.art.latitude},${widget.art
-        .longitude}';
+    String address =
+        '${current_pos.latitude},${current_pos.longitude}/${widget.art.latitude},${widget.art.longitude}';
     String googleMapUrl = "https://www.google.com/maps/dir/$address";
     String appleMapUrl = "http://maps.apple.com/?q=$address";
     if (Platform.isAndroid) {
       try {
         if (await canLaunchUrlString(googleMapUrl)) {
-          await launchUrlString(googleMapUrl, mode: LaunchMode.externalApplication);
+          await launchUrlString(googleMapUrl,
+              mode: LaunchMode.externalApplication);
         }
       } catch (error) {
-        throw("Cannot launch Google map");
+        throw ("Cannot launch Google map");
       }
     }
     if (Platform.isIOS) {
       try {
         if (await canLaunchUrlString(appleMapUrl)) {
-          await launchUrlString(appleMapUrl, mode: LaunchMode.externalApplication);
+          await launchUrlString(appleMapUrl,
+              mode: LaunchMode.externalApplication);
         }
       } catch (error) {
-        throw("Cannot launch Apple map");
+        throw ("Cannot launch Apple map");
       }
     }
   }
@@ -183,28 +188,34 @@ class _DetailsPageBodyState extends State<DetailsPageBody> {
                             image,
                             width: 180,
                           )
-                        : Image.asset("assets/images/icon.png", width: 180,)),
+                        : Image.asset(
+                            "assets/images/icon.png",
+                            width: 180,
+                          )),
                 Column(
-                      children: [
-                        Container(width : 125, margin: const EdgeInsets.fromLTRB(0, 50, 0, 0),
-                          child: Text("You are ${(distance / 1000).round()} km away",
-                            style: const TextStyle(fontSize: 20)),),
-
-                        Container(
-                            margin: const EdgeInsets.fromLTRB(0, 25, 110, 5),
-                            decoration: BoxDecoration(
-                              color: Colors.blue,
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            child: IconButton(
-                              onPressed: () {
-                                launchMapUrl();
-                              },
-                              color: Colors.white,
-                              icon: const Icon(Icons.drive_eta_sharp),
-                            ))
-                      ],
-                    )
+                  children: [
+                    Container(
+                      width: 125,
+                      margin: const EdgeInsets.fromLTRB(0, 50, 0, 0),
+                      child: Text(
+                          "You are ${(distance / 1000).round()} km away",
+                          style: const TextStyle(fontSize: 20)),
+                    ),
+                    Container(
+                        margin: const EdgeInsets.fromLTRB(0, 25, 110, 5),
+                        decoration: BoxDecoration(
+                          color: Colors.blue,
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: IconButton(
+                          onPressed: () {
+                            launchMapUrl();
+                          },
+                          color: Colors.white,
+                          icon: const Icon(Icons.drive_eta_sharp),
+                        ))
+                  ],
+                )
               ],
             ),
           ),
@@ -226,7 +237,9 @@ class _DetailsPageBodyState extends State<DetailsPageBody> {
                       }).toList(),
                     ]))
                 : const Center(
-                    child: IconButton(onPressed: null, icon: Icon(Icons.not_listed_location))),
+                    child: IconButton(
+                        onPressed: null,
+                        icon: Icon(Icons.not_listed_location))),
           ),
         ],
       ),
