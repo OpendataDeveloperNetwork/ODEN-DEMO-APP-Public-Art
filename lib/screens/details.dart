@@ -184,27 +184,29 @@ class _DetailsPageBodyState extends State<DetailsPageBody> {
                             width: 180,
                           )
                         : Image.asset("assets/images/icon.png", width: 180,)),
-                Column(
-                      children: [
-                        Container(width : 125, margin: const EdgeInsets.fromLTRB(0, 50, 0, 0),
-                          child: Text("You are ${(distance / 1000).round()} km away",
+                SingleChildScrollView(
+                  child: Column(
+                    children : [
+                      Container(width : 125, margin: const EdgeInsets.fromLTRB(0, 40, 0, 0),
+                        child: Text("You are ${(distance / 1000).round()} km away",
                             style: const TextStyle(fontSize: 20)),),
 
-                        Container(
-                            margin: const EdgeInsets.fromLTRB(0, 25, 110, 5),
-                            decoration: BoxDecoration(
-                              color: Colors.blue,
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            child: IconButton(
-                              onPressed: () {
-                                launchMapUrl();
-                              },
-                              color: Colors.white,
-                              icon: const Icon(Icons.drive_eta_sharp),
-                            ))
-                      ],
-                    )
+                      Container(
+                          margin: const EdgeInsets.fromLTRB(0, 20, 110, 5),
+                          decoration: BoxDecoration(
+                            color: Colors.blue,
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: IconButton(
+                            onPressed: () {
+                              launchMapUrl();
+                            },
+                            color: Colors.white,
+                            icon: const Icon(Icons.drive_eta_sharp),
+                          ))
+                    ],
+                  ),
+                )
               ],
             ),
           ),
