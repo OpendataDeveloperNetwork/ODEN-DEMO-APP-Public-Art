@@ -48,11 +48,24 @@ class _HomePageState extends State<HomePage> {
     void populateData() async {
       setState(() {
         isTransmogrifying = true;
+        isLoading = false;
       });
       final String response =
           await rootBundle.loadString('assets/json/my-vancouver-data.json');
-      final data = jsonDecode(response);
-      await db.populateData(data["data"]);
+      final data = jsonDecode(response)['data'];
+      totalData = data.length;
+      setState(() {
+        isLoading = true;
+        db.retrievingData.listen((data) {
+          setState(() {
+            debugPrint(data.toString());
+            currentData = data;
+            percent = currentData / totalData;
+          });
+        });
+        dbStatus = db.isPublicArtEmpty() ? "Downloading Data" : "Updating Data";
+      });
+      await db.populateData(data);
       setState(() {
         isLoading = false;
         isTransmogrifying = false;
@@ -116,7 +129,7 @@ class _HomePageState extends State<HomePage> {
         Lottie.network(
             "https://assets2.lottiefiles.com/packages/lf20_2KHZQg.json"),
         const SizedBox(height: 20),
-        const Text("Transmogrifying Open Data",
+        const Text("Getting Ready...",
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
       ];
     }
