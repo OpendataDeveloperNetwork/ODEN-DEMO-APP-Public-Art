@@ -25,6 +25,7 @@ class ObjectBoxDatabase {
 
     for (var i = 0; i < data.length; i++) {
       _retrievingData.add(i);
+      debugPrint(i.toString());
       final publicArt = await jsonToPublicArt(data[i]);
       addPublicArt(publicArt);
     }
