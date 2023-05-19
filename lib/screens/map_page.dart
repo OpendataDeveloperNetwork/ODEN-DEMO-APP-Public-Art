@@ -33,6 +33,7 @@ class _MapsPageState extends State<MapsPage> {
   void initState() {
     setMaps(this);
     _publicArts = db.getAllPublicArts();
+    addCustomMarker();
     super.initState();
     _manager = getClusterManager();
     _setCurrentLocation();
@@ -100,7 +101,7 @@ class _MapsPageState extends State<MapsPage> {
     });
   }
 
-  void checkArtworkProximity(LocationGiver.LocationData currentLocation) {
+  Future<void> checkArtworkProximity(LocationGiver.LocationData currentLocation) async {
     // Loop through each artwork in the list
     for (PublicArt art in publicArts) {
       // Calculate the distance between the user's location and the artwork
@@ -110,7 +111,8 @@ class _MapsPageState extends State<MapsPage> {
 
       // If the distance is less than or equal to 100 meters, add the artwork to the database
       if (distance <= 100) {
-        if (Auth().isLoggedIn) {
+        bool isThere = await FirebaseUserRepo().isPublicArtVisited(Auth().uid, art);
+        if (Auth().isLoggedIn && !isThere) {
           _showDialog(
               context,
               "You are in close proximity to the public art \'${art.name}\'. Do you want to consider it visited ?",
@@ -213,6 +215,13 @@ class _MapsPageState extends State<MapsPage> {
       },
     );
   }
+  
+  addCustomMarker(){
+    PublicArt art = PublicArt(name: "Shrine of Darcy", latitude: 49.248499, longitude: -122.9805,
+        region: "British Columbia", city: "Burnaby", country: "Canada",
+        description: "This world famous artwork is created by developers of ODEN Mobile team as a present to their client Darcy.");
+    _publicArts.add(art);
+  }
 
   // Handles search
   Future<void> search() async {
@@ -237,7 +246,10 @@ class _MapsPageState extends State<MapsPage> {
         }
       } else {
         for (PublicArt art in _publicArts) {
-          if (art.name.toLowerCase() == text) {
+          if (art.name.toLowerCase() == text || art.name.toLowerCase().contains(text) ||
+              art.city.toLowerCase() == text ||
+              art.country.toLowerCase() == text ||
+              art.region.toLowerCase() == text) {
             setState(() {
               searchList.add(art);
             });
@@ -245,25 +257,28 @@ class _MapsPageState extends State<MapsPage> {
         }
       }
 
-      if (searchList.isEmpty) {
-        try {
-          final List<location.Location> locations =
-              await locationFromAddress(text);
-          if (locations.isNotEmpty) {
-            final location.Location loc = locations.first;
-            position = CameraPosition(
-              target: LatLng(loc.latitude, loc.longitude),
-              zoom: 10.4746,
-            );
-            getController()
-                .animateCamera(CameraUpdate.newCameraPosition(position));
-            setState(() {});
-          }
-        } catch (e) {
-          // Invalid name
-          _showDialog(context,
-              "We couldn't find the location. Please try again", "Error", null);
+      bool areaFound = false;
+      try {
+        final List<location.Location> locations =
+        await locationFromAddress(text);
+        if (locations.isNotEmpty) {
+          areaFound = true;
+          final location.Location loc = locations.first;
+          position = CameraPosition(
+            target: LatLng(loc.latitude, loc.longitude),
+            zoom: 10.4746,
+          );
+          getController()
+              .animateCamera(CameraUpdate.newCameraPosition(position));
+          setState(() {});
         }
+      } catch (e) {
+        // Invalid name
+      }
+
+      if (searchList.isEmpty && !areaFound) {
+        _showDialog(context,
+            "We couldn't find the location. Please try again", "Error", null);
       }
     }
 
@@ -356,8 +371,8 @@ class _MapsPageState extends State<MapsPage> {
                 bottomRight: Radius.circular(30.0),
               ),
             ),
-            height: 270,
-            width: 330,
+            height: 250,
+            width: 310,
             child: ListView.builder(
               itemCount: searchList.length,
               itemBuilder: (context, index) {
@@ -376,7 +391,7 @@ class _MapsPageState extends State<MapsPage> {
                   onTap: () {
                     position = CameraPosition(
                       target: LatLng(artPiece.latitude, artPiece.longitude),
-                      zoom: 15.4746,
+                      zoom: 18.4746,
                     );
                     getController().animateCamera(
                         CameraUpdate.newCameraPosition(position));
