@@ -247,14 +247,3 @@ Future<List> transmogrify(List manifest) async {
 
   return schemaEntryDatas;
 }
-
-// example usage
-
-// Future<List> main() async {
-//   String manifest_string = await rootBundle.loadString("assets/van-texas-manifest.json");
-
-//   List manifest = jsonDecode(manifest_string);
-
-//   List data = await transmogrify(manifest);
-//   return data;
-// }

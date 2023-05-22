@@ -84,14 +84,6 @@ class FirebaseUserRepo {
     return data;
   }
 
-  Future<DocumentSnapshot> getPublicArt(String uid, String publicArtId) async {
-    return categories
-        .doc("Public_Art")
-        .collection("Items")
-        .doc(publicArtId)
-        .get();
-  }
-
   Future<void> addPublicArtToVisits(String? uid, PublicArt publicArt) async {
     DateTime now = DateTime.now();
     String date = DateFormat('yyyy-MM-dd hh:mm').format(now);
