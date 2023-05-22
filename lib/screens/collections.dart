@@ -54,107 +54,155 @@ class _FilterPageState extends State<FilterPage> {
   int regionCount = 0;
   int cityCount = 0;
 
+  // following for bottom sheet filtering and its options.
   void _showFilterBottomSheet() {
     showModalBottomSheet(
-        context: context,
-        builder: (BuildContext context) {
-          return StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
-            return Container(
-              child: Wrap(
-                children: [
-                  ListTile(
-                    leading: const Icon(Icons.description),
-                    title: const Text('Description'),
-                    trailing: Switch(
-                      value: hasDescriptionFilter,
-                      onChanged: (bool value) {
-                        setState(() {
-                          hasDescriptionFilter = value;
-                          filterData();
-                        });
-                      },
-                    ),
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
+          return Container(
+            child: Wrap(
+              children: [
+                // Country dropdown
+                ListTile(
+                  leading: const Icon(Icons.location_on),
+                  title: const Text('Country'),
+                  trailing: buildDropdown('Country', countries, selectedCountry, (value) {
+                    setState(() {
+                      selectedCountry = value;
+                      updateRegions();
+                      selectedRegion = null;
+                      updateCities();
+                      selectedCity = null;
+                      filterData();
+                    });
+                  }),
+                ),
+                // Region dropdown
+                ListTile(
+                  leading: const Icon(Icons.location_city),
+                  title: const Text('Region'),
+                  trailing: buildDropdown('Region', regions, selectedRegion, (value) {
+                    setState(() {
+                      selectedRegion = value;
+                      updateCities();
+                      selectedCity = null;
+                      filterData();
+                    });
+                  }),
+                ),
+                // City dropdown
+                ListTile(
+                  leading: const Icon(Icons.home),
+                  title: const Text('City'),
+                  trailing: buildDropdown('City', cities, selectedCity, (value) {
+                    setState(() {
+                      selectedCity = value;
+                      filterData();
+                    });
+                  }),
+                ),
+                // rest of your options
+                ListTile(
+                  leading: const Icon(Icons.description),
+                  title: const Text('Description'),
+                  trailing: Switch(
+                    value: hasDescriptionFilter,
+                    onChanged: (bool value) {
+                      setState(() {
+                        hasDescriptionFilter = value;
+                        filterData();
+                      });
+                    },
                   ),
-                  ListTile(
-                    leading: const Icon(Icons.person),
-                    title: const Text('Artist'),
-                    trailing: Switch(
-                      value: hasArtistFilter,
-                      onChanged: (bool value) {
-                        setState(() {
-                          hasArtistFilter = value;
-                          filterData();
-                        });
-                      },
-                    ),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.person),
+                  title: const Text('Artist'),
+                  trailing: Switch(
+                    value: hasArtistFilter,
+                    onChanged: (bool value) {
+                      setState(() {
+                        hasArtistFilter = value;
+                        filterData();
+                      });
+                    },
                   ),
-                  ListTile(
-                    leading: const Icon(Icons.build),
-                    title: const Text('Material'),
-                    trailing: Switch(
-                      value: hasMaterialFilter,
-                      onChanged: (bool value) {
-                        setState(() {
-                          hasMaterialFilter = value;
-                          filterData();
-                        });
-                      },
-                    ),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.build),
+                  title: const Text('Material'),
+                  trailing: Switch(
+                    value: hasMaterialFilter,
+                    onChanged: (bool value) {
+                      setState(() {
+                        hasMaterialFilter = value;
+                        filterData();
+                      });
+                    },
                   ),
-                  ListTile(
-                    leading: const Icon(Icons.calendar_today),
-                    title: const Text('Date Created'),
-                    trailing: Switch(
-                      value: dateCreatedFilter,
-                      onChanged: (bool value) {
-                        setState(() {
-                          dateCreatedFilter = value;
-                          filterData();
-                        });
-                      },
-                    ),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.calendar_today),
+                  title: const Text('Date Created'),
+                  trailing: Switch(
+                    value: dateCreatedFilter,
+                    onChanged: (bool value) {
+                      setState(() {
+                        dateCreatedFilter = value;
+                        filterData();
+                      });
+                    },
                   ),
-                  ListTile(
-                    leading: const Icon(Icons.calendar_today),
-                    title: const Text('Date Installed'),
-                    trailing: Switch(
-                      value: dateInstalledFilter,
-                      onChanged: (bool value) {
-                        setState(() {
-                          dateInstalledFilter = value;
-                          filterData();
-                        });
-                      },
-                    ),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.calendar_today),
+                  title: const Text('Date Installed'),
+                  trailing: Switch(
+                    value: dateInstalledFilter,
+                    onChanged: (bool value) {
+                      setState(() {
+                        dateInstalledFilter = value;
+                        filterData();
+                      });
+                    },
                   ),
-                ],
-              ),
-            );
-          });
+                ),
+              ],
+            ),
+          );
         });
+      },
+    );
   }
 
 
 
+// Region dropdown is dependant on country information.
   void updateRegions() {
     if (selectedCountry != null && selectedCountry != 'ALL') {
-      regions = ['ALL'] + countryRegionCityData[selectedCountry]!.keys.toList(); // Add the 'ALL' option for regions
+      // Add the 'ALL' option for regions dropdown.
+      regions = ['ALL'] + countryRegionCityData[selectedCountry]!.keys.toList();
     } else {
       regions = [];
     }
   }
 
+  // City dropdown is dependant on region information.
   void updateCities() {
     if (selectedRegion != null && selectedRegion != 'ALL') {
-      cities = ['ALL'] + countryRegionCityData[selectedCountry]![selectedRegion]!; // Add the 'ALL' option for cities
+      // Add the 'ALL' option for cities dropdown.
+      cities = ['ALL'] + countryRegionCityData[selectedCountry]![selectedRegion]!;
     } else {
       cities = [];
     }
   }
 
 
+  // For getting the data from the in-app database.
   Future<List<PublicArt>> fetchDataFromObjectBox() async {
-    List<PublicArt> data = db.getAllPublicArts(); // Get all PublicArt objects using the global 'db' variable
+    // Get all PublicArt objects using the global 'db' variable
+    List<PublicArt> data = db.getAllPublicArts();
 
     Map<String, Map<String, List<String>>> locationData = {};
 
@@ -175,9 +223,10 @@ class _FilterPageState extends State<FilterPage> {
       }
     }
 
-    // Update the countryRegionCityData map and refresh the UI
+    // Update the countryRegionCityData map and refresh the UI.
     setState(() {
       countryRegionCityData = locationData;
+      // Add the 'ALL' option for countries dropdown.
       countries = ['ALL'] + countryRegionCityData.keys.toList();
     });
 
@@ -195,7 +244,6 @@ class _FilterPageState extends State<FilterPage> {
     fetchDataFromObjectBox().then((data) {
       setState(() {
         allArtPieces = data;
-        countries = ['ALL'] + countryRegionCityData.keys.toList(); // Add the 'ALL' option for countries
         filterData();
         isLoading = false;
       });
@@ -203,6 +251,7 @@ class _FilterPageState extends State<FilterPage> {
   }
 
 
+  // For filtering the data based on the selected options.
   void filterData() {
     setState(() {
       filteredArtPieces = allArtPieces.where((artPiece) {
@@ -229,15 +278,6 @@ class _FilterPageState extends State<FilterPage> {
           filteredArtPieces.map((artPiece) => artPiece.region).toSet().length;
       cityCount =
           filteredArtPieces.map((artPiece) => artPiece.city).toSet().length;
-
-
-      // debugging
-      print('Length of allArtPieces: ${allArtPieces.length}\n');
-      print('Length of filteredArtPieces: ${filteredArtPieces.length}\n');
-      // print the filtered data
-      /*for (PublicArt artPiece in filteredArtPieces) {
-        print(artPiece);
-      }*/
     });
   }
 
@@ -260,36 +300,6 @@ class _FilterPageState extends State<FilterPage> {
       ),
       body: Column(
         children: [
-          // Dropdown menus for country, region, and city filters
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              buildDropdown('Country', countries, selectedCountry, (value) {
-                setState(() {
-                  selectedCountry = value;
-                  updateRegions();
-                  selectedRegion = null;
-                  updateCities();
-                  selectedCity = null;
-                  filterData();
-                });
-              }),
-              buildDropdown('Region', regions, selectedRegion, (value) {
-                setState(() {
-                  selectedRegion = value;
-                  updateCities();
-                  selectedCity = null;
-                  filterData();
-                });
-              }),
-              buildDropdown('City', cities, selectedCity, (value) {
-                setState(() {
-                  selectedCity = value;
-                  filterData();
-                });
-              }),
-            ],
-          ),
           // Add a Padding widget to display the number of filtered results
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -322,7 +332,7 @@ class _FilterPageState extends State<FilterPage> {
               itemBuilder: (context, index) {
                 final artPiece = filteredArtPieces[index];
                 return ListTile(
-                  // You can change this part to display the image using an image URL or another property.
+                  // Image for now is default image and does not update dynamically.
                   leading: Image.asset(
                     'assets/images/icon.png',
                     width: 50,

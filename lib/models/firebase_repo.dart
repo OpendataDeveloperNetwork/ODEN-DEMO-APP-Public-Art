@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:oden_app/models/PublicArtData.dart';
 import 'package:oden_app/models/profile_public_art.dart';
 import 'package:oden_app/models/public_art.dart';
 import 'package:intl/intl.dart';
@@ -83,14 +82,6 @@ class FirebaseUserRepo {
   Future<QuerySnapshot> getFavourites(String uid) async {
     final data = await profiles.doc(uid).collection("Favorites").get();
     return data;
-  }
-
-  Future<DocumentSnapshot> getPublicArt(String uid, String publicArtId) async {
-    return categories
-        .doc("Public_Art")
-        .collection("Items")
-        .doc(publicArtId)
-        .get();
   }
 
   Future<void> addPublicArtToVisits(String? uid, PublicArt publicArt) async {
