@@ -178,7 +178,7 @@ class _FilterPageState extends State<FilterPage> {
 
 
 
-
+// Region dropdown is dependant on country information.
   void updateRegions() {
     if (selectedCountry != null && selectedCountry != 'ALL') {
       // Add the 'ALL' option for regions dropdown.
@@ -188,6 +188,7 @@ class _FilterPageState extends State<FilterPage> {
     }
   }
 
+  // City dropdown is dependant on region information.
   void updateCities() {
     if (selectedRegion != null && selectedRegion != 'ALL') {
       // Add the 'ALL' option for cities dropdown.
@@ -243,8 +244,6 @@ class _FilterPageState extends State<FilterPage> {
     fetchDataFromObjectBox().then((data) {
       setState(() {
         allArtPieces = data;
-        // Add the 'ALL' option for countries dropdown.
-        countries = ['ALL'] + countryRegionCityData.keys.toList();
         filterData();
         isLoading = false;
       });
@@ -252,6 +251,7 @@ class _FilterPageState extends State<FilterPage> {
   }
 
 
+  // For filtering the data based on the selected options.
   void filterData() {
     setState(() {
       filteredArtPieces = allArtPieces.where((artPiece) {
