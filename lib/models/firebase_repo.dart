@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:oden_app/models/PublicArtData.dart';
 import 'package:oden_app/models/profile_public_art.dart';
 import 'package:oden_app/models/public_art.dart';
 import 'package:intl/intl.dart';
