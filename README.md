@@ -1,6 +1,6 @@
 # Neartuit-APP-Public-Art
 
-The following App demonstrates using ODEN and a dart version of the Transmogrifier to displays public from around the world. This is made possible because the Transmogrifier fetches, converts, and filters public art data from ODEN and delivers it to the app as a json file. 
+The following App demonstrates using ODEN and a dart version of the Transmogrifier to display public from around the world. This is made possible because the Transmogrifier fetches, converts, and filters public art data from ODEN and delivers it to the app as a json file. 
 
 ## Directory Structure
 The structure and intended contents of the directories in this project are shown in the diagram below:
