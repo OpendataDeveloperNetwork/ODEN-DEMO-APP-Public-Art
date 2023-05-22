@@ -54,6 +54,7 @@ class _FilterPageState extends State<FilterPage> {
   int regionCount = 0;
   int cityCount = 0;
 
+  // following for bottom sheet filtering and its options.
   void _showFilterBottomSheet() {
     showModalBottomSheet(
       context: context,
@@ -180,7 +181,8 @@ class _FilterPageState extends State<FilterPage> {
 
   void updateRegions() {
     if (selectedCountry != null && selectedCountry != 'ALL') {
-      regions = ['ALL'] + countryRegionCityData[selectedCountry]!.keys.toList(); // Add the 'ALL' option for regions
+      // Add the 'ALL' option for regions dropdown.
+      regions = ['ALL'] + countryRegionCityData[selectedCountry]!.keys.toList();
     } else {
       regions = [];
     }
@@ -188,15 +190,18 @@ class _FilterPageState extends State<FilterPage> {
 
   void updateCities() {
     if (selectedRegion != null && selectedRegion != 'ALL') {
-      cities = ['ALL'] + countryRegionCityData[selectedCountry]![selectedRegion]!; // Add the 'ALL' option for cities
+      // Add the 'ALL' option for cities dropdown.
+      cities = ['ALL'] + countryRegionCityData[selectedCountry]![selectedRegion]!;
     } else {
       cities = [];
     }
   }
 
 
+  // For getting the data from the in-app database.
   Future<List<PublicArt>> fetchDataFromObjectBox() async {
-    List<PublicArt> data = db.getAllPublicArts(); // Get all PublicArt objects using the global 'db' variable
+    // Get all PublicArt objects using the global 'db' variable
+    List<PublicArt> data = db.getAllPublicArts();
 
     Map<String, Map<String, List<String>>> locationData = {};
 
@@ -217,9 +222,10 @@ class _FilterPageState extends State<FilterPage> {
       }
     }
 
-    // Update the countryRegionCityData map and refresh the UI
+    // Update the countryRegionCityData map and refresh the UI.
     setState(() {
       countryRegionCityData = locationData;
+      // Add the 'ALL' option for countries dropdown.
       countries = ['ALL'] + countryRegionCityData.keys.toList();
     });
 
@@ -237,7 +243,8 @@ class _FilterPageState extends State<FilterPage> {
     fetchDataFromObjectBox().then((data) {
       setState(() {
         allArtPieces = data;
-        countries = ['ALL'] + countryRegionCityData.keys.toList(); // Add the 'ALL' option for countries
+        // Add the 'ALL' option for countries dropdown.
+        countries = ['ALL'] + countryRegionCityData.keys.toList();
         filterData();
         isLoading = false;
       });
@@ -293,7 +300,6 @@ class _FilterPageState extends State<FilterPage> {
       ),
       body: Column(
         children: [
-          // Dropdown menus for country, region, and city filters
           // Add a Padding widget to display the number of filtered results
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -326,7 +332,7 @@ class _FilterPageState extends State<FilterPage> {
               itemBuilder: (context, index) {
                 final artPiece = filteredArtPieces[index];
                 return ListTile(
-                  // You can change this part to display the image using an image URL or another property.
+                  // Image for now is default image and does not update dynamically.
                   leading: Image.asset(
                     'assets/images/icon.png',
                     width: 50,
