@@ -196,8 +196,12 @@ class _DetailsPageBodyState extends State<DetailsPageBody> {
                   Container(
                     width: 125,
                     margin: const EdgeInsets.fromLTRB(0, 50, 0, 0),
-                    child: Text("You are ${(distance / 1000).round()} km away",
-                        style: const TextStyle(fontSize: 20)),
+                    child: Text(
+                        (distance / 1000).round() == 0
+                            ? "You are less than a km away"
+                            : "You are ${(distance / 1000).round()} km away",
+                        style: const TextStyle(fontSize: 20)
+                    ),
                   ),
                   Container(
                       margin: const EdgeInsets.fromLTRB(0, 40, 110, 5),
