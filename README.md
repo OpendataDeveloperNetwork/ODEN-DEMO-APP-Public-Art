@@ -64,9 +64,7 @@ Following are instructions for installing Flutter for Windows without the tutori
 - Click on “Environment Variables...” and in "Path" under "User variables", click "Edit" and add new path (eg if Flutter file is in C:\src\flutter, add C:\src\flutter\bin).
 - run `flutter doctor` in the terminal to check if flutter is installed correctly.
 
-- **Setup**
-
-### a. **Setup** your objectbox.g.dart
+### **Setup** your objectbox.g.dart
 
 Following must be done for objectbox (in app database to function and whenever there is a change in the model)
 - After setting up flutter, on the terminal: `flutter pub run build_runner watch --delete-conflicting-outputs`
@@ -74,9 +72,48 @@ Following must be done for objectbox (in app database to function and whenever t
 ## Map Page
 
 The Map Page allows users to see all public art entries on a map with the following features:
-- GPS visiting (when logged in).
+- GPS visiting (when logged in) and GPS is on.
 - Grouping of markers when zooming out.
 - Markers with name of public art.
 - Tapping redirects to the Details page for more information. 
 - Search by name of public art or location.
-- Recommended public art when searching for item or location. 
+- Recommended public art when searching for item or location.
+- Direction to public art if marker is tapped and GPS is on.
+
+## Details Page
+
+The Details Page allows users to see more information about a public art entry with the following features:
+- Favorite the artpiece (if logged in).
+- Display the name of the art pieces.
+- Display how far away the art pieces is from the user if GPS is on.
+- Display the country, region, and city of the art pieces.
+- Provide directions to the art pieces if GPS is on.
+- Display the description of the art pieces (if available).
+- Display the artist name of the art pieces (if available).
+- Display the year the art pieces was created (if available).
+- Display the year the art pieces was installed (if available).
+- Display the material of the art pieces (if available).
+
+## Collections Page
+
+The Details Page allows users to see more information about a public art entry with the following features:
+- Filter art pieces by country, region, and city.
+- Display total number of art pieces in the collection.
+- Filter if description is available.
+- Filter if artist name is available.
+- Filter if year created is available.
+- Filter if year installed is available.
+- Filter if material is available.
+- on tap, redirect to the Details page for more information.
+
+## Profile Page
+
+The Profile Page allows user personlize their experinece with the following features:
+- Track favorite art pieces.
+- Track visited art pieces.
+
+## Update Using The Transmogrifier
+Public art entries are updated dynamically by calling the Transmogrifier. This allows for the following:
+- New public art entries are fetched by tapping "Update" on the Home Page through the Transmogrifier.
+- Transmogrifier filters and converts new entry to the [ODEN Public Art Schema](https://github.com/OpendataDeveloperNetwork/ODEN-Transmogrifiers/blob/main/schemas/public-art.json).
+- New entries are added to the internal database.
