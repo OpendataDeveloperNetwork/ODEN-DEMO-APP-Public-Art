@@ -8,6 +8,7 @@ import 'package:oden_app/models/auth.dart';
 import 'package:oden_app/models/firebase_repo.dart';
 import 'package:oden_app/models/public_art.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+
 import '../components/profile_button_app_bar.dart';
 import '../models/geolocator.dart';
 
@@ -31,6 +32,8 @@ class DetailsPageBody extends StatefulWidget {
   DetailsPageBody({super.key, required this.art}) {
     artDetails = {};
     if (art.dateCreated != null) artDetails['Date Created'] = art.dateCreated;
+    if (art.dateInstalled != null)
+      artDetails['Date Installed'] = art.dateInstalled;
     if (art.dateInstalled != null)
       artDetails['Date Installed'] = art.dateInstalled;
     if (art.description != null) artDetails['Description'] = art.description;
@@ -106,6 +109,11 @@ class _DetailsPageBodyState extends State<DetailsPageBody> {
         param == 'image/gif' ||
         param == 'image/JPEG' ||
         param == 'image/PNG') {
+    if (param == 'image/jpeg' ||
+        param == 'image/png' ||
+        param == 'image/gif' ||
+        param == 'image/JPEG' ||
+        param == 'image/PNG') {
       return true;
     }
     return false;
@@ -123,6 +131,8 @@ class _DetailsPageBodyState extends State<DetailsPageBody> {
   Future<void> launchMapUrl() async {
     String address =
         '${current_pos.latitude},${current_pos.longitude}/${widget.art.latitude},${widget.art.longitude}';
+    String address =
+        '${current_pos.latitude},${current_pos.longitude}/${widget.art.latitude},${widget.art.longitude}';
     String googleMapUrl = "https://www.google.com/maps/dir/$address";
     String appleMapUrl = "http://maps.apple.com/?q=$address";
     if (Platform.isAndroid) {
@@ -130,8 +140,11 @@ class _DetailsPageBodyState extends State<DetailsPageBody> {
         if (await canLaunchUrlString(googleMapUrl)) {
           await launchUrlString(googleMapUrl,
               mode: LaunchMode.externalApplication);
+          await launchUrlString(googleMapUrl,
+              mode: LaunchMode.externalApplication);
         }
       } catch (error) {
+        throw ("Cannot launch Google map");
         throw ("Cannot launch Google map");
       }
     }
@@ -140,8 +153,11 @@ class _DetailsPageBodyState extends State<DetailsPageBody> {
         if (await canLaunchUrlString(appleMapUrl)) {
           await launchUrlString(appleMapUrl,
               mode: LaunchMode.externalApplication);
+          await launchUrlString(appleMapUrl,
+              mode: LaunchMode.externalApplication);
         }
       } catch (error) {
+        throw ("Cannot launch Apple map");
         throw ("Cannot launch Apple map");
       }
     }
@@ -149,101 +165,92 @@ class _DetailsPageBodyState extends State<DetailsPageBody> {
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-        alignment: Alignment.center,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Flexible(
-                child: Container(
-                    alignment: Alignment.centerLeft,
-                    color: const Color(0xFF16BCD2),
-                    child: Row(
-                      children: [
-                        const BackButton(
-                          color: Colors.white,
-                        ),
-                        Expanded(
-                            child: Text(widget.art.name,
-                                style: const TextStyle(
-                                    fontSize: 22, color: Colors.white))),
-                        IconButton(
-                          onPressed: isFavourited,
-                          icon: Icon(
-                            _isFavourite ? Icons.star : Icons.star_outline,
-                            color: Colors.yellow,
-                          ),
-                          iconSize: 40,
-                        )
-                      ],
-                    )),
-              ),
-              Expanded(
-                flex: 3,
-                child: Row(
-                  children: [
-                    Padding(
-                        padding: const EdgeInsets.all(13.0),
-                        child: image.isNotEmpty
-                            ? Image.network(
-                                image,
-                                width: 180,
-                              )
-                            : Image.asset(
-                                "assets/images/icon.png",
-                                width: 180,
-                              )),
-                    Column(
-                      children: [
-                        Container(
-                          width: 125,
-                          margin: const EdgeInsets.fromLTRB(0, 40, 0, 0),
-                          child: Text(
-                              "You are ${(distance / 1000).round()} km away",
-                              style: const TextStyle(fontSize: 20)),
-                        ),
-                        Container(
-                            margin: const EdgeInsets.fromLTRB(0, 20, 110, 5),
-                            decoration: BoxDecoration(
-                              color: Colors.blue,
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            child: IconButton(
-                              onPressed: () {
-                                launchMapUrl();
-                              },
-                              color: Colors.white,
-                              icon: const Icon(Icons.drive_eta_sharp),
-                            ))
-                      ],
+    return SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      child: Column(
+        children: [
+          Container(
+              alignment: Alignment.centerLeft,
+              color: const Color(0xFF16BCD2),
+              child: Row(
+                children: [
+                  const BackButton(
+                    color: Colors.white,
+                  ),
+                  Expanded(child:
+                    Text(widget.art.name,
+                        style:
+                        const TextStyle(fontSize: 22, color: Colors.white))
+                  )
+                  ,
+                  IconButton(
+                    onPressed: isFavourited,
+                    icon: Icon(
+                      _isFavourite ? Icons.star : Icons.star_outline,
+                      color: Colors.yellow,
                     ),
-                  ],
-                ),
-              ),
-              Expanded(
-                flex: 7,
-                child: widget.artDetails.keys.isNotEmpty
-                    ? Container(
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                            color: Colors.black87),
-                        margin: const EdgeInsets.fromLTRB(10, 5, 10, 0),
-                        padding: const EdgeInsets.fromLTRB(20, 5, 20, 20),
-                        width: 500,
-                        child: ListView(children: [
-                          ...widget.artDetails.keys.map((key) {
-                            return Text("\n$key : ${widget.artDetails[key]}",
-                                style: const TextStyle(
-                                    fontSize: 20, color: Colors.white54));
-                          }).toList(),
-                        ]))
-                    : const Center(
-                        child: IconButton(
-                            onPressed: null,
-                            icon: Icon(Icons.not_listed_location))),
-              ),
+                    iconSize: 40,
+                  )
+                ],
+              )),
+          Row(
+            children: [
+              Padding(
+                  padding: const EdgeInsets.all(13.0),
+                  child: image.isNotEmpty
+                      ? Image.network(
+                          image,
+                          width: 180,
+                        )
+                      : Image.asset(
+                          "assets/images/icon.png",
+                          width: 180,
+                        )),
+              Column(
+                children: [
+                  Container(
+                    width: 125,
+                    margin: const EdgeInsets.fromLTRB(0, 50, 0, 0),
+                    child: Text("You are ${(distance / 1000).round()} km away",
+                        style: const TextStyle(fontSize: 20)),
+                  ),
+                  Container(
+                      margin: const EdgeInsets.fromLTRB(0, 40, 110, 5),
+                      decoration: BoxDecoration(
+                        color: Colors.blue,
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: IconButton(
+                        onPressed: () {
+                          launchMapUrl();
+                        },
+                        color: Colors.white,
+                        icon: const Icon(Icons.drive_eta_sharp),
+                      ))
+                ],
+              )
             ],
           ),
-        ));
+          widget.artDetails.keys.isNotEmpty
+              ? Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: Colors.black87),
+                  margin: const EdgeInsets.fromLTRB(10, 5, 10, 0),
+                  padding: const EdgeInsets.fromLTRB(20, 5, 20, 20),
+                  width: 500,
+                  child: Column(children: [
+                    ...widget.artDetails.keys.map((key) {
+                      return Text("\n$key : ${widget.artDetails[key]}",
+                          style: const TextStyle(
+                              fontSize: 20, color: Colors.white54));
+                    }),
+                  ]))
+              : const Center(
+                  child: IconButton(
+                      onPressed: null, icon: Icon(Icons.not_listed_location))),
+        ],
+      ),
+    );
   }
 }
