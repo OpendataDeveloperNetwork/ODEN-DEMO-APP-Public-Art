@@ -1,6 +1,6 @@
-# ODEN-DEMO-APP-Public-Art
+# Neartuit-APP-Public-Art
 
-The following App demonstrates using ODEN and a dart version of the Transmogrifier to create a simple app that displays public art in from around the world.
+The following App demonstrates using ODEN and a dart version of the Transmogrifier to displays public from around the world. This is made possible because the Transmogrifier fetches, converts, and filters public art data from ODEN and delivers it to the app as a json file. 
 
 ## Directory Structure
 The structure and intended contents of the directories in this project are shown in the diagram below:
@@ -52,12 +52,31 @@ project
 
 ## Installation:
 
-Please see the appropriate guide for your environment of choice:
+Following is a video tutorial in installing FLutter [Flutter Setup Tutorial](https://www.youtube.com/watch?v=ly0hAtV7EBg)
+
+Following are instructions for installing Flutter for Windows without the tutorial video above:
+- Install Flutter for your OS: [Flutter Setup](https://flutter.dev/docs/get-started/install).
+- Git is required for installation: [Git Setup](https://git-scm.com/downloads).
+- Download the latest release of the Flutter SDK.
+- Extract the zip file and place the contained “flutter” folder in the desired installation location.
+- Alternatively, you can run “git clone https://github.com/flutter/flutter.git -b stable” in the installation location using Windows powershell.
+- From the Start search bar, enter “env” and select “Edit the system environment variables”. 
+- Click on “Environment Variables...” and in "Path" under "User variables", click "Edit" and add new path (eg if Flutter file is in C:\src\flutter, add C:\src\flutter\bin).
+- run `flutter doctor` in the terminal to check if flutter is installed correctly.
 
 - **Setup**
 
 ### a. **Setup** your objectbox.g.dart
 
-- To setup Flutter on your device: [Flutter Setup](https://www.youtube.com/watch?v=ly0hAtV7EBg)
+Following must be done for objectbox (in app database to function and whenever there is a change in the model)
 - After setting up flutter, on the terminal: `flutter pub run build_runner watch --delete-conflicting-outputs`
--
+
+## Map Page
+
+The Map Page allows users to see all public art entries on a map with the following features:
+- GPS visiting (when logged in).
+- Grouping of markers when zooming out.
+- Markers with name of public art.
+- Tapping redirects to the Details page for more information. 
+- Search by name of public art or location.
+- Recommended public art when searching for item or location. 
