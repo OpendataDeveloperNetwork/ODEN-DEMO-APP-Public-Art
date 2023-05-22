@@ -229,15 +229,6 @@ class _FilterPageState extends State<FilterPage> {
           filteredArtPieces.map((artPiece) => artPiece.region).toSet().length;
       cityCount =
           filteredArtPieces.map((artPiece) => artPiece.city).toSet().length;
-
-
-      // debugging
-      print('Length of allArtPieces: ${allArtPieces.length}\n');
-      print('Length of filteredArtPieces: ${filteredArtPieces.length}\n');
-      // print the filtered data
-      /*for (PublicArt artPiece in filteredArtPieces) {
-        print(artPiece);
-      }*/
     });
   }
 
