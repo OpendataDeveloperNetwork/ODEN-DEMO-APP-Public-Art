@@ -1,7 +1,16 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:lottie/lottie.dart';
+import 'package:oden_app/main.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
 import '../components/profile_button_app_bar.dart';
 import '../models/category.dart';
 import '../models/public_art.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:oden_app/transmogrifier.dart' as transmogrifier;
 
 // ------------------------ //
 // ----- Landing Page ----- //
@@ -10,13 +19,25 @@ import '../models/public_art.dart';
 ///
 /// A class stateful that is responsible for displaying the home page.
 ///
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  bool isLoading = false;
+  bool isTransmogrifying = false;
+  int totalData = 0;
+  int currentData = 0;
+  double percent = 0;
+  String dbStatus = "";
 
   ///
   /// A private function that builds the collection button widget
   ///
-  FloatingActionButton _buildCollectionFloatingWidget(BuildContext context) {
+  SpeedDial _buildCollectionFloatingWidget(BuildContext context) {
     ///
     /// An inner function that navigates to the collections page.
     ///
@@ -24,17 +45,111 @@ class HomePage extends StatelessWidget {
       Navigator.pushNamed(context, '/collections');
     }
 
-    return FloatingActionButton(
-        onPressed: navigateToCollections,
-        backgroundColor: const Color(0xFF000080),
-        child: const Icon(Icons.folder_open));
+    void populateData() async {
+      setState(() {
+        isTransmogrifying = true;
+      });
+      String ODENManifest =
+          await rootBundle.loadString('assets/json/ODEN-manifest.json');
+
+      dynamic data =
+          await transmogrifier.transmogrify(jsonDecode(ODENManifest));
+      dynamic publicArtData = await transmogrifier.transmogrify(data[0]);
+      setState(() {
+        isLoading = true;
+        db.retrievingData.listen((data) {
+          setState(() {
+            debugPrint(data.toString());
+            currentData = data;
+            percent = currentData / totalData;
+          });
+        });
+        dbStatus = db.isPublicArtEmpty() ? "Downloading Data" : "Updating Data";
+      });
+      List jsonData = publicArtData[0]['data'];
+      totalData = jsonData.length;
+      await db.populateData(publicArtData[0]['data']);
+      setState(() {
+        isLoading = false;
+        isTransmogrifying = false;
+      });
+      debugPrint("<----- Completed Transmogrification ----->");
+    }
+
+    return SpeedDial(
+      animatedIcon: AnimatedIcons.menu_close,
+      animatedIconTheme: const IconThemeData(size: 22),
+      backgroundColor: const Color(0xFF000080),
+      visible: true,
+      curve: Curves.bounceIn,
+      children: [
+        // FAB 1
+        SpeedDialChild(
+            child: const Icon(Icons.folder_open, color: Colors.white),
+            backgroundColor: const Color(0xFF000080),
+            onTap: navigateToCollections,
+            label: 'Collections',
+            labelStyle: const TextStyle(
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+                fontSize: 16.0),
+            labelBackgroundColor: const Color(0xFF000080)),
+        // FAB 2
+        SpeedDialChild(
+            child: const Icon(Icons.update, color: Colors.white),
+            backgroundColor: const Color(0xFF000080),
+            onTap: populateData,
+            label: 'Update',
+            labelStyle: const TextStyle(
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+                fontSize: 16.0),
+            labelBackgroundColor: const Color(0xFF000080))
+      ],
+    );
+  }
+
+  List<Widget> showLoading() {
+    if (isLoading) {
+      return [
+        Text(dbStatus, style: const TextStyle(fontSize: 20)),
+        const SizedBox(height: 20),
+        CircularPercentIndicator(
+          progressColor: Colors.blue[900],
+          backgroundColor: Colors.deepPurple.shade100,
+          circularStrokeCap: CircularStrokeCap.round,
+          center: Text(
+            "${(percent * 100).toStringAsFixed(0)}%",
+            style: const TextStyle(fontSize: 25),
+          ),
+          radius: 200,
+          lineWidth: 20,
+          percent: percent,
+        )
+      ];
+    } else {
+      return [
+        Lottie.network(
+            "https://assets2.lottiefiles.com/packages/lf20_2KHZQg.json"),
+        const SizedBox(height: 20),
+        const Text("Transmogrifying Open Data",
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+      ];
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: profileAppBarWidget(context, false),
-        body: const HomePageBody(),
+        body: isTransmogrifying
+            ? Center(
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: showLoading()),
+              )
+            : const HomePageBody(),
         floatingActionButton: _buildCollectionFloatingWidget(context));
   }
 }

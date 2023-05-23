@@ -1,7 +1,10 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:oden_app/screens/profile_page.dart';
+import 'package:oden_app/transmogrifier.dart' as transmogrifier;
 import './screens/home_page.dart';
 import './screens/map_page.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -11,9 +14,6 @@ import 'screens/collections.dart';
 import 'screens/login.dart';
 import 'screens/sign_up.dart';
 import 'screens/details.dart';
-
-// import path to dummy_manifest.dart
-import './dummy_manifest.dart';
 
 // ---------------------------- //
 // ----- The main driver ------ //
@@ -30,7 +30,6 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   db = await ObjectBoxDatabase.create();
-
   runApp(const MyApp());
 }
 

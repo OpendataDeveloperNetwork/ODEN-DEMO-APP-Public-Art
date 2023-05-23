@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:oden_app/models/profile_public_art.dart';
 import 'package:oden_app/models/public_art.dart';
@@ -10,31 +12,29 @@ import 'package:geolocator/geolocator.dart';
 
 class ObjectBoxDatabase {
   /// The Store of this app.
+  final StreamController _retrievingData = StreamController.broadcast();
   final Store _store;
   late final Box<PublicArt> _publicArts;
 
   ObjectBoxDatabase._create(this._store) {
     _publicArts = Box<PublicArt>(_store);
-    // Run this first! Once
-    // _publicArts.removeAll();
-    if (_publicArts.isEmpty()) {
-      _putDemoData();
-    }
   }
 
-  Future<void> _putDemoData() async {
-    final String response =
-        await rootBundle.loadString('assets/json/public-art-data.json');
-    final List data = await json.decode(response)['data'];
+  Future<void> populateData(data) async {
     DateTime start = DateTime.now();
+
     for (var i = 0; i < data.length; i++) {
+      _retrievingData.add(i);
       final publicArt = await jsonToPublicArt(data[i]);
       addPublicArt(publicArt);
-      print(i);
     }
     DateTime end = DateTime.now();
     print(
         "Time taken to retrieve data from json file: ${end.difference(start).inSeconds.toString()} seconds");
+  }
+
+  bool isPublicArtEmpty() {
+    return _publicArts.isEmpty();
   }
 
   // Creates a public art object
@@ -49,7 +49,7 @@ class ObjectBoxDatabase {
     String name = publicArtJSON["name"];
     String? description = publicArtJSON["description"];
     String? artist = publicArtJSON["artist"];
-    String? material = publicArtJSON["materials"];
+    String? material = publicArtJSON["material"];
     String? dateCreated =
         publicArtJSON['dates']?['created']?['year'].toString();
     String? dateInstalled =
@@ -57,7 +57,7 @@ class ObjectBoxDatabase {
     String country = publicArtJSON['labels']['country'];
     String region = publicArtJSON['labels']['region'];
     String city = publicArtJSON['labels']['city'];
-    List? imageUrls = publicArtJSON['image_urls'];
+    dynamic imageUrls = publicArtJSON['image_urls']?[0];
     return PublicArt(
         name: name,
         latitude: lat,
@@ -75,6 +75,7 @@ class ObjectBoxDatabase {
   }
 
   /// Create an instance of ObjectBox to use throughout the app.
+  /// Pass in a list of data and a version
   static Future<ObjectBoxDatabase> create() async {
     final docsDir = await getApplicationDocumentsDirectory();
     // Future<Store> openStore() {...} is defined in the generated objectbox.g.dart
@@ -107,4 +108,6 @@ class ObjectBoxDatabase {
         .find();
     return query[0];
   }
+
+  get retrievingData => _retrievingData.stream;
 }

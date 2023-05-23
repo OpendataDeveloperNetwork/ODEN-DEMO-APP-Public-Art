@@ -33,6 +33,7 @@ class _MapsPageState extends State<MapsPage> {
   void initState() {
     setMaps(this);
     _publicArts = db.getAllPublicArts();
+    addCustomMarker();
     super.initState();
     _manager = getClusterManager();
     _setCurrentLocation();
@@ -55,6 +56,8 @@ class _MapsPageState extends State<MapsPage> {
 
   /// List of PublicArt objects.
   List<PublicArt> _publicArts = [];
+
+  List<PublicArt> searchList = [];
 
   // Position of camera on map
   CameraPosition position = const CameraPosition(
@@ -92,12 +95,13 @@ class _MapsPageState extends State<MapsPage> {
 
   void _monitorLocation() {
     locationProvider.onLocationChanged
+        .take(1)
         .listen((LocationGiver.LocationData currentLocation) {
       checkArtworkProximity(currentLocation);
     });
   }
 
-  void checkArtworkProximity(LocationGiver.LocationData currentLocation) {
+  Future<void> checkArtworkProximity(LocationGiver.LocationData currentLocation) async {
     // Loop through each artwork in the list
     for (PublicArt art in publicArts) {
       // Calculate the distance between the user's location and the artwork
@@ -107,7 +111,8 @@ class _MapsPageState extends State<MapsPage> {
 
       // If the distance is less than or equal to 100 meters, add the artwork to the database
       if (distance <= 100) {
-        if (Auth().isLoggedIn) {
+        bool isThere = await FirebaseUserRepo().isPublicArtVisited(Auth().uid, art);
+        if (Auth().isLoggedIn && !isThere) {
           _showDialog(
               context,
               "You are in close proximity to the public art \'${art.name}\'. Do you want to consider it visited ?",
@@ -187,7 +192,7 @@ class _MapsPageState extends State<MapsPage> {
         return AlertDialog(
           title: Text(title),
           content: Text(message),
-          actions: !title.startsWith("Error")
+          actions: title.startsWith("Error")
               ? <Widget>[
                   TextButton(
                     onPressed: () => Navigator.pop(context),
@@ -199,19 +204,31 @@ class _MapsPageState extends State<MapsPage> {
                       onPressed: () => Navigator.of(context).pop(),
                       child: const Text('Cancel')),
                   TextButton(
-                      onPressed: () => FirebaseUserRepo()
-                          .addPublicArtToVisits(Auth().uid, art!),
+                      onPressed: () => {
+                            FirebaseUserRepo()
+                                .addPublicArtToVisits(Auth().uid, art!),
+                            Navigator.of(context).pop()
+                          },
                       child: const Text('Confirm'))
                 ],
         );
       },
     );
   }
+  
+  addCustomMarker(){
+    PublicArt art = PublicArt(name: "Shrine of Darcy", latitude: 49.248499, longitude: -122.9805,
+        region: "British Columbia", city: "Burnaby", country: "Canada",
+        description: "This world famous artwork is created by developers of ODEN Mobile team as a present to their client Darcy.");
+    _publicArts.add(art);
+  }
 
   // Handles search
   Future<void> search() async {
     var text = myController.text.trim().toLowerCase();
-    bool found = false;
+    setState(() {
+      searchList.clear();
+    });
 
     if (text.isNotEmpty) {
       if (text.contains(",")) {
@@ -222,45 +239,47 @@ class _MapsPageState extends State<MapsPage> {
               (art.city.toLowerCase() == searchField[1] ||
                   art.country.toLowerCase() == searchField[1] ||
                   art.region.toLowerCase() == searchField[1])) {
-            found = true;
-            position = CameraPosition(
-              target: LatLng(art.latitude, art.longitude),
-              zoom: 20.4746,
-            );
+            setState(() {
+              searchList.add(art);
+            });
           }
         }
       } else {
         for (PublicArt art in _publicArts) {
-          if (art.name.toLowerCase() == text) {
-            found = true;
-            position = CameraPosition(
-              target: LatLng(art.latitude, art.longitude),
-              zoom: 20.4746,
-            );
+          if (art.name.toLowerCase() == text || art.name.toLowerCase().contains(text) ||
+              art.city.toLowerCase() == text ||
+              art.country.toLowerCase() == text ||
+              art.region.toLowerCase() == text) {
+            setState(() {
+              searchList.add(art);
+            });
           }
         }
       }
 
-      if (!found) {
-        try {
-          final List<location.Location> locations =
-              await locationFromAddress(text);
-          if (locations.isNotEmpty) {
-            final location.Location loc = locations.first;
-            position = CameraPosition(
-              target: LatLng(loc.latitude, loc.longitude),
-              zoom: 10.4746,
-            );
-          }
-        } catch (e) {
-          // Invalid name
-          _showDialog(context,
-              "We couldn't find the location. Please try again", "Error", null);
+      bool areaFound = false;
+      try {
+        final List<location.Location> locations =
+        await locationFromAddress(text);
+        if (locations.isNotEmpty) {
+          areaFound = true;
+          final location.Location loc = locations.first;
+          position = CameraPosition(
+            target: LatLng(loc.latitude, loc.longitude),
+            zoom: 10.4746,
+          );
+          getController()
+              .animateCamera(CameraUpdate.newCameraPosition(position));
+          setState(() {});
         }
+      } catch (e) {
+        // Invalid name
       }
 
-      getController().animateCamera(CameraUpdate.newCameraPosition(position));
-      setState(() {});
+      if (searchList.isEmpty && !areaFound) {
+        _showDialog(context,
+            "We couldn't find the location. Please try again", "Error", null);
+      }
     }
 
     myController.clear();
@@ -280,6 +299,9 @@ class _MapsPageState extends State<MapsPage> {
                 mapType: MapType.normal,
                 initialCameraPosition: position,
                 markers: _markers,
+                onTap: (LatLng) => setState(() {
+                      searchList.clear();
+                    }),
                 onCameraMove: _onCameraMove,
                 onCameraIdle: _manager.updateMap,
                 onMapCreated: (controller) => _OnMapCreated(controller)),
@@ -321,8 +343,67 @@ class _MapsPageState extends State<MapsPage> {
                 ),
               ),
             ),
+            Container(
+                margin: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                child: IconButton(
+                  onPressed: () {
+                    search();
+                  },
+                  color: Colors.white,
+                  icon: const Icon(Icons.search),
+                )),
           ],
         ));
+  }
+
+  Container _buildSearchList() {
+    return searchList.isNotEmpty
+        ? Container(
+            padding: const EdgeInsets.all(5),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(30.0),
+                bottomRight: Radius.circular(30.0),
+              ),
+            ),
+            height: 250,
+            width: 310,
+            child: ListView.builder(
+              itemCount: searchList.length,
+              itemBuilder: (context, index) {
+                final artPiece = searchList[index];
+                return ListTile(
+                  // You can change this part to display the image using an image URL or another property.
+                  leading: Image.asset(
+                    'assets/images/icon.png',
+                    width: 50,
+                    height: 50,
+                    fit: BoxFit.cover,
+                  ),
+                  title: Text(artPiece.name),
+                  subtitle: Text(
+                      '${artPiece.city}, ${artPiece.region}, ${artPiece.country}'),
+                  onTap: () {
+                    position = CameraPosition(
+                      target: LatLng(artPiece.latitude, artPiece.longitude),
+                      zoom: 18.4746,
+                    );
+                    getController().animateCamera(
+                        CameraUpdate.newCameraPosition(position));
+                    setState(() {
+                      searchList.clear();
+                    });
+                  },
+                );
+              },
+            ),
+          )
+        : Container();
   }
 
   @override
@@ -333,6 +414,11 @@ class _MapsPageState extends State<MapsPage> {
           children: [
             _buildMap(),
             _buildSearchBar(),
+            Positioned(
+              left: 40,
+              top: 80,
+              child: _buildSearchList(),
+            )
           ],
         ));
   }

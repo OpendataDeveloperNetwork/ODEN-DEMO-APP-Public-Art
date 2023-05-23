@@ -35,13 +35,13 @@ class PublicArt with ClusterItem {
   final String country;
   final String region;
   final String? description;
-  final String? link;
   final String? artist;
   final double? distance;
   final String? dateInstalled;
-  final List? imageUrls;
+  final dynamic imageUrls;
   final String? material;
   final String? dateCreated;
+
   int id;
 
   PublicArt({
@@ -55,12 +55,11 @@ class PublicArt with ClusterItem {
     this.dateInstalled,
     this.material,
     this.description,
-    this.link,
     this.distance,
     this.artist,
     this.imageUrls,
     this.dateCreated,
-  }) : _location = LatLng(latitude, longitude);
+  })  : _location = LatLng(latitude, longitude);
 
   @override
   LatLng get location => _location;
@@ -69,6 +68,6 @@ class PublicArt with ClusterItem {
 
   @override
   String toString() {
-    return 'PublicArt{\nid: $id\nname: $name,\n latitude: $latitude,\n longitude: $longitude,\n description: $description,\n link: $link\t}';
+    return 'PublicArt{\nid: $id\nname: $name,\n latitude: $latitude,\n longitude: $longitude,\n description: $description,\n link: $imageUrls\t}';
   }
 }

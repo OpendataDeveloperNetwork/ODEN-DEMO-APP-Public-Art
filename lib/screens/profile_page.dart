@@ -71,22 +71,22 @@ class _ProfileBodyState extends State<ProfileBody> {
     }
   }
 
-  // void _getVisits() async {
-  //   final userVists = await FirebaseUserRepo().getVisits(Auth().uid!);
-  //   for (var doc in userVists.docs) {
-  //     setState(() {
-  //       ProfilePublicArt publicArt =
-  //           ProfilePublicArt(doc["date"], doc["name"], doc["id"]);
-  //       _visits.add(publicArt);
-  //     });
-  //   }
-  // }
+  void _getVisits() async {
+    final userVisits = await FirebaseUserRepo().getVisits(Auth().uid!);
+    for (var doc in userVisits.docs) {
+      ProfilePublicArt publicArt = ProfilePublicArt(
+          doc["date"], doc["name"], doc["city"], doc['country'], doc['region']);
+      setState(() {
+        _visits.add(publicArt);
+      });
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     _getFavourites();
-    // _getVisits();
+    _getVisits();
   }
 
   ///
@@ -149,7 +149,7 @@ class _ProfileBodyState extends State<ProfileBody> {
         const SizedBox(height: 15),
         /* Visibility of listviews are dynamic depending on which toggle button is selected */
         _buildListView(FavouritesListView(_favourites), _selectedCategories[0]),
-        // _buildListView(const VisitsListView(), _selectedCategories[1]),
+        _buildListView(VisitsListView(_visits), _selectedCategories[1]),
       ],
     );
   }
