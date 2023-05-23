@@ -52,7 +52,9 @@ project
 
 ## Installation:
 
-Following is a video tutorial in installing FLutter [Flutter Setup Tutorial](https://www.youtube.com/watch?v=ly0hAtV7EBg)
+You will need a emulalator API of 33 or higher to run this flutter project.
+
+Following is a video tutorial in installing Flutter [Flutter Setup Tutorial](https://www.youtube.com/watch?v=ly0hAtV7EBg)
 
 Following are instructions for installing Flutter for Windows without the tutorial video above:
 - Install Flutter for your OS: [Flutter Setup](https://flutter.dev/docs/get-started/install).
