@@ -74,13 +74,13 @@ Following must be done for objectbox (in app database to function and whenever t
 ## Map Page
 
 The Map Page allows users to see all public art entries on a map with the following features:
-- GPS visiting (when logged in) and GPS is on.
+- GPS visiting (when logged in and within 100m of an unvisited art installation) when GPS is on.
 - Grouping of markers when zooming out.
 - Markers with name of public art.
 - Tapping redirects to the Details page for more information. 
 - Search by name of public art or location.
 - Recommended public art when searching for item or location.
-- Direction to public art if marker is tapped and GPS is on.
+- Direction to public art if marker is tapped when GPS is on.
 
 ## Details Page
 
