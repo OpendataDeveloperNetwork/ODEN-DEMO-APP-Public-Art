@@ -217,9 +217,10 @@ class _MapsPageState extends State<MapsPage> {
   }
   
   addCustomMarker(){
-    PublicArt art = PublicArt(name: "Shrine of Darcy", latitude: 49.248499, longitude: -122.9805,
+    PublicArt art = PublicArt(name: "Shrine of D'Arcy", latitude: 49.25415948482971, longitude: -123.00097214796834,
         region: "British Columbia", city: "Burnaby", country: "Canada",
-        description: "This world famous artwork is created by developers of ODEN Mobile team as a present to their client Darcy.");
+        description: "This world famous artwork was created by developers in honor of D'Arcy Smith and his mastery of POSIX C Programming. Previously displayed in SE12 room 323.",
+        material: "Laminated Poster");
     _publicArts.add(art);
   }
 
